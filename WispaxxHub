@@ -10670,14 +10670,74 @@ task.spawn(function()
     end)
     -- Haze Hub HUD dragging disabled
 
+-- Haze Hub HUD dragging disabled
 
-    if Config.ShowUnlockButtonsHUD then
-        task.defer(function()
-            toggleUnlockBaseMenu(true)
+-- ============================================================
+-- RAGDOLL PROGRESS BAR (collée sous STEAL TARGET GUI)
+-- ============================================================
+do
+    -- Attendre que l'UI AutoSteal soit créée
+    local autoStealGui = PlayerGui:WaitForChild("AutoStealUI", 10)
+    local autoStealFrame = autoStealGui and autoStealGui:WaitForChild("Frame", 10)
+    if not autoStealFrame then return end
+
+    local ragdollBarContainer = Instance.new("Frame")
+    ragdollBarContainer.Name = "RagdollBarContainer"
+    ragdollBarContainer.Size = UDim2.new(1, -24, 0, 8)  -- même largeur que le contenu
+    ragdollBarContainer.Position = UDim2.new(0, 12, 1, -10)  -- collé en bas, avec un petit padding
+    ragdollBarContainer.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+    ragdollBarContainer.BackgroundTransparency = 0.2
+    ragdollBarContainer.BorderSizePixel = 0
+    ragdollBarContainer.Visible = false
+    ragdollBarContainer.Parent = autoStealFrame
+    Instance.new("UICorner", ragdollBarContainer).CornerRadius = UDim.new(0, 4)
+
+    local ragdollBarFill = Instance.new("Frame")
+    ragdollBarFill.Name = "BarFill"
+    ragdollBarFill.Size = UDim2.new(0, 0, 1, 0)
+    ragdollBarFill.BackgroundColor3 = Color3.fromRGB(220, 40, 40)
+    ragdollBarFill.BorderSizePixel = 0
+    ragdollBarFill.Parent = ragdollBarContainer
+    Instance.new("UICorner", ragdollBarFill).CornerRadius = UDim.new(0, 4)
+
+    local isRagdollBarActive = false
+    local currentRagdollTween = nil
+
+    local function startRagdollBar()
+        if isRagdollBarActive then return end
+        isRagdollBarActive = true
+        ragdollBarContainer.Visible = true
+        ragdollBarFill.Size = UDim2.new(0, 0, 1, 0)
+
+        if currentRagdollTween then currentRagdollTween:Cancel() end
+        currentRagdollTween = TweenService:Create(ragdollBarFill, TweenInfo.new(2, Enum.EasingStyle.Linear), {
+            Size = UDim2.new(1, 0, 1, 0)
+        })
+        currentRagdollTween:Play()
+        currentRagdollTween.Completed:Connect(function()
+            ragdollBarContainer.Visible = false
+            isRagdollBarActive = false
+            currentRagdollTween = nil
         end)
     end
-end)
 
+    local lastRagdollState = false
+    RunService.Heartbeat:Connect(function()
+        local nowRagdolled = isRagdolled()
+        if nowRagdolled and not lastRagdollState then
+            startRagdollBar()
+        end
+        lastRagdollState = nowRagdolled
+    end)
+
+    LocalPlayer.CharacterAdded:Connect(function()
+        if ragdollBarContainer then ragdollBarContainer.Visible = false end
+        isRagdollBarActive = false
+        if currentRagdollTween then currentRagdollTween:Cancel() end
+        currentRagdollTween = nil
+        lastRagdollState = false
+    end)
+end
 
 
 task.spawn(function()
@@ -15204,3 +15264,4 @@ __initAdminPanelLiteralReplacement()
             return
         end
     end)
+end)
