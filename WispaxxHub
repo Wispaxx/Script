@@ -2623,20 +2623,13 @@ _G.toggleFloat = toggleFloat
 LocalPlayer:GetAttributeChangedSignal("Stealing"):Connect(function()
     local isStealing = (LocalPlayer:GetAttribute("Stealing") == true)
 
-    if not State.floatActive then
-        return
-    end
-
-    if isStealing then
-        FloatData.sawStealingDuringThisFloat = true
-        return
-    end
-
-    if FloatData.sawStealingDuringThisFloat then
-        setFloatEnabled(false, false)
+    if isStealing and State.floatActive then
+        -- Désactive le float immédiatement quand on tient un brainrot
+        setFloatEnabled(false, true)  -- true = silencieux
         if type(ShowNotification) == "function" then
-            ShowNotification("FLOAT", "Disabled")
+            ShowNotification("FLOAT", "Auto-disabled (brainrot in hand)")
         end
+        -- Ne jamais réactiver automatiquement
     end
 end)
 
@@ -2656,6 +2649,110 @@ task.spawn(function()
         createFloatPlatform()
     end
 end)
+
+-- ============================================================
+-- AUTO DISABLE FLOAT WHEN HOLDING A BRAINROT IN HAND (IMPROVED)
+-- ============================================================
+
+do
+    local brainrotNamesSet = nil
+
+    local function buildBrainrotNamesSet()
+        if brainrotNamesSet then return brainrotNamesSet end
+        local ok, data = pcall(function()
+            local ReplicatedStorage = game:GetService("ReplicatedStorage")
+            local Datas = ReplicatedStorage:FindFirstChild("Datas")
+            if not Datas then return nil end
+            local AnimalsDataModule = require(Datas:WaitForChild("Animals"))
+            return AnimalsDataModule
+        end)
+        local set = {}
+        if ok and data then
+            for name, _ in pairs(data) do
+                if type(name) == "string" then
+                    set[string.lower(name)] = true
+                end
+            end
+        end
+        -- Also add priority list names
+        for _, name in ipairs(PRIORITY_LIST or {}) do
+            if type(name) == "string" then
+                set[string.lower(name)] = true
+            end
+        end
+        brainrotNamesSet = set
+        return set
+    end
+
+    local function isBrainrotTool(tool)
+        local toolName = tool.Name
+        if not toolName or toolName == "" then return false end
+        local lowerName = string.lower(toolName)
+        local set = buildBrainrotNamesSet()
+        if set[lowerName] then return true end
+        for known, _ in pairs(set) do
+            if lowerName:find(known, 1, true) or known:find(lowerName, 1, true) then
+                return true
+            end
+        end
+        if tool:FindFirstChild("AnimalData") or tool:GetAttribute("AnimalName") then
+            return true
+        end
+        return false
+    end
+
+    local function hasBrainrotInHand()
+        local char = LocalPlayer.Character
+        if not char then return false end
+        for _, child in ipairs(char:GetChildren()) do
+            if child:IsA("Tool") and isBrainrotTool(child) then
+                return true
+            end
+        end
+        for _, child in ipairs(char:GetChildren()) do
+            if child:IsA("Model") then
+                if child:FindFirstChild("Humanoid") or isBrainrotTool(child) then
+                    return true
+                end
+            end
+        end
+        return false
+    end
+
+    local function checkAndDisableFloatIfBrainrotInHand()
+        if not State.floatActive then return end
+        if hasBrainrotInHand() then
+            setFloatEnabled(false, true)
+            ShowNotification("FLOAT", "Auto-disabled (brainrot in hand)")
+        end
+    end
+
+    task.spawn(function()
+        while true do
+            task.wait(0.5)
+            checkAndDisableFloatIfBrainrotInHand()
+        end
+    end)
+
+    local function onCharacterDescendantAdded(desc)
+        task.wait(0.1)
+        if desc:IsA("Tool") or desc:IsA("Model") then
+            checkAndDisableFloatIfBrainrotInHand()
+        end
+    end
+
+    LocalPlayer.CharacterAdded:Connect(function(char)
+        char.DescendantAdded:Connect(onCharacterDescendantAdded)
+        task.wait(0.5)
+        checkAndDisableFloatIfBrainrotInHand()
+    end)
+
+    if LocalPlayer.Character then
+        LocalPlayer.Character.DescendantAdded:Connect(onCharacterDescendantAdded)
+        task.wait(0.5)
+        checkAndDisableFloatIfBrainrotInHand()
+    end
+end
 
 -- ============================================================
 -- TP / CARPET SPEED
@@ -2845,66 +2942,75 @@ local function isRagdolled()
 end
 
 -- ============================================================
--- ANTI RAGDOLL
+-- ANTI RAGDOLL V2 (FIXED)
 -- ============================================================
 
-local AntiRagdollV2Data = {
-    antiRagdollConns = {},
-}
-local antiRagdollConns = AntiRagdollV2Data.antiRagdollConns
-
+local antiRagdollActive = false
+local antiRagdollConns = {}
 local cleanRagdollV2Scheduled = false
-local function cleanRagdollV2(char)
+
+local function deepCleanRagdoll(char)
     if not char then return end
-    local carpetEquipped = false
-    pcall(function()
-        local toolName = Config.TpSettings.Tool or "Flying Carpet"
-        local tool = char:FindFirstChild(toolName)
-        if tool then
-            local hrp = char:FindFirstChild("HumanoidRootPart")
-            if hrp then
-                for _, obj in ipairs(hrp:GetChildren()) do
-                    if obj:IsA("BodyVelocity") or obj:IsA("BodyPosition") or obj:IsA("BodyGyro") then
-                        carpetEquipped = true
-                        break
-                    end
-                end
-            end
-            if not carpetEquipped then
-                for _, obj in ipairs(tool:GetChildren()) do
-                    if obj:IsA("BodyVelocity") or obj:IsA("BodyPosition") or obj:IsA("BodyGyro") then
-                        carpetEquipped = true
-                        break
-                    end
-                end
-            end
-        end
-    end)
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if not hum or not hrp then return end
+
+    -- 1. Force humanoid out of ragdoll/physics state
+    local state = hum:GetState()
+    if state == Enum.HumanoidStateType.Physics or state == Enum.HumanoidStateType.Ragdoll or state == Enum.HumanoidStateType.FallingDown then
+        hum:ChangeState(Enum.HumanoidStateType.Running)
+    end
+
+    -- 2. Clear the RagdollEndTime attribute (used by game to keep you ragdolled)
+    if LocalPlayer:GetAttribute("RagdollEndTime") then
+        LocalPlayer:SetAttribute("RagdollEndTime", 0)
+    end
+
+    -- 3. Destroy all ragdoll-related constraints and attachments
     local descendants = char:GetDescendants()
     for _, d in ipairs(descendants) do
-        if d:IsA("BallSocketConstraint") or d:IsA("NoCollisionConstraint")
-            or d:IsA("HingeConstraint")
-            or (d:IsA("Attachment") and (d.Name == "A" or d.Name == "B")) then
+        if d:IsA("BallSocketConstraint") or d:IsA("NoCollisionConstraint") or d:IsA("HingeConstraint") then
             d:Destroy()
-        elseif (d:IsA("BodyVelocity") or d:IsA("BodyPosition") or d:IsA("BodyGyro")) and not carpetEquipped then
+        elseif d:IsA("Attachment") and (d.Name == "A" or d.Name == "B") then
             d:Destroy()
+        elseif (d:IsA("BodyVelocity") or d:IsA("BodyPosition") or d:IsA("BodyGyro")) then
+            -- Keep carpet speed bodies, remove others
+            local keep = false
+            local toolName = Config.TpSettings.Tool or "Flying Carpet"
+            local tool = char:FindFirstChild(toolName)
+            if tool then
+                if d.Parent == hrp or d.Parent == tool then keep = true end
+            end
+            if not keep then d:Destroy() end
         end
     end
+
+    -- 4. Re-enable motor6ds
     for _, d in ipairs(descendants) do
         if d:IsA("Motor6D") then d.Enabled = true end
     end
-    local hum = char:FindFirstChildOfClass("Humanoid")
-    if hum then
-        local animator = hum:FindFirstChild("Animator")
-        if animator then
-            for _, track in ipairs(animator:GetPlayingAnimationTracks()) do
-                local n = track.Animation and track.Animation.Name:lower() or ""
-                if n:find("rag") or n:find("fall") or n:find("hurt") or n:find("down") then
-                    track:Stop(0)
-                end
+
+    -- 5. Stop ragdoll animations
+    local animator = hum:FindFirstChild("Animator")
+    if animator then
+        for _, track in ipairs(animator:GetPlayingAnimationTracks()) do
+            local animName = track.Animation and track.Animation.Name:lower() or ""
+            if animName:find("rag") or animName:find("fall") or animName:find("hurt") or animName:find("down") then
+                track:Stop(0)
             end
         end
     end
+
+    -- 6. Reset velocity to avoid being re-ragdolled
+    hrp.AssemblyLinearVelocity = Vector3.zero
+    hrp.AssemblyAngularVelocity = Vector3.zero
+
+    -- 7. Ensure camera follows
+    if Workspace.CurrentCamera and Workspace.CurrentCamera.CameraSubject ~= hum then
+        Workspace.CurrentCamera.CameraSubject = hum
+    end
+
+    -- 8. Re-enable user controls
     task.defer(function()
         pcall(function()
             local pm = LocalPlayer:FindFirstChild("PlayerScripts")
@@ -2913,127 +3019,122 @@ local function cleanRagdollV2(char)
         end)
     end)
 end
-local function cleanRagdollV2Debounced(char)
+
+local function debouncedClean(char)
     if cleanRagdollV2Scheduled then return end
     cleanRagdollV2Scheduled = true
     task.defer(function()
         cleanRagdollV2Scheduled = false
-        if char and char.Parent then cleanRagdollV2(char) end
+        if char and char.Parent then deepCleanRagdoll(char) end
     end)
 end
-local function isRagdollRelatedDescendant(obj)
-    if obj:IsA("BallSocketConstraint") or obj:IsA("NoCollisionConstraint") or obj:IsA("HingeConstraint") then return true end
-    if obj:IsA("Attachment") and (obj.Name == "A" or obj.Name == "B") then return true end
-    if obj:IsA("BodyVelocity") or obj:IsA("BodyPosition") or obj:IsA("BodyGyro") then return true end
-    return false
+
+local function isRagdollConstraint(obj)
+    return obj:IsA("BallSocketConstraint") or obj:IsA("NoCollisionConstraint") or obj:IsA("HingeConstraint")
+        or (obj:IsA("Attachment") and (obj.Name == "A" or obj.Name == "B"))
 end
 
-local function hookAntiRagV2(char)
+local function setupAntiRagdoll(char)
+    -- Remove old connections for this character
     for _, c in ipairs(antiRagdollConns) do pcall(function() c:Disconnect() end) end
-    AntiRagdollV2Data.antiRagdollConns = {}
-    antiRagdollConns = AntiRagdollV2Data.antiRagdollConns
+    table.clear(antiRagdollConns)
 
     local hum = char:WaitForChild("Humanoid", 10)
     local hrp = char:WaitForChild("HumanoidRootPart", 10)
     if not hum or not hrp then return end
 
-    local lastVel = Vector3.new(0, 0, 0)
-
-    local c1 = hum.StateChanged:Connect(function()
+    -- 1. State change detector
+    table.insert(antiRagdollConns, hum.StateChanged:Connect(function()
         local st = hum:GetState()
-        if st == Enum.HumanoidStateType.Physics or st == Enum.HumanoidStateType.Ragdoll
-            or st == Enum.HumanoidStateType.FallingDown or st == Enum.HumanoidStateType.GettingUp then
-            local carpetActive = false
-            pcall(function()
-                local toolName = Config.TpSettings.Tool or "Flying Carpet"
-                local tool = char:FindFirstChild(toolName)
-                if tool and hrp then
-                    for _, obj in ipairs(hrp:GetChildren()) do
-                        if obj:IsA("BodyVelocity") or obj:IsA("BodyPosition") or obj:IsA("BodyGyro") then
-                            carpetActive = true
+        if st == Enum.HumanoidStateType.Physics or st == Enum.HumanoidStateType.Ragdoll or st == Enum.HumanoidStateType.FallingDown then
+            deepCleanRagdoll(char)
+        end
+    end))
+
+    -- 2. Constraint added detector
+    table.insert(antiRagdollConns, char.DescendantAdded:Connect(function(desc)
+        if isRagdollConstraint(desc) then
+            debouncedClean(char)
+        end
+    end))
+
+    -- 3. Block impulse remote (game pushes you into ragdoll)
+    pcall(function()
+        local net = ReplicatedStorage:FindFirstChild("Packages") and ReplicatedStorage.Packages:FindFirstChild("Net")
+        if net then
+            local applyImpulse = net:FindFirstChild("RE/CombatService/ApplyImpulse")
+            if applyImpulse and applyImpulse:IsA("RemoteEvent") then
+                table.insert(antiRagdollConns, applyImpulse.OnClientEvent:Connect(function()
+                    if hum and hum.Parent then
+                        local st = hum:GetState()
+                        if st == Enum.HumanoidStateType.Physics or st == Enum.HumanoidStateType.Ragdoll then
+                            hrp.AssemblyLinearVelocity = Vector3.zero
+                            deepCleanRagdoll(char)
                         end
                     end
-                end
-            end)
-            if not carpetActive then
-                hum:ChangeState(Enum.HumanoidStateType.Running)
-            end
-            cleanRagdollV2(char)
-            pcall(function() Workspace.CurrentCamera.CameraSubject = hum end)
-            pcall(function()
-                local pm = LocalPlayer:FindFirstChild("PlayerScripts")
-                if pm then pm = pm:FindFirstChild("PlayerModule") end
-                if pm then require(pm):GetControls():Enable() end
-            end)
-        end
-    end)
-    table.insert(antiRagdollConns, c1)
-
-    local c2 = char.DescendantAdded:Connect(function(desc)
-        if isRagdollRelatedDescendant(desc) then
-            cleanRagdollV2Debounced(char)
-        end
-    end)
-    table.insert(antiRagdollConns, c2)
-
-    pcall(function()
-        local pkg = ReplicatedStorage:FindFirstChild("Packages")
-        if pkg then
-            local net = pkg:FindFirstChild("Net")
-            if net then
-                local applyImp = net:FindFirstChild("RE/CombatService/ApplyImpulse")
-                if applyImp and applyImp:IsA("RemoteEvent") then
-                    local c3 = applyImp.OnClientEvent:Connect(function()
-                        local st = hum:GetState()
-                        if st == Enum.HumanoidStateType.Physics or st == Enum.HumanoidStateType.Ragdoll
-                            or st == Enum.HumanoidStateType.FallingDown or st == Enum.HumanoidStateType.GettingUp then
-                            pcall(function() hrp.AssemblyLinearVelocity = Vector3.new(0, 0, 0) end)
-                        end
-                    end)
-                    table.insert(antiRagdollConns, c3)
-                end
+                end))
             end
         end
     end)
 
-    local c4 = RunService.Heartbeat:Connect(function()
+    -- 4. Heartbeat monitor – fixes ragdoll that slips through
+    local lastVel = Vector3.zero
+    table.insert(antiRagdollConns, RunService.Heartbeat:Connect(function()
+        if not hum.Parent then return end
         local st = hum:GetState()
-        if st == Enum.HumanoidStateType.Physics or st == Enum.HumanoidStateType.Ragdoll
-            or st == Enum.HumanoidStateType.FallingDown or st == Enum.HumanoidStateType.GettingUp then
-            cleanRagdollV2(char)
+        if st == Enum.HumanoidStateType.Physics or st == Enum.HumanoidStateType.Ragdoll or st == Enum.HumanoidStateType.FallingDown then
+            deepCleanRagdoll(char)
+            -- Clamp extreme velocity spikes that cause re-ragdoll
             local vel = hrp.AssemblyLinearVelocity
             if (vel - lastVel).Magnitude > 40 and vel.Magnitude > 25 then
                 hrp.AssemblyLinearVelocity = vel.Unit * math.min(vel.Magnitude, 15)
             end
+            lastVel = hrp.AssemblyLinearVelocity
         end
-        lastVel = hrp.AssemblyLinearVelocity
-    end)
-    table.insert(antiRagdollConns, c4)
+    end))
 
-    cleanRagdollV2(char)
+    -- Initial cleanup
+    deepCleanRagdoll(char)
 end
 
-local function stopAntiRagdollV2()
-    cleanRagdollV2Scheduled = false
-    for _, c in ipairs(antiRagdollConns) do pcall(function() c:Disconnect() end) end
-    AntiRagdollV2Data.antiRagdollConns = {}
-    antiRagdollConns = AntiRagdollV2Data.antiRagdollConns
-end
-
-local function startAntiRagdollV2(enabled)
-    stopAntiRagdollV2()
-    if not enabled then
-        return
-    end
+local function startAntiRagdoll()
+    if antiRagdollActive then return end
+    antiRagdollActive = true
 
     local char = LocalPlayer.Character
-    if char then task.spawn(function() hookAntiRagV2(char) end) end
-    LocalPlayer.CharacterAdded:Connect(function(c)
-        task.spawn(function() hookAntiRagV2(c) end)
+    if char then setupAntiRagdoll(char) end
+
+    LocalPlayer.CharacterAdded:Connect(function(newChar)
+        task.wait(0.1) -- wait for humanoid to appear
+        if antiRagdollActive then setupAntiRagdoll(newChar) end
     end)
 end
 
-if Config.AntiRagdollV2 then startAntiRagdollV2(true) end
+local function stopAntiRagdoll()
+    antiRagdollActive = false
+    for _, c in ipairs(antiRagdollConns) do pcall(function() c:Disconnect() end) end
+    table.clear(antiRagdollConns)
+end
+
+-- Hook into the existing config toggle
+if Config.AntiRagdollV2 then
+    startAntiRagdoll()
+else
+    stopAntiRagdoll()
+end
+
+-- Also listen for config changes from settings UI (if user toggles it)
+local function monitorConfig()
+    while true do
+        task.wait(0.5)
+        if Config.AntiRagdollV2 and not antiRagdollActive then
+            startAntiRagdoll()
+        elseif not Config.AntiRagdollV2 and antiRagdollActive then
+            stopAntiRagdoll()
+        end
+    end
+end
+task.spawn(monitorConfig)
 
 -- ============================================================
 -- LINE TO BASE
