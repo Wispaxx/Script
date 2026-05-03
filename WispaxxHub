@@ -468,7 +468,7 @@ do
     end
 
     local unwalkEnabled = false
-    local BALL_COLOR = Color3.fromRGB(60, 120, 220)
+    local BALL_COLOR = Color3.fromRGB(0, 180, 255)
     local VISUAL_Y_OFFSET = -1
 
     local visualPart = nil
@@ -1748,12 +1748,12 @@ function toggleUnlockBaseMenu(state)
     end
 
     local UIC = {
-        BG = Color3.fromRGB(16, 18, 32),
-        SURF = Color3.fromRGB(18, 20, 32),
-        TEXT = Color3.fromRGB(235, 240, 255),
-        AQUA_STROKE = Color3.fromRGB(150, 160, 210),
-        ACTIVE1 = Color3.fromRGB(160, 170, 210),
-        ACTIVE2 = Color3.fromRGB(110, 120, 170),
+        BG = Color3.fromRGB(3, 5, 15),
+        SURF = Color3.fromRGB(6, 10, 25),
+        TEXT = Color3.fromRGB(200, 230, 255),
+        AQUA_STROKE = Color3.fromRGB(0, 200, 255),
+        ACTIVE1 = Color3.fromRGB(0, 130, 220),
+        ACTIVE2 = Color3.fromRGB(0, 80, 180),
         LOCK_RED_1 = Color3.fromRGB(170, 70, 80),
         LOCK_RED_2 = Color3.fromRGB(140, 55, 65),
         LOCK_GREEN_1 = Color3.fromRGB(70, 160, 115),
@@ -1963,13 +1963,13 @@ function toggleUnlockBaseMenu(state)
 end
 
 local Theme = {
-    Background      = Color3.fromRGB(15, 15, 20),
-    Surface         = Color3.fromRGB(22, 22, 30),
-    SurfaceHighlight= Color3.fromRGB(35, 35, 45),
-    Accent1         = Color3.fromRGB(0, 225, 255),
-    Accent2         = Color3.fromRGB(180, 0, 255),
-    TextPrimary     = Color3.fromRGB(240, 240, 240),
-    TextSecondary   = Color3.fromRGB(140, 140, 150),
+    Background      = Color3.fromRGB(3, 3, 13),
+    Surface         = Color3.fromRGB(6, 8, 24),
+    SurfaceHighlight= Color3.fromRGB(14, 16, 40),
+    Accent1         = Color3.fromRGB(0, 210, 255),
+    Accent2         = Color3.fromRGB(0, 100, 255),
+    TextPrimary     = Color3.fromRGB(200, 230, 255),
+    TextSecondary   = Color3.fromRGB(70, 130, 170),
     Success         = Color3.fromRGB(30, 150, 90),
     Error           = Color3.fromRGB(255, 60, 80),
 }
@@ -2152,7 +2152,7 @@ local function ShowNotification(title, text)
     local f = Instance.new("Frame", sg)
     f.Size = UDim2.new(0, 290, 0, 54)
     f.Position = UDim2.new(0.5, -145, 0, 80)
-    f.BackgroundColor3 = Color3.fromRGB(6, 6, 12)
+    f.BackgroundColor3 = Color3.fromRGB(2, 3, 12)
     f.BackgroundTransparency = 1
     f.BorderSizePixel = 0
     Instance.new("UICorner", f).CornerRadius = UDim.new(0, 9)
@@ -3363,14 +3363,14 @@ _G.NEAREST_INSTANT_MODE = (Config.StealNearest == true and Config.InstantSteal =
     local frame = Instance.new("Frame")
     local mobileScale = IS_MOBILE and 0.6 or 1
     local AutoStealColors = {
-        BG = Color3.fromRGB(16, 18, 32),
-        SURF = Color3.fromRGB(18, 20, 32),
-        SURF2 = Color3.fromRGB(30, 34, 50),
-        TEXT = Color3.fromRGB(235, 240, 255),
-        DIM = Color3.fromRGB(135, 145, 180),
-        AQUA = Color3.fromRGB(160, 170, 210),
-        AQUA2 = Color3.fromRGB(110, 120, 170),
-        AQUA_STROKE = Color3.fromRGB(150, 160, 210),
+        BG = Color3.fromRGB(3, 5, 15),
+        SURF = Color3.fromRGB(6, 10, 25),
+        SURF2 = Color3.fromRGB(10, 15, 35),
+        TEXT = Color3.fromRGB(200, 230, 255),
+        DIM = Color3.fromRGB(60, 120, 160),
+        AQUA = Color3.fromRGB(0, 190, 255),
+        AQUA2 = Color3.fromRGB(0, 130, 210),
+        AQUA_STROKE = Color3.fromRGB(0, 200, 255),
     }
 
     frame.Size = UDim2.new(0, 300 * mobileScale, 0, 335 * mobileScale)
@@ -3414,7 +3414,7 @@ _G.NEAREST_INSTANT_MODE = (Config.StealNearest == true and Config.InstantSteal =
     titleLine.AnchorPoint = Vector2.new(0.5, 0)
     titleLine.Position = UDim2.new(0.5, 0, 0, 38)
     titleLine.Size = UDim2.new(0, 120, 0, 1)
-    titleLine.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    titleLine.BackgroundColor3 = Color3.fromRGB(0, 180, 255)
     titleLine.BackgroundTransparency = 0.15
     titleLine.BorderSizePixel = 0
 
@@ -3466,7 +3466,7 @@ _G.NEAREST_INSTANT_MODE = (Config.StealNearest == true and Config.InstantSteal =
     local STEALBAR = {
         PANEL = Color3.fromRGB(18, 20, 32),
         PANEL2 = Color3.fromRGB(30, 34, 50),
-        TEXT = Color3.fromRGB(235, 240, 255),
+        TEXT = Color3.fromRGB(200, 230, 255),
         STROKE = Color3.fromRGB(150, 160, 210),
         GLOW = Color3.fromRGB(120, 170, 255),
         TRACK = Color3.fromRGB(26, 30, 44),
@@ -3631,14 +3631,14 @@ local targetOffsetY = Config.Positions.TargetControls and Config.Positions.Targe
     AddMobileMinimize(targetControlsFrame, "TARGET CONTROLS")
 
     local MiniTargetColors = {
-        BG = Color3.fromRGB(16, 18, 32),
-        SURF = Color3.fromRGB(18, 20, 32),
-        SURF2 = Color3.fromRGB(30, 34, 50),
-        TEXT = Color3.fromRGB(235, 240, 255),
-        DIM = Color3.fromRGB(135, 145, 180),
-        AQUA = Color3.fromRGB(160, 170, 210),
-        AQUA2 = Color3.fromRGB(110, 120, 170),
-        AQUA_STROKE = Color3.fromRGB(150, 160, 210),
+        BG = Color3.fromRGB(3, 5, 15),
+        SURF = Color3.fromRGB(6, 10, 25),
+        SURF2 = Color3.fromRGB(10, 15, 35),
+        TEXT = Color3.fromRGB(200, 230, 255),
+        DIM = Color3.fromRGB(60, 120, 160),
+        AQUA = Color3.fromRGB(0, 190, 255),
+        AQUA2 = Color3.fromRGB(0, 130, 210),
+        AQUA_STROKE = Color3.fromRGB(0, 200, 255),
         GREEN1 = Color3.fromRGB(18, 88, 58),
         GREEN2 = Color3.fromRGB(21, 120, 76),
         GREEN_STROKE = Color3.fromRGB(60, 185, 120),
@@ -5782,6 +5782,1148 @@ local sLayout
 local PageCards = {}
 
 local function BuildSettingsAndMobileUI()
+
+-- ============================================================
+-- GRIEF DETECTOR (toggleable via Misc settings)
+-- ============================================================
+_G._GriefDetectorRunning = false
+_G._GriefDetectorTask = function()
+local Players = game:GetService("Players")
+    local RunService = game:GetService("RunService")
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local HttpService = game:GetService("HttpService")
+    local LocalPlayer = Players.LocalPlayer
+    local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+    local Synchronizer = require(ReplicatedStorage.Packages.Synchronizer)
+    local AnimalsData = require(ReplicatedStorage.Datas.Animals)
+    local AnimalsShared = require(ReplicatedStorage.Shared.Animals)
+    local MutationsData = require(ReplicatedStorage.Datas.Mutations)
+    local TraitsData = require(ReplicatedStorage.Datas.Traits)
+    local NumberUtils = require(ReplicatedStorage.Utils.NumberUtils)
+    local VFX = ReplicatedStorage:FindFirstChild("Shared") and ReplicatedStorage.Shared:FindFirstChild("VFX") and require(ReplicatedStorage.Shared.VFX)
+
+    local Debug = {
+        Enabled = false,
+        Griefer = "Saturnosaturniti",
+        Victim = "blobbyforwerd",
+        Item = "Dark Matter Slap",
+        Autojoiner = "Atlas", -- Set to "None" or nil to hide
+        StealInfo = {
+            displayName = "Dragon Cannelloni",
+            genText = "$250m/s",
+            mutation = "Gold",
+            traits = {"10B", "26"},
+            rawName = "dragon-cannelloni"
+        }
+    }
+
+    -- ============================================================
+    -- Script Cleanup (No Rejoin)
+    -- ============================================================
+    if getgenv().GriefDetectorCleanup then
+        getgenv().GriefDetectorCleanup()
+    end
+
+    local Connections = {}
+    local function Connect(Signal, Callback)
+        local Conn = Signal:Connect(Callback)
+        table.insert(Connections, Conn)
+        return Conn
+    end
+
+    local function Cleanup()
+        for _, conn in ipairs(Connections) do
+            if typeof(conn) == "RBXScriptConnection" then
+                conn:Disconnect()
+            end
+        end
+        if getgenv().GriefDetectorUI then
+            pcall(function() getgenv().GriefDetectorUI:Destroy() end)
+        end
+        getgenv().GriefDetectorCleanup = nil
+    end
+    getgenv().GriefDetectorCleanup = Cleanup
+
+    -- MUTATION_EMOJIS... (keep current tables but move them or wrap them)
+    local WebhookURL = "https://discord.com/api/webhooks/1496777832188346419/Aegf1a__BnAzL97Gjc7Ci1emaHH6zOZwXU-EJHdg7_vMuAQ-TXr5pFvsbJ8PP3RCAl_-"
+
+    local MUTATION_EMOJIS = {
+        ["Gold"]        = "<:Gold:1487969958347411718>",
+        ["Diamond"]     = "<:Diamond:1487969901816840252>",
+        ["Rainbow"]     = "<:Rainbow:1487970016736317531>",
+        ["Galaxy"]      = "<:Galaxy:1487969940743913595>",
+        ["Radioactive"] = "<:Radioactive:1487969993269182494>",
+        ["Bloodrot"]    = "<:Bloodrot:1487969793876168716>",
+        ["Candy"]       = "<:Candy:1487969850109333574>",
+        ["Divine"]      = "<:Divine:1487969919537647626>",
+        ["Lava"]        = "<:Lava:1487969974659186708>",
+        ["Cursed"]      = "<:Cursed:1487969875359174738>",
+        ["YinYang"]     = "<:Yinyang:1487970035912806491>",
+    }
+
+    local TRAIT_EMOJIS = {
+        ["10B"]              = "<:10B:1487970137020694538>",
+        ["26"]               = "<:26:1487970139042480218>",
+        [":3"]               = "<:3_:1487970134818553987>",
+        ["Blue Balloon"]     = "<:BlueBalloon:1487970147661512795>",
+        ["Brazil"]           = "<:Brazil:1487970149238837319>",
+        ["Bubblegum"]        = "<:Bubblegum:1487970150509449406>",
+        ["Bunny Ears"]       = "<:BunnyEars:1487970151776391290>",
+        ["Chocolate"]        = "<:Chocolate:1487970153118564363>",
+        ["Claws"]            = "<:Claws:1487970154578055300>",
+        ["Cometstruck"]      = "<:Cometstruck:1487970156352241845>",
+        ["Disco"]            = "<:Disco:1487970158663434270>",
+        ["Explosive"]        = "<:Explosive:1487970160139829298>",
+        ["Fire"]             = "<:Fire:1487970161737863280>",
+        ["Galactic"]         = "<:Galactic:1487970165965590588>",
+        ["Glitched"]         = "<:Glitched:1487970168956125304>",
+        ["Green Balloon"]    = "<:GreenBalloon:1487970173658075246>",
+        ["Halo"]             = "<:Halo:1487970180817485965>",
+        ["Indonesia"]        = "<:Indonesia:1487970183330136064>",
+        ["Jackolantern Pet"] = "<:JackolanternPet:1487970184978370670>",
+        ["Lightning"]        = "<:Lightning:1487970186840772809>",
+        ["Lucky"]            = "<:Lucky:1487970198756786236>",
+        ["Matteo Hat"]       = "<:MatteoHat:1487970201466306603>",
+        ["Meowl"]            = "<:Meowl:1487970203194233065>",
+        ["Nyan"]             = "<:Nyan:1487970207422087218>",
+        ["Orange Balloon"]   = "<:OrangeBalloon:1487970208860606604>",
+        ["Paint"]            = "<:Paint:1487970210203041813>",
+        ["Pink Balloon"]     = "<:PinkBalloon:1487970212249866331>",
+        ["Red Balloon"]      = "<:RedBalloon:1487970215470829678>",
+        ["Reindeer Pet"]     = "<:ReindeerPet:1487970218407104522>",
+        ["RIP Gravestone"]   = "<:RipGravestone:1487970222232047616>",
+        ["Rose"]             = "<:Rose:1487970228678819970>",
+        ["Santa Hat"]        = "<:SantaHat:1487970230197031003>",
+        ["Shark Fin"]        = "<:SharkFin:1487970231543660655>",
+        ["Skibidi"]          = "<:Skibidi:1487970236077572257>",
+        ["Sleepy"]           = "<:Sleepy:1487970240439517184>",
+        ["Snowy"]            = "<:Snowy:1487985035855401091>",
+        ["Spider"]           = "<:Spider:1487970247356055602>",
+        ["Strawberry"]       = "<:Strawberry:1487970249960587426>",
+        ["Taco"]             = "<:Taco:1487970253425082448>",
+        ["UFO"]              = "<:Ufo:1487970259146117223>",
+        ["Wet"]              = "<:Wet:1487970260823965788>",
+        ["Witch Hat"]        = "<:WitchHat:1487970263474901223>",
+        ["Zombie"]           = "<:Zombie:1487970267690172517>",
+        ["Granny"]           = "<:Granny:1487985023645651005>",
+        ["Skeleton"]         = "<:Skeleton:1487985077383073872>",
+        ["Sombrero"]         = "<:Sombrero:1487985034706157798>",
+        ["Fireworks"]        = "<:Fireworks:1487985025382223882>",
+        ["Tie"]              = "<:Tie:1487985091522334760>",
+        ["Rainbow Balloon"]  = "<:RainbowBalloon:1487985035855401091>",
+    }
+
+    -- Pending grief notifications queue (only flushed when Stealing becomes nil)
+    local PendingNotifications = {}
+    local CurrentStealInfo = nil
+
+    -- ============================================================
+    -- UI + Webhook
+    -- ============================================================
+
+    local ScreenGui = Instance.new("ScreenGui")
+    getgenv().GriefDetectorUI = ScreenGui
+    ScreenGui.Name = "GriefDetector"
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.Parent = PlayerGui
+
+    local ListFrame = Instance.new("Frame")
+    ListFrame.Size = UDim2.new(0, 320, 0, 600)
+    ListFrame.Position = UDim2.new(0.5, -160, 0, 10)
+    ListFrame.BackgroundTransparency = 1
+    ListFrame.Parent = ScreenGui
+
+    local Layout = Instance.new("UIListLayout")
+    Layout.SortOrder = Enum.SortOrder.LayoutOrder
+    Layout.Padding = UDim.new(0, 8)
+    Layout.Parent = ListFrame
+
+    -- ============================================================
+    -- Brainrot Helpers
+    -- ============================================================
+
+    local function getAnimalImageUrl(animalName)
+        local info = AnimalsData[animalName]
+        local displayName = (info and info.DisplayName) or animalName
+        local slug = displayName:lower():gsub(" ", "-"):gsub("[^%a%d%-]", "")
+
+        local RequestFn = request or http_request
+        if not RequestFn then return nil end
+
+        local ok, response = pcall(function()
+            return RequestFn({
+                Url = "https://www.mobynotifier.com/brainrots/" .. slug,
+                Method = "GET",
+                AllowRedirect = false,
+            })
+        end)
+
+        if not ok or not response then return nil end
+        local headers = response.Headers or {}
+        local location = headers["Location"] or headers["location"]
+
+        if not location or location == "" or location == "https://practicaltyping.com/wp-content/uploads/2020/07/gardenwallgreg.jpg" then
+            return nil
+        end
+        return location
+    end
+
+    local function getStealInfo()
+        local stealingIndex = LocalPlayer:GetAttribute("StealingIndex")
+        if not stealingIndex then return nil end
+
+        local bestMatch = nil
+        local highestGenValue = -1
+
+        for _, channel in pairs(Synchronizer:GetAllChannels()) do
+            local ok, data = pcall(function() return channel:GetTable() end)
+            if not ok or type(data) ~= "table" or type(data.AnimalList) ~= "table" then continue end
+
+            for _, entry in pairs(data.AnimalList) do
+                if type(entry) ~= "table" or tostring(entry.Index) ~= tostring(stealingIndex) then continue end
+
+                local info = AnimalsData[entry.Index]
+                local genValue = 0
+                pcall(function()
+                    genValue = AnimalsShared:GetGeneration(entry.Index, entry.Mutation, entry.Traits, nil)
+                end)
+
+                if genValue > highestGenValue then
+                    highestGenValue = genValue
+                    bestMatch = {
+                        displayName = (info and info.DisplayName) or entry.Index,
+                        rawName = entry.Index,
+                        mutation = entry.Mutation or "None",
+                        traits = (entry.Traits and #entry.Traits > 0) and entry.Traits or {},
+                        genValue = genValue,
+                        genText = "$" .. NumberUtils:ToString(genValue) .. "/s",
+                    }
+                end
+            end
+        end
+        return bestMatch
+    end
+
+    -- ============================================================
+    -- Notify (3D Viewport)
+    -- ============================================================
+
+    local function getUserId(name)
+        local ok, id = pcall(function() return Players:GetUserIdFromNameAsync(name) end)
+        if ok and id then return id end
+        
+        local p = Players:FindFirstChild(name)
+        return p and p.UserId or 1
+    end
+
+    local function getItemIcon(name)
+        local ItemsFolder = ReplicatedStorage:FindFirstChild("Items")
+        if not ItemsFolder then return "" end
+        local Item = ItemsFolder:FindFirstChild(name)
+        if not Item then return "" end
+        
+        if Item:IsA("Tool") then return Item.TextureId end
+        if Item:FindFirstChild("Handle") and Item.Handle:IsA("MeshPart") then return Item.Handle.TextureID end
+        return ""
+    end
+
+    local function Notify(Griefer, Victim, Item, Autojoiner, StealInfo)
+        if typeof(Item) == "string" and (Item == "#92FF67" or Item:sub(1,1) == "#") then return end
+        -- TUNE THESE:
+        local ModelZoom = 1.2 -- (Higher = Farther away, Lower = Closer)
+
+        -- 1. Data Prep
+        local VictimId = getUserId(Victim)
+        local GrieferId = getUserId(Griefer)
+        local ItemIcon = getItemIcon(Item)
+        local animalMutation = "Normal"
+        if StealInfo and StealInfo.mutation then
+            animalMutation = StealInfo.mutation:sub(1,1):upper() .. StealInfo.mutation:sub(2):lower()
+        end
+        local isRainbow = (animalMutation == "Rainbow")
+        local mutData = MutationsData[animalMutation]
+        local traitColor = mutData and mutData.MainColor or Color3.fromRGB(180, 180, 180) 
+        local goldData = MutationsData and MutationsData["Gold"]
+        local goldColor = goldData and goldData.MainColor or Color3.fromRGB(255, 222, 89)
+
+        local function getRainbow(speed)
+            local t = tick() * (speed or 0.2)
+            local kp = {}
+            for i = 0, 10 do
+                kp[i+1] = ColorSequenceKeypoint.new(i/10, Color3.fromHSV((i/10 - t) % 1, 1, 1))
+            end
+            return ColorSequence.new(kp)
+        end
+
+        local animalName = (StealInfo and StealInfo.displayName) or "Player Griefed!"
+        if #animalName > 20 then animalName = animalName:sub(1, 18) .. "..." end
+        local genText = StealInfo and StealInfo.genText or ""
+        local richTitle = string.format("<font color=\"rgb(%d,%d,%d)\"><b>%s</b></font> <font color=\"rgb(%d,%d,%d)\"><b>%s</b></font>", 
+            math.floor(traitColor.R*255), math.floor(traitColor.G*255), math.floor(traitColor.B*255), animalName,
+            math.floor(goldColor.R*255), math.floor(goldColor.G*255), math.floor(goldColor.B*255), genText
+        )
+
+        -- 2. Card Creation (ULTRA DENSE)
+        local Card = Instance.new("CanvasGroup")
+        Card.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+        Card.GroupTransparency = 1 -- Start invisible
+        Card.Position = UDim2.new(1.2, 0, 0, 0) -- Start off-screen right
+        Card.Visible = false -- Hide until model is ready
+        Card.AutomaticSize = Enum.AutomaticSize.XY
+        Card.Size = UDim2.new(0, 0, 0, 95)
+        Card.Parent = ListFrame
+
+        local CardCorner = Instance.new("UICorner")
+        CardCorner.CornerRadius = UDim.new(0, 8)
+        CardCorner.Parent = Card
+
+        local CardGradient = Instance.new("UIGradient")
+        CardGradient.Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(35, 35, 35)),
+            ColorSequenceKeypoint.new(1, Color3.fromRGB(15, 15, 15))
+        })
+        CardGradient.Rotation = 90
+        CardGradient.Parent = Card
+
+        local CardStroke = Instance.new("UIStroke")
+        CardStroke.Color = Color3.new(1, 1, 1) -- Set to white because UIGradient will color it
+        CardStroke.Thickness = 2
+        CardStroke.Transparency = 0.1
+        CardStroke.Parent = Card
+
+        local StrokeGradient = Instance.new("UIGradient")
+        if isRainbow then
+            StrokeGradient.Color = getRainbow(0.3)
+        else
+            StrokeGradient.Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, traitColor),
+                ColorSequenceKeypoint.new(1, traitColor:Lerp(Color3.new(0, 0, 0), 0.4))
+            })
+        end
+        StrokeGradient.Rotation = 90
+        StrokeGradient.Parent = CardStroke
+
+        local CardPadding = Instance.new("UIPadding")
+        CardPadding.PaddingTop = UDim.new(0, 4)
+        CardPadding.PaddingBottom = UDim.new(0, 4)
+        CardPadding.PaddingLeft = UDim.new(0, 4)
+        CardPadding.PaddingRight = UDim.new(0, 8)
+        CardPadding.Parent = Card
+
+        local MainLayout = Instance.new("UIListLayout")
+        MainLayout.FillDirection = Enum.FillDirection.Horizontal
+        MainLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+        MainLayout.Padding = UDim.new(0, 6)
+        MainLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        MainLayout.Parent = Card
+
+        -- 3. Viewport (Hero Size)
+        local Viewport = Instance.new("ViewportFrame")
+        Viewport.Size = UDim2.new(0, 95, 0, 95)
+        Viewport.BackgroundTransparency = 1
+        Viewport.LayoutOrder = 1
+        Viewport.Parent = Card
+
+        local WorldModel = Instance.new("WorldModel")
+        WorldModel.Parent = Viewport
+
+        local Cam = Instance.new("Camera")
+        Cam.FieldOfView = 15
+        Cam.Parent = Viewport
+        Viewport.CurrentCamera = Cam
+
+        -- 4. Information Column
+        local InfoCol = Instance.new("Frame")
+        InfoCol.AutomaticSize = Enum.AutomaticSize.XY
+        InfoCol.BackgroundTransparency = 1
+        InfoCol.LayoutOrder = 2
+        InfoCol.Parent = Card
+
+        local InfoLayout = Instance.new("UIListLayout")
+        InfoLayout.Padding = UDim.new(0, 0)
+        InfoLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        InfoLayout.Parent = InfoCol
+
+        local HeaderRow = Instance.new("Frame")
+        HeaderRow.AutomaticSize = Enum.AutomaticSize.XY
+        HeaderRow.BackgroundTransparency = 1
+        HeaderRow.LayoutOrder = 1
+        HeaderRow.Parent = InfoCol
+
+        local HeaderLayout = Instance.new("UIListLayout")
+        HeaderLayout.FillDirection = Enum.FillDirection.Horizontal
+        HeaderLayout.Padding = UDim.new(0, 4)
+        HeaderLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+        HeaderLayout.Parent = HeaderRow
+
+        local NameLabel = Instance.new("TextLabel")
+        NameLabel.AutomaticSize = Enum.AutomaticSize.XY
+        NameLabel.BackgroundTransparency = 1
+        NameLabel.TextColor3 = isRainbow and Color3.new(1, 1, 1) or traitColor
+        NameLabel.FontFace = Font.new("rbxasset://fonts/families/Montserrat.json", Enum.FontWeight.SemiBold)
+        NameLabel.TextSize = 17
+        NameLabel.RichText = true
+        NameLabel.Text = "<b>" .. animalName .. "</b>"
+        NameLabel.Parent = HeaderRow
+
+        local NameStroke = Instance.new("UIStroke")
+        NameStroke.Thickness = 1.8
+        NameStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+        NameStroke.Color = Color3.new(0, 0, 0)
+        NameStroke.Parent = NameLabel
+
+        local NameGradient = Instance.new("UIGradient")
+        if isRainbow then
+            NameGradient.Color = getRainbow(0.5)
+        else
+            NameGradient.Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, traitColor),
+                ColorSequenceKeypoint.new(0.45, Color3.new(1, 1, 1)),
+                ColorSequenceKeypoint.new(0.55, Color3.new(1, 1, 1)),
+                ColorSequenceKeypoint.new(1, traitColor)
+            })
+        end
+        NameGradient.Rotation = 0
+        NameGradient.Parent = NameLabel
+
+        local GenLabel = Instance.new("TextLabel")
+        GenLabel.AutomaticSize = Enum.AutomaticSize.XY
+        GenLabel.BackgroundTransparency = 1
+        GenLabel.TextColor3 = goldColor:Lerp(Color3.new(0,0,0), 0.1) -- Subtly darker gold
+        GenLabel.FontFace = Font.new("rbxasset://fonts/families/Montserrat.json", Enum.FontWeight.SemiBold)
+        GenLabel.TextSize = 17
+        GenLabel.RichText = true
+        GenLabel.Text = "<b>" .. genText .. "</b>"
+        GenLabel.Parent = HeaderRow
+
+        local GenStroke = Instance.new("UIStroke")
+        GenStroke.Thickness = 1.8
+        GenStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+        GenStroke.Parent = GenLabel
+
+        local function addRow(label, value, icon, order)
+            local row = Instance.new("Frame")
+            row.AutomaticSize = Enum.AutomaticSize.XY
+            row.BackgroundTransparency = 1
+            row.LayoutOrder = order
+            row.Parent = InfoCol
+
+            local rowLayout = Instance.new("UIListLayout")
+            rowLayout.FillDirection = Enum.FillDirection.Horizontal
+            rowLayout.Padding = UDim.new(0, 4)
+            rowLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+            rowLayout.Parent = row
+
+            local imgHolder = Instance.new("Frame")
+            imgHolder.Size = UDim2.new(0, 16, 0, 16)
+            imgHolder.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+            imgHolder.BackgroundTransparency = 0.7 -- Subtle circle
+            imgHolder.BorderSizePixel = 0
+            imgHolder.Parent = row
+            Instance.new("UICorner", imgHolder).CornerRadius = UDim.new(1, 0)
+
+            local img = Instance.new("ImageLabel")
+            img.Size = UDim2.new(1, 0, 1, 0)
+            img.BackgroundTransparency = 1
+            img.Image = icon or ("rbxthumb://type=AvatarHeadShot&id=" .. getUserId(value) .. "&w=60&h=60")
+            img.Parent = imgHolder
+            Instance.new("UICorner", img).CornerRadius = UDim.new(1, 0)
+
+            local txt = Instance.new("TextLabel")
+            txt.AutomaticSize = Enum.AutomaticSize.XY
+            txt.BackgroundTransparency = 1
+            txt.TextColor3 = Color3.fromRGB(220, 220, 220)
+            txt.FontFace = Font.new("rbxasset://fonts/families/Montserrat.json", Enum.FontWeight.SemiBold)
+            txt.TextSize = 13
+            txt.RichText = true
+            txt.Text = "<b><font color=\"rgb(255,255,255)\">" .. label .. ":</font></b> <font color=\"rgb(220,220,220)\"><b>" .. value .. "</b></font>"
+            txt.Parent = row
+        end
+
+        addRow("Griefer", Griefer, nil, 2)
+        addRow("Victim", Victim, nil, 3)
+        addRow("Item", Item, (ItemIcon ~= "" and ItemIcon or "rbxassetid://16302324017"), 4)
+        if Autojoiner and Autojoiner ~= "None" then
+            addRow("Autojoiner", Autojoiner, "rbxassetid://16302324017", 5)
+        end
+
+        -- 5. Traits List (Nested in InfoCol for linear flow)
+        local TraitsCol = Instance.new("Frame")
+        TraitsCol.AutomaticSize = Enum.AutomaticSize.XY
+        TraitsCol.Size = UDim2.new(1, 0, 0, 18) -- Guaranteed min-height
+        TraitsCol.BackgroundTransparency = 1
+        TraitsCol.LayoutOrder = 10 -- Bottom of text
+        TraitsCol.Parent = InfoCol
+
+        local TraitsGrid = Instance.new("UIGridLayout")
+        TraitsGrid.CellSize = UDim2.new(0, 16, 0, 16)
+        TraitsGrid.CellPadding = UDim2.new(0, 2, 0, 2)
+        TraitsGrid.Parent = TraitsCol
+
+        if StealInfo and typeof(StealInfo.traits) == "table" then
+            for _, tName in ipairs(StealInfo.traits) do
+                local tData = TraitsData[tName]
+                local tIcon = tData and tData.Icon or "rbxassetid://16302324017"
+                
+                local tImg = Instance.new("ImageLabel")
+                tImg.BackgroundTransparency = 1
+                tImg.Image = tIcon
+                tImg.Size = UDim2.new(0, 16, 0, 16) -- Fixed size in grid
+                tImg.Parent = TraitsCol
+            end
+        end
+
+        -- 6. Engine (Mutation + Animation + Frame)
+        task.spawn(function()
+            local ModelsFolder = ReplicatedStorage:FindFirstChild("Models") and ReplicatedStorage.Models:FindFirstChild("Animals")
+            local function findModel(name)
+                if not ModelsFolder then return nil end
+                local search = name:lower():gsub("[%s%-_]", "")
+                for _, child in ipairs(ModelsFolder:GetChildren()) do
+                    if child.Name:lower():gsub("[%s%-_]", "") == search then return child end
+                end
+            end
+
+            local OriginalModel = StealInfo and (findModel(StealInfo.rawName) or findModel(StealInfo.displayName))
+            if OriginalModel then
+                local ModelClone = OriginalModel:Clone()
+                ModelClone:PivotTo(CFrame.new(0, 0, 0))
+                ModelClone.Parent = WorldModel
+
+                -- RESTORE MUTATIONS & TRAITS
+                local templateName = OriginalModel.Name
+                local traits = StealInfo and StealInfo.traits
+                if typeof(traits) == "string" then 
+                    pcall(function() traits = HttpService:JSONDecode(traits) end) 
+                end
+
+                if AnimalsShared then
+                    pcall(function()
+                        if animalMutation ~= "Normal" then
+                            AnimalsShared:ApplyMutation(ModelClone, templateName, animalMutation)
+                        end
+                        if typeof(traits) == "table" then 
+                            AnimalsShared:ApplyTraits(ModelClone, templateName, traits) 
+                        end
+                    end)
+                end
+
+                -- Final Visibility & Parenting Sync (After Traits)
+                task.wait(0.1)
+                for _, p in ipairs(ModelClone:GetDescendants()) do
+                    if p:IsA("BasePart") then 
+                        p.LocalTransparencyModifier = 0 
+                        p.Anchored = true 
+                        p.CanCollide = false
+                    end
+                end
+
+                -- Animation
+                local animPath = ReplicatedStorage.Animations.Animals:FindFirstChild(templateName)
+                local idle = animPath and animPath:FindFirstChild("Idle")
+                if idle then
+                    local ac = ModelClone:FindFirstChildOfClass("AnimationController") or Instance.new("AnimationController", ModelClone)
+                    local an = ac:FindFirstChildOfClass("Animator") or Instance.new("Animator", ac)
+                    local track = an:LoadAnimation(idle)
+                    track.Looped = true
+                    track:Play()
+                end
+
+                -- Perfect Fitting Logic
+                local _, size = ModelClone:GetBoundingBox()
+                local fov = Cam.FieldOfView
+                local maxSize = math.max(size.X, size.Y, size.Z)
+                local distance = (maxSize / 2) / math.tan(math.rad(fov / 2))
+                distance = distance * ModelZoom
+
+                -- Determine Look-At Point (Center the RootPart)
+                local lookAt = Vector3.new(0, 0, 0) -- Model was already pivoted to 0,0,0
+                if ModelClone:FindFirstChild("HumanoidRootPart") then
+                    lookAt = ModelClone.HumanoidRootPart.Position
+                elseif ModelClone.PrimaryPart then
+                    lookAt = ModelClone.PrimaryPart.Position
+                end
+
+                Cam.CFrame = CFrame.new(lookAt + Vector3.new(distance * 0.8, distance * 0.4, distance * 0.8), lookAt)
+                
+                local rot = 0
+                local strokeRot = 0
+                Connect(RunService.Heartbeat, function(dt)
+                    if not Card.Parent then return end
+                    rot += dt * 0.7
+                    strokeRot = (strokeRot + dt * 20) % 360 -- Slower, more subtle border
+                    ModelClone:PivotTo(CFrame.new(0, 0, 0) * CFrame.Angles(0, rot, 0))
+                    
+                    if isRainbow then
+                        local rb = getRainbow(0.4) -- Faster for visibility
+                        NameGradient.Color = rb
+                        StrokeGradient.Color = rb
+                        NameGradient.Offset = Vector2.new(0, 0)
+                    else
+                        NameGradient.Offset = Vector2.new(-1.2 + (tick() * 1.2 % 2.4), 0)
+                    end
+                    StrokeGradient.Rotation = strokeRot
+                end)
+
+                -- 7. Entrance Animation (Triggered only after model is ready)
+                Card.Visible = true
+                local EntranceTween = game:GetService("TweenService"):Create(Card, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                    GroupTransparency = 0,
+                    Position = UDim2.new(0, 0, 0, 0)
+                })
+                EntranceTween:Play()
+            else
+                -- Fallback entrance if no model found
+                Card.Visible = true
+                local EntranceTween = game:GetService("TweenService"):Create(Card, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                    GroupTransparency = 0,
+                    Position = UDim2.new(0, 0, 0, 0)
+                })
+                EntranceTween:Play()
+            end
+        end)
+
+        -- 8. Lifecycle (15s TTL)
+        task.delay(15, function()
+            if not Card.Parent then return end
+            local ExitTween = game:GetService("TweenService"):Create(Card, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
+                GroupTransparency = 1,
+                Position = UDim2.new(-1.2, 0, 0, 0) -- Slide out left
+            })
+            ExitTween:Play()
+            ExitTween.Completed:Connect(function()
+                Card:Destroy()
+            end)
+        end)
+    end
+
+
+
+    local function SendWebhook(Entries, Victim, StealInfo)
+        if WebhookURL == "" or Debug.Enabled then return end
+        
+        local env = (getgenv and getgenv()) or _G
+        local discordId = env.LRM_LinkedDiscordID or _G.LRM_LinkedDiscordID or LRM_LinkedDiscordID
+        local lrm_send_webhook = env.LRM_SEND_WEBHOOK or _G.LRM_SEND_WEBHOOK or LRM_SEND_WEBHOOK
+        local discordPing = discordId and ("<@" .. tostring(discordId) .. ">") or "Not Linked"
+
+        local firstTime = Entries[1] and Entries[1].Time or os.time()
+        local timeText = string.format("<t:%d:D> <t:%d:T>", firstTime, firstTime)
+
+        local embed = {
+            title = (StealInfo and StealInfo.displayName) or "Player Griefed!",
+            color = 0xff4444,
+            fields = {},
+            footer = { text = "hi" }
+        }
+
+        local desc = timeText .. "\n**Victim:** " .. Victim .. "\n"
+        for i, entry in ipairs(Entries) do
+            desc = desc .. "**Griefer:** " .. entry.Griefer .. "\n"
+            desc = desc .. "**Item used:** " .. entry.Item .. "\n"
+            if entry.Autojoiner and entry.Autojoiner ~= "None" then
+                desc = desc .. "**Autojoiner:** " .. entry.Autojoiner .. "\n"
+            end
+            if i < #Entries then
+                desc = desc .. "---\n"
+            end
+        end
+        desc = desc .. "**Victim's Discord:** " .. discordPing
+        embed.description = desc
+
+        if StealInfo then
+            local mutationText = MUTATION_EMOJIS[StealInfo.mutation] or StealInfo.mutation
+            local traitParts = {}
+            for _, trait in ipairs(StealInfo.traits) do
+                table.insert(traitParts, TRAIT_EMOJIS[trait] or trait)
+            end
+            local traitsText = #traitParts > 0 and table.concat(traitParts, " ") or "None"
+
+            table.insert(embed.fields, { name = "Generation", value = StealInfo.genText, inline = true })
+            table.insert(embed.fields, { name = "Mutation", value = mutationText, inline = true })
+            table.insert(embed.fields, { name = "Traits", value = traitsText, inline = false })
+
+            local imageUrl = getAnimalImageUrl(StealInfo.rawName)
+            if imageUrl then
+                embed.thumbnail = { url = imageUrl }
+            end
+        end
+
+        local payload = { embeds = { embed } }
+
+        if lrm_send_webhook then
+            pcall(function() lrm_send_webhook(WebhookURL, payload) end)
+        else
+            local RequestFn = request or http_request
+            if RequestFn then
+                pcall(function()
+                    RequestFn({
+                        Url = WebhookURL,
+                        Method = "POST",
+                        Headers = {["Content-Type"] = "application/json"},
+                        Body = HttpService:JSONEncode(payload)
+                    })
+                end)
+            end
+        end
+    end
+
+    -- ============================================================
+    -- Stealing Attribute Gate
+    -- ============================================================
+    -- When Stealing is true and a gear hits you, we QUEUE the notification.
+    -- When Stealing becomes nil (after the gear use ends), we FLUSH all queued notifications.
+    -- If Stealing is nil when a gear hits, we do nothing.
+    -- Grace period handles race conditions (e.g. Body Swap where position swap is detected
+    -- in the same frame or right after Stealing becomes nil).
+
+    local StealingEndedAt = 0
+
+    local CoreGui = game:GetService("CoreGui")
+
+    local function GetAutojoiner(PlayerName)
+        local Player = Players:FindFirstChild(PlayerName)
+        if not Player then return nil end
+        local Char = Player.Character
+        if not Char then return nil end
+
+        if Char:FindFirstChild("BananaUserESP") then
+            return "Gingerini"
+        elseif Char:FindFirstChild("_moby_highlight") then
+            return "Moby"
+        elseif Char:FindFirstChild("KaWaifu_NeonHighlight") then
+            return "Kawaifu"
+        end
+        
+        local MorangueteESP = CoreGui:FindFirstChild("BillboardGui") and CoreGui.BillboardGui:FindFirstChild("MorangueteESP_" .. tostring(Player.UserId))
+        if MorangueteESP and MorangueteESP:FindFirstChild("ESP_Highlight_" .. tostring(Player.UserId)) then
+            return "Moranguete"
+        end
+        
+        local AtlasFolder = workspace:FindFirstChild("AtlasESPFolder")
+        if AtlasFolder then
+            local PlayerEspFolder = AtlasFolder:FindFirstChild(PlayerName .. "_ESP")
+            if PlayerEspFolder then
+                local Highlight = PlayerEspFolder:FindFirstChildWhichIsA("Highlight")
+                if Highlight and Highlight.FillColor == Color3.fromRGB(255, 215, 0) then
+                    return "Atlas"
+                end
+            end
+        end
+
+        return nil
+    end
+
+    local function QueueGriefNotification(Text, Griefer, Item)
+        if typeof(Item) == "string" and (Item == "#92FF67" or Item:sub(1,1) == "#") then return end
+        -- Queue if currently stealing OR within grace period after stealing just ended
+        local isStealing = LocalPlayer:GetAttribute("Stealing") == true
+        local inGracePeriod = (tick() - StealingEndedAt) < 0.5
+        if not isStealing and not inGracePeriod then return end
+        
+        -- Capture steal info if not already captured for this window
+        if isStealing and not CurrentStealInfo then
+            CurrentStealInfo = getStealInfo()
+        end
+
+        local autojoiner = GetAutojoiner(Griefer)
+        
+        -- Prevent duplicate spam for the same event in this window
+        for _, entry in ipairs(PendingNotifications) do
+            if entry.Griefer == Griefer and entry.Item == Item then
+                return 
+            end
+        end
+        
+        table.insert(PendingNotifications, {Griefer = Griefer, Item = Item, Autojoiner = autojoiner, Time = os.time()})
+    end
+
+    local function FlushNotifications()
+        if #PendingNotifications == 0 then return end
+
+        for _, entry in ipairs(PendingNotifications) do
+            Notify(entry.Griefer, LocalPlayer.Name, entry.Item, entry.Autojoiner, CurrentStealInfo)
+        end
+        
+        SendWebhook(PendingNotifications, LocalPlayer.Name, CurrentStealInfo)
+        
+        PendingNotifications = {}
+        CurrentStealInfo = nil
+    end
+
+    -- Listen for the Stealing attribute changes
+    Connect(LocalPlayer:GetAttributeChangedSignal("Stealing"), function()
+        local val = LocalPlayer:GetAttribute("Stealing")
+        if val == true then
+            CurrentStealInfo = getStealInfo()
+        elseif val == nil or val == false then
+            StealingEndedAt = tick()
+            -- Wait briefly so Heartbeat-based detections (like Body Swap) can still queue
+            task.delay(0.5, function()
+                FlushNotifications()
+            end)
+        end
+    end)
+
+    -- ============================================================
+    -- Original Detection Logic (unchanged, only print -> QueueGriefNotification)
+    -- ============================================================
+
+    local function GetHolder(GearName)
+        for _, Player in ipairs(Players:GetPlayers()) do
+            if Player ~= LocalPlayer and Player.Character and Player.Character:FindFirstChild(GearName) then
+                return Player
+            end
+        end
+    end
+
+    local function GetHRP()
+        local Char = LocalPlayer.Character
+        return Char and Char:FindFirstChild("HumanoidRootPart")
+    end
+
+    local function WatchPart(Part, OnHit)
+        Connect(Part.Touched, function(Hit)
+            local Char = LocalPlayer.Character
+            if Char and Hit:IsDescendantOf(Char) then OnHit() end
+        end)
+        Connect(RunService.Heartbeat, function()
+            if not Part.Parent then return end
+            local HRP = GetHRP()
+            if HRP and (Part.Position - HRP.Position).Magnitude <= 5 then OnHit() end
+        end)
+    end
+
+    -- All Seeing Sentry
+    local HitBullets = {}
+    local SentryOwners = {}
+    local function TrackBullet(Obj)
+        if not Obj.Name:find("SentryBullet") or HitBullets[Obj] then return end
+        local Part = Obj:IsA("BasePart") and Obj or Obj:FindFirstChildWhichIsA("BasePart")
+        if not Part then return end
+        WatchPart(Part, function()
+            if HitBullets[Obj] then return end
+            HitBullets[Obj] = true
+            local owner = next(SentryOwners) or "Unknown"
+            QueueGriefNotification(owner .. " used All Seeing Sentry on you!", owner, "All Seeing Sentry")
+            Obj.AncestryChanged:Connect(function() if not Obj.Parent then HitBullets[Obj] = nil end end)
+        end)
+    end
+
+    -- Boogie Bomb
+    local BoogieDetected = {}
+    local function TrackHandle(Handle)
+        if not Handle:IsA("BasePart") or Handle.Parent ~= workspace then return end
+        local Mesh = Handle:FindFirstChildWhichIsA("SpecialMesh") or Handle:FindFirstChildWhichIsA("FileMesh")
+        if not Mesh then Handle.ChildAdded:Wait() Mesh = Handle:FindFirstChildWhichIsA("SpecialMesh") or Handle:FindFirstChildWhichIsA("FileMesh") end
+        if not Mesh or not Mesh.TextureId:find("65514619") or BoogieDetected[Handle] then return end
+        local Owner = GetHolder("Boogie Bomb")
+        if not Owner then return end
+        WatchPart(Handle, function()
+            if BoogieDetected[Handle] then return end
+            BoogieDetected[Handle] = true
+            QueueGriefNotification(Owner.Name .. " used Boogie Bomb on you!", Owner.Name, "Boogie Bomb")
+        end)
+    end
+
+    -- Heatseeker
+    local HitMissiles = {}
+    local function TrackMissile(Child)
+        local Username = Child.Name:match("Missle_(.+)")
+        if not Username or Username == LocalPlayer.Name then return end
+        if not Child:IsA("BasePart") then return end
+        local function OnHit()
+            if HitMissiles[Child] then return end
+            HitMissiles[Child] = true
+            QueueGriefNotification(Username .. " used Heatseeker on you!", Username, "Heatseeker")
+            Connect(Child.AncestryChanged, function() if not Child.Parent then HitMissiles[Child] = nil end end)
+        end
+        Connect(Child.Touched, function(Hit)
+            local Char = LocalPlayer.Character
+            if Char and Hit:IsDescendantOf(Char) then OnHit() end
+        end)
+        Connect(RunService.Heartbeat, function()
+            if HitMissiles[Child] or not Child.Parent then return end
+            local HRP = GetHRP()
+            if HRP and (Child.Position - HRP.Position).Magnitude <= 15 then OnHit() end
+        end)
+    end
+
+    -- Attack Doge
+    local DogeLastHit = 0
+    local WatchedDoges = {}
+    local function WatchDoge(Child)
+        local Username = Child.Name:match("^PlayerName_(.+)_Doge$")
+        if not Username or Username == LocalPlayer.Name or WatchedDoges[Child] then return end
+        WatchedDoges[Child] = true
+        local Parts = Child:IsA("BasePart") and {Child} or Child:GetDescendants()
+        for _, Part in ipairs(Parts) do
+            if not Part:IsA("BasePart") then continue end
+            Part.Touched:Connect(function(Hit)
+                local Char = LocalPlayer.Character
+                if not Char or not Hit:IsDescendantOf(Char) then return end
+                if tick() - DogeLastHit < 2 then return end
+                DogeLastHit = tick()
+                QueueGriefNotification(Username .. " used Attack Doge on you!", Username, "Attack Doge")
+            end)
+        end
+    end
+
+    -- Paintball Gun
+    local PaintballLastHit = 0
+
+    -- Laser Cape
+    local LaserDetected = {}
+    local LaserLastHit = 0
+    local function OnLaserHit()
+        if tick() - LaserLastHit < 2 then return end
+        local Holder = GetHolder("Laser Cape")
+        if not Holder then return end
+        LaserLastHit = tick()
+        QueueGriefNotification(Holder.Name .. " used Laser Cape on you!", Holder.Name, "Laser Cape")
+    end
+
+    -- Medusa's Head
+    local MedusaLastHit = 0
+    local MedusaRadius = (33.986812591552734 + 33.986873626708984) / 2 / 2 * math.pi
+    local BodyPartSet = {
+        LeftFoot=true, RightFoot=true, LeftLowerLeg=true, RightLowerLeg=true,
+        LeftUpperLeg=true, RightUpperLeg=true, LeftHand=true, RightHand=true,
+        LeftLowerArm=true, RightLowerArm=true, LeftUpperArm=true, RightUpperArm=true,
+        UpperTorso=true, LowerTorso=true, Head=true
+    }
+
+    -- Body Swap Potion
+    local HitCooldowns = {}
+    local LocalJustFired = false
+    local PrevHolderPos, PrevLocalPos = nil, nil
+    local function HookLocalPotion()
+        local Char = LocalPlayer.Character
+        if not Char then return end
+        local function HookPotion(Potion)
+            Potion.Activated:Connect(function()
+                LocalJustFired = true
+                task.delay(1, function() LocalJustFired = false end)
+            end)
+        end
+        local Potion = Char:FindFirstChild("Body Swap Potion")
+        if Potion then HookPotion(Potion) end
+        Connect(Char.ChildAdded, function(Child)
+            if Child.Name == "Body Swap Potion" then HookPotion(Child) end
+        end)
+    end
+    Connect(LocalPlayer.CharacterAdded, HookLocalPotion)
+    HookLocalPotion()
+
+    -- workspace.ChildAdded
+    Connect(workspace.ChildAdded, function(Child)
+        local SentryId = Child.Name:match("Sentry_(%d+)")
+        if SentryId then
+            local Ok, Name = pcall(Players.GetNameFromUserIdAsync, Players, tonumber(SentryId))
+            SentryOwners[Ok and Name or "Unknown"] = true
+        end
+        TrackBullet(Child)
+        if Child:IsA("Model") or Child:IsA("Folder") then Connect(Child.DescendantAdded, TrackBullet) end
+
+        if Child.Name == "Handle" then TrackHandle(Child) end
+
+        TrackMissile(Child)
+
+        WatchDoge(Child)
+
+        if Child:IsA("BasePart") and math.abs(Child.Size.X-1) <= 0.1 and math.abs(Child.Size.Y-1) <= 0.1 and math.abs(Child.Size.Z-0.1) <= 0.1 then
+            local Holder = GetHolder("Paintball Gun")
+            if Holder then
+                local TouchConn, HeartbeatConn
+                local function OnHit()
+                    if tick() - PaintballLastHit < 2 then return end
+                    PaintballLastHit = tick()
+                    QueueGriefNotification(Holder.Name .. " used Paintball Gun on you!", Holder.Name, "Paintball Gun")
+                    TouchConn:Disconnect()
+                    HeartbeatConn:Disconnect()
+                end
+                TouchConn = Connect(Child.Touched, function(Hit)
+                    local Char = LocalPlayer.Character
+                    if Char and Hit:IsDescendantOf(Char) then OnHit() end
+                end)
+                HeartbeatConn = Connect(RunService.Heartbeat, function()
+                    if not Child.Parent then TouchConn:Disconnect() HeartbeatConn:Disconnect() return end
+                    local HRP = GetHRP()
+                    if HRP and (Child.Position - HRP.Position).Magnitude <= 3 then OnHit() end
+                end)
+            end
+        end
+
+        if Child:IsA("BasePart") and Child:FindFirstChildWhichIsA("Attachment")
+            and math.abs(Child.Size.X-0.2) <= 0.01 and math.abs(Child.Size.Y-0.2) <= 0.01 and math.abs(Child.Size.Z-0.2) <= 0.01
+            and not LaserDetected[Child] then
+            local Holder = GetHolder("Laser Cape")
+            if Holder then
+                local Char = LocalPlayer.Character
+                local HRP = GetHRP()
+                local MyHead = Char and Char:FindFirstChild("Head")
+                if HRP and (Child.Position - HRP.Position).Magnitude <= 8 then
+                    local HolderHead = Holder.Character and Holder.Character:FindFirstChild("Head")
+                    if HolderHead and HolderHead:FindFirstChildWhichIsA("Attachment") then
+                        if MyHead and MyHead:FindFirstChildWhichIsA("Attachment") then
+                            local HeadAtt = MyHead:FindFirstChildWhichIsA("Attachment")
+                            local PartAtt = Child:FindFirstChildWhichIsA("Attachment")
+                            if HeadAtt.WorldPosition == PartAtt.WorldPosition then return end
+                        end
+                        LaserDetected[Child] = true
+                        OnLaserHit()
+                    end
+                end
+            end
+        end
+
+        if Child:IsA("MeshPart") and BodyPartSet[Child.Name] and tick() - MedusaLastHit >= 3 then
+            local Holder = GetHolder("Medusa's Head")
+            if Holder then
+                local HolderHRP = Holder.Character and Holder.Character:FindFirstChild("HumanoidRootPart")
+                if HolderHRP then
+                    local Start = tick()
+                    local Conn
+                    Conn = Connect(RunService.Heartbeat, function()
+                        if tick() - MedusaLastHit < 3 or tick() - Start > 1 then Conn:Disconnect() return end
+                        local Char = LocalPlayer.Character
+                        local HRP = GetHRP()
+                        if not HRP then return end
+                        local D = HolderHRP.Position - HRP.Position
+                        if math.sqrt(D.X^2 + D.Z^2) > MedusaRadius then return end
+                        local LocalPart = Char:FindFirstChild(Child.Name)
+                        if LocalPart and (Child.Position - LocalPart.Position).Magnitude <= 2 then
+                            MedusaLastHit = tick()
+                            Conn:Disconnect()
+                            QueueGriefNotification(Holder.Name .. " used Medusa's Head on you!", Holder.Name, "Medusa's Head")
+                        end
+                    end)
+                end
+            end
+        end
+
+        if Child.Name == "WebRope" and Child:IsA("RopeConstraint") then
+            local Holder = GetHolder("Web Slinger")
+            if Holder then
+                local Conn
+                Conn = Connect(RunService.Heartbeat, function()
+                    if not Child.Parent then Conn:Disconnect() return end
+                    local Char = LocalPlayer.Character
+                    if not Char then return end
+                    if (Child.Attachment0 and Child.Attachment0:IsDescendantOf(Char)) or (Child.Attachment1 and Child.Attachment1:IsDescendantOf(Char)) then
+                        QueueGriefNotification(Holder.Name .. " used Web Slinger on you!", Holder.Name, "Web Slinger")
+                        Conn:Disconnect()
+                    end
+                end)
+            end
+        end
+    end)
+
+    -- Heartbeat
+    Connect(RunService.Heartbeat, function()
+        local HRP = GetHRP()
+        if HRP then
+            for _, Child in ipairs(workspace:GetChildren()) do
+                local Username = Child.Name:match("^PlayerName_(.+)_Doge$")
+                if not Username or Username == LocalPlayer.Name then continue end
+                local Part = Child:IsA("BasePart") and Child or Child:FindFirstChildWhichIsA("BasePart", true)
+                if not Part or (Part.Position - HRP.Position).Magnitude > 5 then continue end
+                if tick() - DogeLastHit < 2 then continue end
+                DogeLastHit = tick()
+                QueueGriefNotification(Username .. " used Attack Doge on you!", Username, "Attack Doge")
+            end
+        end
+
+        local Holder = GetHolder("Body Swap Potion")
+        if not Holder then PrevHolderPos = nil PrevLocalPos = nil return end
+        local Cooldown = HitCooldowns[Holder.Name]
+        if Cooldown and tick() - Cooldown < 30 then return end
+        local HolderHRP = Holder.Character and Holder.Character:FindFirstChild("HumanoidRootPart")
+        local LocalHRP = GetHRP()
+        if not HolderHRP or not LocalHRP then return end
+        local CurrHolder, CurrLocal = HolderHRP.Position, LocalHRP.Position
+        if PrevHolderPos and PrevLocalPos then
+            -- Increased distance from 5 to 12 to account for ping and movement during the swap
+            if (CurrHolder - PrevLocalPos).Magnitude <= 12 and (CurrLocal - PrevHolderPos).Magnitude <= 12 and not LocalJustFired then
+                HitCooldowns[Holder.Name] = tick()
+                QueueGriefNotification(Holder.Name .. " used Body Swap Potion on you!", Holder.Name, "Body Swap Potion")
+            end
+        end
+        PrevHolderPos = CurrHolder
+        PrevLocalPos = CurrLocal
+    end)
+
+    -- Admin Panel Notifications
+    local NotificationFolder = LocalPlayer.PlayerGui:WaitForChild("Notification"):WaitForChild("Notification")
+    Connect(NotificationFolder.ChildAdded, function(Child)
+        if not Child:IsA("TextLabel") then return end
+        local Text = Child.Text
+        if not (Text:find("ragdoll") or Text:find("balloon") or Text:find("rocket")) then return end
+        for _, Player in ipairs(Players:GetPlayers()) do
+            if Player == LocalPlayer then continue end
+            if Text:find(Player.Name, 1, true) then
+                local Command = Text:match('"([^"]+)"')
+                local CommandName = Command:sub(1,1):upper() .. Command:sub(2)
+                QueueGriefNotification(Player.Name .. " used " .. CommandName .. " on you!", Player.Name, CommandName)
+                return
+            end
+        end
+    end)
+
+    -- Existing workspace children on run
+    for _, C in ipairs(workspace:GetChildren()) do
+        local SentryId = C.Name:match("Sentry_(%d+)")
+        if SentryId then
+            local Ok, Name = pcall(Players.GetNameFromUserIdAsync, Players, tonumber(SentryId))
+            SentryOwners[Ok and Name or "Unknown"] = true
+        end
+        TrackBullet(C)
+        if C.Name == "Handle" then TrackHandle(C) end
+        WatchDoge(C)
+        TrackMissile(C)
+    end
+
+    -- Net Remotes
+    local Ok, Net = pcall(function() return ReplicatedStorage.Packages.Net end)
+    if Ok and Net then
+        for _, v in ipairs(Net:GetChildren()) do
+            if v.Name == "Ragdoll" and v:IsA("RemoteEvent") then
+                Connect(v.OnClientEvent, OnLaserHit)
+            end
+            if v.Name:sub(1,3) ~= "RE/" then continue end
+            local Children = Net:GetChildren()
+            local Remote = Children[table.find(Children, v) + 1]
+            if not Remote or not Remote:IsA("RemoteEvent") then continue end
+            Connect(Remote.OnClientEvent, function(...)
+                local Args = {...}
+                if #Args < 1 or typeof(Args[1]) ~= "Instance" or Args[1].Name ~= "Hit" then return end
+                local Hit = Args[1]
+                local rawGear = Args[2]
+                local Gear = (typeof(rawGear) == "string" and rawGear ~= "" and not rawGear:match("^#%x+$") and not tonumber(rawGear)) and rawGear or (Hit.Parent and Hit.Parent.Name or "Unknown")
+                local Char = Hit.Parent and Hit.Parent.Parent
+                if not Char then return end
+                local Plr = Players:GetPlayerFromCharacter(Char)
+                local Attacker = Plr and Plr.Name or Char.Name
+                if Attacker ~= "Unknown" and Attacker ~= LocalPlayer.Name then
+                    QueueGriefNotification(Attacker .. " used " .. Gear .. " on you!", Attacker, Gear)
+                end
+            end)
+        end
+    end
+
+    if Debug.Enabled then
+        Notify(Debug.Griefer, Debug.Victim, Debug.Item, Debug.Autojoiner, Debug.StealInfo)
+    end
+end
+
+if Config.GriefDetector then
+    _G._GriefDetectorRunning = true
+    task.spawn(function()
+        _G._GriefDetectorTask()
+    end)
+end
+
     settingsGui = UI.settingsGui
 
     if IS_MOBILE then
@@ -5997,14 +7139,14 @@ local function BuildSettingsAndMobileUI()
         end)
     end
 
-    Theme.Background = Color3.fromRGB(20, 10, 14)
-    Theme.Surface = Color3.fromRGB(32, 14, 20)
-    Theme.SurfaceHighlight = Color3.fromRGB(52, 26, 36)
-    Theme.Accent1 = Color3.fromRGB(195, 70, 110)
-    Theme.Accent2 = Color3.fromRGB(160, 48, 88)
-    Theme.TextPrimary = Color3.fromRGB(255, 255, 255)
-    Theme.TextSecondary = Color3.fromRGB(238, 228, 236)
-    Theme.Success = Color3.fromRGB(195, 70, 110)
+    Theme.Background = Color3.fromRGB(3, 3, 13)
+    Theme.Surface = Color3.fromRGB(6, 8, 24)
+    Theme.SurfaceHighlight = Color3.fromRGB(14, 16, 40)
+    Theme.Accent1 = Color3.fromRGB(0, 210, 255)
+    Theme.Accent2 = Color3.fromRGB(0, 100, 255)
+    Theme.TextPrimary = Color3.fromRGB(200, 230, 255)
+    Theme.TextSecondary = Color3.fromRGB(70, 130, 170)
+    Theme.Success = Color3.fromRGB(30, 150, 90)
 
     local HAZE = {
         BG = Color3.fromRGB(20, 10, 14),
@@ -6087,20 +7229,20 @@ local function BuildSettingsAndMobileUI()
     local CUT = RIGHT_AVAILABLE - RIGHT_W
     local MAIN_W = BASE_MAIN_W - CUT
 
-    HAZE.BG = Color3.fromRGB(8, 10, 18)
-    HAZE.SURF = Color3.fromRGB(18, 20, 32)
-    HAZE.SURF2 = Color3.fromRGB(30, 34, 50)
-    HAZE.SIDE = Color3.fromRGB(32, 38, 58)
-    HAZE.SIDE2 = Color3.fromRGB(46, 54, 80)
-    HAZE.TEXT = Color3.fromRGB(235, 240, 255)
-    HAZE.DIM = Color3.fromRGB(160, 170, 200)
-    HAZE.TOP = Color3.fromRGB(160, 170, 210)
-    HAZE.MID = Color3.fromRGB(110, 120, 170)
-    HAZE.BOT = Color3.fromRGB(46, 54, 80)
-    HAZE.ACCENT = Color3.fromRGB(160, 170, 210)
-    HAZE.ACCENT2 = Color3.fromRGB(110, 120, 170)
-    HAZE.STROKE = Color3.fromRGB(150, 160, 210)
-    HAZE.GLOW = Color3.fromRGB(200, 205, 255)
+    HAZE.BG = Color3.fromRGB(3, 3, 13)
+    HAZE.SURF = Color3.fromRGB(6, 8, 24)
+    HAZE.SURF2 = Color3.fromRGB(10, 15, 35)
+    HAZE.SIDE = Color3.fromRGB(8, 18, 45)
+    HAZE.SIDE2 = Color3.fromRGB(12, 25, 60)
+    HAZE.TEXT = Color3.fromRGB(200, 230, 255)
+    HAZE.DIM = Color3.fromRGB(100, 170, 210)
+    HAZE.TOP = Color3.fromRGB(0, 180, 255)
+    HAZE.MID = Color3.fromRGB(0, 120, 200)
+    HAZE.BOT = Color3.fromRGB(12, 25, 60)
+    HAZE.ACCENT = Color3.fromRGB(0, 210, 255)
+    HAZE.ACCENT2 = Color3.fromRGB(0, 130, 210)
+    HAZE.STROKE = Color3.fromRGB(0, 190, 255)
+    HAZE.GLOW = Color3.fromRGB(120, 220, 255)
     Theme.Background = HAZE.BG
     Theme.Surface = HAZE.SURF
     Theme.SurfaceHighlight = HAZE.SURF2
@@ -6175,11 +7317,11 @@ local function BuildSettingsAndMobileUI()
     sFrame.Parent = settingsGui
     HazeCorner(sFrame, 18)
 
-    local outline = HazeStroke(sFrame, 2, Color3.fromRGB(90, 140, 255), 0)
+    local outline = HazeStroke(sFrame, 2, Color3.fromRGB(0, 180, 255), 0)
     outline.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
     local glow = Instance.new("UIStroke")
-    glow.Color = Color3.fromRGB(120, 170, 255)
+    glow.Color = Color3.fromRGB(0, 200, 255)
     glow.Thickness = 4
     glow.Transparency = 0.75
     glow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
@@ -7455,6 +8597,26 @@ local function BuildSettingsAndMobileUI()
         ShowNotification("CLEAN ERROR GUIS", ns and "ENABLED" or "DISABLED")
     end)
 
+    CreateSectionHeader("Detection")
+    local rGriefDetector = CreateRow("Grief Detector")
+    CreateToggleSwitch(rGriefDetector, Config.GriefDetector or false, function(ns, set)
+        set(ns); Config.GriefDetector = ns; SaveConfig()
+        if ns then
+            if not _G._GriefDetectorRunning then
+                _G._GriefDetectorRunning = true
+                task.spawn(function()
+                    _G._GriefDetectorTask()
+                end)
+            end
+        else
+            if getgenv().GriefDetectorCleanup then
+                pcall(getgenv().GriefDetectorCleanup)
+            end
+            _G._GriefDetectorRunning = false
+        end
+        ShowNotification("GRIEF DETECTOR", ns and "ENABLED" or "DISABLED")
+    end)
+
 
     end
     do
@@ -8559,7 +9721,7 @@ task.spawn(function()
         nameLabel.TextYAlignment = Enum.TextYAlignment.Top
         nameLabel.TextXAlignment = Enum.TextXAlignment.Left
         nameLabel.TextTruncate = Enum.TextTruncate.None
-        nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        nameLabel.TextColor3 = Color3.fromRGB(200, 230, 255)
         nameLabel.TextStrokeTransparency = 1
         nameLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
         nameLabel.Text = tostring(data.name or data.petName or "Brainrot")
@@ -9392,12 +10554,12 @@ task.spawn(function()
     invisGui.Enabled = Config.ShowInvisPanel
 
     local INVIS_UI = {
-        BG = Color3.fromRGB(16, 18, 32),
-        SURF = Color3.fromRGB(18, 20, 32),
-        SURF2 = Color3.fromRGB(30, 34, 50),
-        TEXT = Color3.fromRGB(235, 240, 255),
-        DIM = Color3.fromRGB(135, 145, 180),
-        AQUA_STROKE = Color3.fromRGB(150, 160, 210),
+        BG = Color3.fromRGB(3, 5, 15),
+        SURF = Color3.fromRGB(6, 10, 25),
+        SURF2 = Color3.fromRGB(10, 15, 35),
+        TEXT = Color3.fromRGB(200, 230, 255),
+        DIM = Color3.fromRGB(60, 120, 160),
+        AQUA_STROKE = Color3.fromRGB(0, 200, 255),
         GREEN1 = Color3.fromRGB(18, 88, 58),
         GREEN2 = Color3.fromRGB(21, 120, 76),
         GREEN_STROKE = Color3.fromRGB(60, 185, 120),
@@ -9478,7 +10640,7 @@ task.spawn(function()
     titleLine.AnchorPoint = Vector2.new(0.5, 0)
     titleLine.Position = UDim2.new(0.5, 0, 0, 38)
     titleLine.Size = UDim2.new(0, 108, 0, 1)
-    titleLine.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    titleLine.BackgroundColor3 = Color3.fromRGB(0, 180, 255)
     titleLine.BackgroundTransparency = 0.15
     titleLine.BorderSizePixel = 0
 
@@ -10420,10 +11582,10 @@ task.spawn(function()
 
     local outer = new("Frame", {
         Name = "Outer",
-        AnchorPoint = Vector2.new(0.5, 1),
+        AnchorPoint = Vector2.new(0.5, 0),
         Size = UDim2.new(0, 470, 0, 44),
-        Position = UDim2.new(0.5, 0, 1, -86),
-        BackgroundColor3 = Color3.fromRGB(15, 16, 20),
+        Position = UDim2.new(0.5, 0, 0, 8),
+        BackgroundColor3 = Color3.fromRGB(3, 3, 13),
         BorderSizePixel = 0,
         Parent = gui,
     })
@@ -10448,9 +11610,9 @@ task.spawn(function()
     })
 
     new("UIStroke", {
-        Color = Color3.fromRGB(42, 45, 56),
-        Thickness = 1,
-        Transparency = 0.18,
+        Color = Color3.fromRGB(0, 180, 255),
+        Thickness = 1.5,
+        Transparency = 0.25,
         ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
         Parent = outer,
     })
@@ -10459,10 +11621,9 @@ task.spawn(function()
         local grad = Instance.new("UIGradient")
         grad.Rotation = 0
         grad.Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0.00, Color3.fromRGB(22, 24, 30)),
-            ColorSequenceKeypoint.new(0.35, Color3.fromRGB(17, 18, 23)),
-            ColorSequenceKeypoint.new(0.72, Color3.fromRGB(13, 14, 18)),
-            ColorSequenceKeypoint.new(1.00, Color3.fromRGB(18, 19, 24)),
+            ColorSequenceKeypoint.new(0.00, Color3.fromRGB(3, 5, 18)),
+            ColorSequenceKeypoint.new(0.50, Color3.fromRGB(5, 8, 22)),
+            ColorSequenceKeypoint.new(1.00, Color3.fromRGB(3, 5, 18)),
         })
         grad.Parent = outer
     end
@@ -10471,8 +11632,8 @@ task.spawn(function()
         Name = "Sheen",
         Position = UDim2.new(0, 10, 0, 3),
         Size = UDim2.new(1, -20, 0, 1),
-        BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-        BackgroundTransparency = 0.95,
+        BackgroundColor3 = Color3.fromRGB(0, 200, 255),
+        BackgroundTransparency = 0.60,
         BorderSizePixel = 0,
         ZIndex = 3,
         Parent = outer,
@@ -10483,7 +11644,7 @@ task.spawn(function()
         AnchorPoint = Vector2.new(0.5, 0.5),
         Position = UDim2.new(0, 18, 0.5, 0),
         Size = UDim2.new(0, 8, 0, 8),
-        BackgroundColor3 = Color3.fromRGB(161, 128, 255),
+        BackgroundColor3 = Color3.fromRGB(0, 210, 255),
         BorderSizePixel = 0,
         ZIndex = 2,
         Parent = outer,
@@ -10494,9 +11655,9 @@ task.spawn(function()
     })
 
     new("UIStroke", {
-        Color = Color3.fromRGB(190, 165, 255),
+        Color = Color3.fromRGB(120, 230, 255),
         Thickness = 1,
-        Transparency = 0.35,
+        Transparency = 0.25,
         ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
         Parent = dot,
     })
@@ -10506,17 +11667,18 @@ task.spawn(function()
         BackgroundTransparency = 1,
         Position = UDim2.new(0, 30, 0, 0),
         Size = UDim2.new(0, 170, 1, 0),
-        Font = Enum.Font.GothamBold,
-        Text = "Wispaxx Hub",
-        TextSize = 15,
-        TextColor3 = Color3.fromRGB(245, 246, 248),
+        Font = Enum.Font.GothamBlack,
+        Text = "WISPAXX HUB",
+        TextSize = 14,
+        TextColor3 = Color3.fromRGB(0, 210, 255),
         TextXAlignment = Enum.TextXAlignment.Left,
         TextYAlignment = Enum.TextYAlignment.Center,
         ZIndex = 2,
         Parent = outer,
     })
     title.AutoLocalize = false
-    title.TextStrokeTransparency = 0.92
+    title.TextStrokeTransparency = 0.75
+    title.TextStrokeColor3 = Color3.fromRGB(0, 80, 120)
 
     local clockLabel = new("TextLabel", {
         Name = "Clock",
@@ -10526,7 +11688,7 @@ task.spawn(function()
         Font = Enum.Font.GothamBold,
         Text = "00:00",
         TextSize = 13,
-        TextColor3 = Color3.fromRGB(226, 228, 232),
+        TextColor3 = Color3.fromRGB(160, 220, 255),
         TextXAlignment = Enum.TextXAlignment.Center,
         TextYAlignment = Enum.TextYAlignment.Center,
         ZIndex = 2,
@@ -10548,7 +11710,7 @@ task.spawn(function()
             AnchorPoint = Vector2.new(0, 1),
             Position = UDim2.new(0, x, 1, 0),
             Size = UDim2.new(0, 3, 0, h),
-            BackgroundColor3 = Color3.fromRGB(95, 255, 135),
+            BackgroundColor3 = Color3.fromRGB(0, 200, 255),
             BorderSizePixel = 0,
             ZIndex = 2,
             Parent = signalWrap,
@@ -10568,8 +11730,8 @@ task.spawn(function()
         new("Frame", {
             Position = UDim2.new(0, x, 0.5, -10),
             Size = UDim2.new(0, 1, 0, 20),
-            BackgroundColor3 = Color3.fromRGB(55, 58, 70),
-            BackgroundTransparency = 0.15,
+            BackgroundColor3 = Color3.fromRGB(0, 120, 200),
+            BackgroundTransparency = 0.60,
             BorderSizePixel = 0,
             ZIndex = 2,
             Parent = outer,
@@ -10586,7 +11748,7 @@ task.spawn(function()
         Font = Enum.Font.GothamBold,
         Text = "FPS",
         TextSize = 9,
-        TextColor3 = Color3.fromRGB(118, 122, 132),
+        TextColor3 = Color3.fromRGB(70, 160, 200),
         TextXAlignment = Enum.TextXAlignment.Left,
         TextYAlignment = Enum.TextYAlignment.Center,
         ZIndex = 2,
@@ -10601,7 +11763,7 @@ task.spawn(function()
         Font = Enum.Font.GothamBold,
         Text = "0",
         TextSize = 14,
-        TextColor3 = Color3.fromRGB(95, 255, 135),
+        TextColor3 = Color3.fromRGB(0, 220, 255),
         TextXAlignment = Enum.TextXAlignment.Left,
         TextYAlignment = Enum.TextYAlignment.Center,
         ZIndex = 2,
@@ -10616,7 +11778,7 @@ task.spawn(function()
         Font = Enum.Font.GothamBold,
         Text = "PING",
         TextSize = 9,
-        TextColor3 = Color3.fromRGB(118, 122, 132),
+        TextColor3 = Color3.fromRGB(70, 160, 200),
         TextXAlignment = Enum.TextXAlignment.Left,
         TextYAlignment = Enum.TextYAlignment.Center,
         ZIndex = 2,
@@ -10631,7 +11793,7 @@ task.spawn(function()
         Font = Enum.Font.GothamBold,
         Text = "0ms",
         TextSize = 14,
-        TextColor3 = Color3.fromRGB(95, 255, 135),
+        TextColor3 = Color3.fromRGB(0, 220, 255),
         TextXAlignment = Enum.TextXAlignment.Left,
         TextYAlignment = Enum.TextYAlignment.Center,
         ZIndex = 2,
@@ -10669,10 +11831,8 @@ task.spawn(function()
         end
     end)
     -- Haze Hub HUD dragging disabled
-
--- Haze Hub HUD dragging disabled
-
--- ============================================================
+   
+    -- ============================================================
 -- RAGDOLL PROGRESS BAR (collée sous STEAL TARGET GUI)
 -- ============================================================
 do
@@ -10738,6 +11898,15 @@ do
         lastRagdollState = false
     end)
 end
+
+
+    if Config.ShowUnlockButtonsHUD then
+        task.defer(function()
+            toggleUnlockBaseMenu(true)
+        end)
+    end
+end)
+
 
 
 task.spawn(function()
@@ -11665,10 +12834,10 @@ task.spawn(function()
             remove.Text = "x"
             remove.Font = Enum.Font.GothamBold
             remove.TextSize = 10
-            remove.TextColor3 = Color3.fromRGB(255, 230, 240)
+            remove.TextColor3 = Color3.fromRGB(255, 80, 100)
             remove.Size = UDim2.fromOffset(16, 16)
             remove.Position = UDim2.new(1, -54, 0.5, -8)
-            remove.BackgroundColor3 = Color3.fromRGB(78, 32, 58)
+            remove.BackgroundColor3 = Color3.fromRGB(30, 5, 15)
             remove.BorderSizePixel = 0
             remove.Parent = row
             round(remove, 5)
@@ -11678,10 +12847,10 @@ task.spawn(function()
             up.Text = "^"
             up.Font = Enum.Font.GothamBold
             up.TextSize = 10
-            up.TextColor3 = Color3.fromRGB(120, 235, 255)
+            up.TextColor3 = Color3.fromRGB(0, 210, 255)
             up.Size = UDim2.fromOffset(16, 16)
             up.Position = UDim2.new(1, -36, 0.5, -8)
-            up.BackgroundColor3 = Color3.fromRGB(30, 17, 51)
+            up.BackgroundColor3 = Color3.fromRGB(5, 10, 30)
             up.BorderSizePixel = 0
             up.Parent = row
             round(up, 5)
@@ -11691,10 +12860,10 @@ task.spawn(function()
             down.Text = "v"
             down.Font = Enum.Font.GothamBold
             down.TextSize = 10
-            down.TextColor3 = Color3.fromRGB(120, 235, 255)
+            down.TextColor3 = Color3.fromRGB(0, 210, 255)
             down.Size = UDim2.fromOffset(16, 16)
             down.Position = UDim2.new(1, -18, 0.5, -8)
-            down.BackgroundColor3 = Color3.fromRGB(30, 17, 51)
+            down.BackgroundColor3 = Color3.fromRGB(5, 10, 30)
             down.BorderSizePixel = 0
             down.Parent = row
             round(down, 5)
@@ -12156,11 +13325,11 @@ end
 
 task.spawn(function()
     local HTheme = {
-        Background = Color3.fromRGB(15,17,22),
-        Accent1 = Color3.fromRGB(0,225,255),
-        Accent2 = Color3.fromRGB(170,0,255),
-        White   = Color3.fromRGB(235,235,245),
-        Gray    = Color3.fromRGB(130,130,145),
+        Background = Color3.fromRGB(3, 3, 13),
+        Accent1 = Color3.fromRGB(0, 210, 255),
+        Accent2 = Color3.fromRGB(0, 100, 255),
+        White   = Color3.fromRGB(200, 230, 255),
+        Gray    = Color3.fromRGB(60, 120, 170),
         Success = Color3.fromRGB(30, 150, 90),
         Error   = Color3.fromRGB(255, 60, 80)
     }
@@ -12183,7 +13352,7 @@ task.spawn(function()
     main.AnchorPoint = Vector2.new(0.5, 0) 
     main.Position = UDim2.new(savedPos.X, 0, savedPos.Y, 0)
     
-    main.BackgroundColor3 = Color3.fromRGB(20,22,28)
+    main.BackgroundColor3 = Color3.fromRGB(3, 3, 13)
     main.BackgroundTransparency = 0.15
     main.BorderSizePixel = 0
     main.Parent = joinerGui
@@ -12192,8 +13361,8 @@ task.spawn(function()
 
     local bgGradient = Instance.new("UIGradient", main)
     bgGradient.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(20,22,28)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(25,27,35))
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(3, 3, 13)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(5, 8, 22))
     }
     bgGradient.Rotation = 45
 
@@ -12244,7 +13413,7 @@ task.spawn(function()
         
         local box = Instance.new("TextBox", frame)
         box.Size = UDim2.new(1, 0, 1, 0)
-        box.BackgroundColor3 = Color3.fromRGB(10, 10, 12)
+        box.BackgroundColor3 = Color3.fromRGB(2, 3, 12)
         box.BackgroundTransparency = 0.5
         box.Text = default or ""
         box.PlaceholderText = placeholder
@@ -12306,7 +13475,7 @@ task.spawn(function()
     idFrame.Parent = content
     idBox.TextTruncate = Enum.TextTruncate.AtEnd
 
-    local clearBtn = CreateButton("CLEAR", 50, Color3.fromRGB(60, 60, 70))
+    local clearBtn = CreateButton("CLEAR", 50, Color3.fromRGB(10, 20, 50))
     clearBtn.Parent = content
 
     local attFrame, attBox = CreateInput("Attempts", 60, "2000")
@@ -12672,7 +13841,7 @@ do
     local abRejoinBtn = Instance.new("TextButton", abRejoinRow)
     abRejoinBtn.Size             = UDim2.new(1, -16, 0, 24)
     abRejoinBtn.Position         = UDim2.new(0, 8, 0.5, -12)
-    abRejoinBtn.BackgroundColor3 = Color3.fromRGB(220, 50, 50)
+    abRejoinBtn.BackgroundColor3 = Color3.fromRGB(180, 30, 30)
     abRejoinBtn.Text             = "⟳  REJOIN SERVER"
     abRejoinBtn.Font             = Enum.Font.GothamBlack
     abRejoinBtn.TextSize         = 12
@@ -12681,7 +13850,7 @@ do
     abRejoinBtn.AutoButtonColor  = false
     Instance.new("UICorner", abRejoinBtn).CornerRadius = UDim.new(0, 6)
     local rejoinStroke = Instance.new("UIStroke", abRejoinBtn)
-    rejoinStroke.Color = Color3.fromRGB(255, 100, 100)
+    rejoinStroke.Color = Color3.fromRGB(255, 80, 80)
     rejoinStroke.Thickness = 1.2
     rejoinStroke.Transparency = 0.4
     abRejoinBtn.MouseEnter:Connect(function()
@@ -12692,7 +13861,7 @@ do
     end)
     abRejoinBtn.MouseButton1Click:Connect(function()
         abRejoinBtn.Text = "Rejoining..."
-        abRejoinBtn.BackgroundColor3 = Color3.fromRGB(150, 40, 40)
+        abRejoinBtn.BackgroundColor3 = Color3.fromRGB(100, 20, 20)
         task.wait(0.3)
         pcall(function()
             TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer)
@@ -13158,7 +14327,7 @@ mainFrame.Size = UDim2.new(0, FRAME_W, 0, FRAME_H)
 mainFrame.Position = (savedX and savedY)
     and UDim2.new(0, savedX, 0, savedY)
     or UDim2.new(0.5, -132, 0.5, -219)
-mainFrame.BackgroundColor3 = Color3.fromRGB(10, 14, 22)
+mainFrame.BackgroundColor3 = Color3.fromRGB(3, 3, 13)
 mainFrame.BorderSizePixel = 0
 mainFrame.Active = true
 mainFrame.Draggable = false
@@ -13168,7 +14337,7 @@ Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 12)
 
 -- Cyan border stroke
 local stroke = Instance.new("UIStroke")
-stroke.Color = Color3.fromRGB(0, 200, 230)
+stroke.Color = Color3.fromRGB(0, 200, 255)
 stroke.Thickness = 1.5
 stroke.Transparency = 0.5
 stroke.Parent = mainFrame
@@ -13204,7 +14373,7 @@ end
 local accentLine = Instance.new("Frame")
 accentLine.Size = UDim2.new(1, 0, 0, 2)
 accentLine.Position = UDim2.new(0, 0, 0, 48)
-accentLine.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+accentLine.BackgroundColor3 = Color3.fromRGB(0, 200, 255)
 accentLine.BorderSizePixel = 0
 accentLine.ZIndex = 3
 accentLine.Parent = mainFrame
@@ -13212,7 +14381,7 @@ accentLine.Parent = mainFrame
 -- Title bar
 local titleBar = Instance.new("Frame")
 titleBar.Size = UDim2.new(1, 0, 0, 48)
-titleBar.BackgroundColor3 = Color3.fromRGB(12, 20, 32)
+titleBar.BackgroundColor3 = Color3.fromRGB(4, 6, 20)
 titleBar.BorderSizePixel = 0
 titleBar.ZIndex = 3
 titleBar.Parent = mainFrame
@@ -13224,7 +14393,7 @@ titleLabel.Size = UDim2.new(1, -80, 1, 0)
 titleLabel.Position = UDim2.new(0, 30, 0, 0)
 titleLabel.BackgroundTransparency = 1
 titleLabel.Text = "Remote Sell"
-titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.TextColor3 = Color3.fromRGB(0, 210, 255)
 titleLabel.Font = Enum.Font.GothamBlack
 titleLabel.TextSize = 15
 titleLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -13237,7 +14406,7 @@ statusLabel.Size = UDim2.new(1, -20, 0, 22)
 statusLabel.Position = UDim2.new(0, 10, 0, 54)
 statusLabel.BackgroundTransparency = 1
 statusLabel.Text = "Scanning..."
-statusLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+statusLabel.TextColor3 = Color3.fromRGB(0, 210, 255)
 statusLabel.Font = Enum.Font.Gotham
 statusLabel.TextSize = 11
 statusLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -13248,10 +14417,10 @@ statusLabel.Parent = mainFrame
 local scrollFrame = Instance.new("ScrollingFrame")
 scrollFrame.Size = UDim2.new(1, -18, 1, -112)
 scrollFrame.Position = UDim2.new(0, 9, 0, 80)
-scrollFrame.BackgroundColor3 = Color3.fromRGB(14, 20, 30)
+scrollFrame.BackgroundColor3 = Color3.fromRGB(3, 5, 15)
 scrollFrame.BorderSizePixel = 0
 scrollFrame.ScrollBarThickness = 3
-scrollFrame.ScrollBarImageColor3 = Color3.fromRGB(34, 39, 58)
+scrollFrame.ScrollBarImageColor3 = Color3.fromRGB(0, 100, 180)
 scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
 scrollFrame.ZIndex = 3
 scrollFrame.Parent = mainFrame
@@ -13282,7 +14451,7 @@ local shownPodiums = {}
 local function addRow(podiumNum, sellPrompt, sellText)
     local row = Instance.new("Frame")
     row.Size = UDim2.new(1, -12, 0, 40)
-    row.BackgroundColor3 = Color3.fromRGB(30, 34, 50)
+    row.BackgroundColor3 = Color3.fromRGB(8, 14, 30)
     row.BorderSizePixel = 0
     row.LayoutOrder = podiumNum
     row.ZIndex = 4
@@ -13294,7 +14463,7 @@ local function addRow(podiumNum, sellPrompt, sellText)
     local leftAccent = Instance.new("Frame")
     leftAccent.Size = UDim2.new(0, 3, 1, -8)
     leftAccent.Position = UDim2.new(0, 0, 0, 4)
-    leftAccent.BackgroundColor3 = Color3.fromRGB(171, 181, 223)
+    leftAccent.BackgroundColor3 = Color3.fromRGB(0, 180, 255)
     leftAccent.BorderSizePixel = 0
     leftAccent.ZIndex = 5
     leftAccent.Parent = row
@@ -13304,9 +14473,9 @@ local function addRow(podiumNum, sellPrompt, sellText)
     local badge = Instance.new("TextLabel")
     badge.Size = UDim2.new(0, 28, 0, 28)
     badge.Position = UDim2.new(0, 10, 0.5, -14)
-    badge.BackgroundColor3 = Color3.fromRGB(18, 20, 32)
+    badge.BackgroundColor3 = Color3.fromRGB(5, 8, 22)
     badge.Text = tostring(podiumNum)
-    badge.TextColor3 = Color3.fromRGB(255, 255, 255)
+    badge.TextColor3 = Color3.fromRGB(200, 230, 255)
     badge.Font = Enum.Font.GothamBlack
     badge.TextSize = 12
     badge.BorderSizePixel = 0
@@ -13320,7 +14489,7 @@ local function addRow(podiumNum, sellPrompt, sellText)
     nameLabel.Position = UDim2.new(0, 46, 0, 0)
     nameLabel.BackgroundTransparency = 1
     nameLabel.Text = sellText
-    nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    nameLabel.TextColor3 = Color3.fromRGB(200, 230, 255)
     nameLabel.Font = Enum.Font.Gotham
     nameLabel.TextSize = 11
     nameLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -13332,7 +14501,7 @@ local function addRow(podiumNum, sellPrompt, sellText)
     local sellBtn = Instance.new("TextButton")
     sellBtn.Size = UDim2.new(0, 56, 0, 28)
     sellBtn.Position = UDim2.new(1, -62, 0.5, -14)
-    sellBtn.BackgroundColor3 = Color3.fromRGB(37, 41, 60)
+    sellBtn.BackgroundColor3 = Color3.fromRGB(8, 15, 40)
     sellBtn.Text = "SELL"
     sellBtn.TextColor3 = Color3.new(74, 239, 10)
     sellBtn.Font = Enum.Font.GothamBold
@@ -13348,7 +14517,7 @@ local function addRow(podiumNum, sellPrompt, sellText)
         end)
         if sellOk then
             sellBtn.Text = "✓"
-            sellBtn.BackgroundColor3 = Color3.fromRGB(20, 160, 60)
+            sellBtn.BackgroundColor3 = Color3.fromRGB(0, 160, 60)
             task.wait(0.4)
             shownPodiums[podiumNum] = nil
             row:Destroy()
@@ -13362,10 +14531,10 @@ local function addRow(podiumNum, sellPrompt, sellText)
             end
         else
             sellBtn.Text = "ERR"
-            sellBtn.BackgroundColor3 = Color3.fromRGB(80, 0, 30)
+            sellBtn.BackgroundColor3 = Color3.fromRGB(30, 0, 50)
             task.wait(1)
             sellBtn.Text = "SELL"
-            sellBtn.BackgroundColor3 = Color3.fromRGB(0, 160, 200)
+            sellBtn.BackgroundColor3 = Color3.fromRGB(0, 140, 210)
         end
     end)
 end
@@ -14020,25 +15189,25 @@ local function __initAdminPanelLiteralReplacement()
     __cleanupResidualAdminPanels()
 
     local RP_COLORS = {
-        Text = Color3.fromRGB(245, 247, 250),
-        SubText = Color3.fromRGB(150, 156, 168),
-        Accent = Color3.fromRGB(255, 255, 255),
-        AccentSoft = Color3.fromRGB(72, 78, 90),
-        AccentBright = Color3.fromRGB(215, 220, 230),
+        Text = Color3.fromRGB(200, 230, 255),
+        SubText = Color3.fromRGB(70, 130, 170),
+        Accent = Color3.fromRGB(0, 210, 255),
+        AccentSoft = Color3.fromRGB(10, 30, 70),
+        AccentBright = Color3.fromRGB(120, 200, 255),
 
-        PanelTop = Color3.fromRGB(12, 13, 17),
-        PanelTop2 = Color3.fromRGB(8, 9, 12),
-        PanelInner = Color3.fromRGB(10, 11, 14),
-        ControlsBar = Color3.fromRGB(8, 9, 12),
+        PanelTop = Color3.fromRGB(4, 6, 18),
+        PanelTop2 = Color3.fromRGB(2, 3, 12),
+        PanelInner = Color3.fromRGB(3, 5, 15),
+        ControlsBar = Color3.fromRGB(2, 3, 12),
 
-        RowA = Color3.fromRGB(17, 19, 24),
-        RowB = Color3.fromRGB(14, 16, 21),
-        RowHover = Color3.fromRGB(23, 26, 33),
-        RowLine = Color3.fromRGB(42, 46, 58),
+        RowA = Color3.fromRGB(5, 8, 20),
+        RowB = Color3.fromRGB(3, 6, 16),
+        RowHover = Color3.fromRGB(8, 15, 35),
+        RowLine = Color3.fromRGB(15, 35, 70),
 
-        ButtonBg = Color3.fromRGB(14, 16, 21),
-        ButtonStroke = Color3.fromRGB(76, 82, 94),
-        LockedFill = Color3.fromRGB(86, 69, 26),
+        ButtonBg = Color3.fromRGB(5, 10, 28),
+        ButtonStroke = Color3.fromRGB(0, 100, 180),
+        LockedFill = Color3.fromRGB(20, 50, 100),
         Danger = Color3.fromRGB(167, 58, 62),
         Yellow = Color3.fromRGB(255, 213, 96),
         White = Color3.fromRGB(255, 255, 255),
@@ -14144,9 +15313,9 @@ local function __initAdminPanelLiteralReplacement()
             stroke.Color = RP_COLORS.AccentBright
             stroke.Transparency = 1
         elseif state == "locked" then
-            fill.BackgroundColor3 = Color3.fromRGB(145, 34, 34)
+            fill.BackgroundColor3 = Color3.fromRGB(120, 20, 20)
             fill.BackgroundTransparency = 0.02
-            stroke.Color = Color3.fromRGB(255, 120, 120)
+            stroke.Color = Color3.fromRGB(255, 70, 70)
             stroke.Transparency = 0.35
         end
     end
@@ -14357,7 +15526,7 @@ local function __initAdminPanelLiteralReplacement()
 
     rpui.backdrop = rpMake("Frame", {
         Name = "Backdrop",
-        BackgroundColor3 = Color3.fromRGB(8, 9, 12),
+        BackgroundColor3 = Color3.fromRGB(2, 3, 12),
         BackgroundTransparency = 0.50,
         BorderSizePixel = 0,
         Position = UDim2.fromOffset(-3, -2),
@@ -14384,7 +15553,7 @@ local function __initAdminPanelLiteralReplacement()
     rpui.refreshBtn = rpMake("TextButton", {
         Size = UDim2.fromOffset(72, 24),
         Position = UDim2.fromOffset(10, 8),
-        BackgroundColor3 = Color3.fromRGB(24, 27, 33),
+        BackgroundColor3 = Color3.fromRGB(6, 10, 25),
         AutoButtonColor = false,
         Text = "Refresh",
         Font = Enum.Font.GothamBold,
@@ -14398,7 +15567,7 @@ local function __initAdminPanelLiteralReplacement()
     rpui.closeBtn = rpMake("TextButton", {
         Size = UDim2.fromOffset(18, 18),
         Position = UDim2.new(1, -28, 0, 10),
-        BackgroundColor3 = Color3.fromRGB(22, 24, 30),
+        BackgroundColor3 = Color3.fromRGB(5, 8, 20),
         AutoButtonColor = false,
         Text = "□",
         Font = Enum.Font.GothamBlack,
@@ -14424,7 +15593,7 @@ local function __initAdminPanelLiteralReplacement()
 
     rpui.controlsBar = rpMake("Frame", {
         Name = "ControlsBar",
-        BackgroundColor3 = Color3.fromRGB(8, 9, 12),
+        BackgroundColor3 = Color3.fromRGB(2, 3, 12),
         BackgroundTransparency = 0,
         BorderSizePixel = 0,
         Position = UDim2.fromOffset(6, 6),
@@ -14445,7 +15614,7 @@ local function __initAdminPanelLiteralReplacement()
         Name = "ProximityAPButton",
         Size = UDim2.fromOffset(52, 24),
         Position = UDim2.fromOffset(2, 7),
-        BackgroundColor3 = Color3.fromRGB(20, 22, 28),
+        BackgroundColor3 = Color3.fromRGB(4, 6, 18),
         AutoButtonColor = false,
         Text = "Prox",
         Font = Enum.Font.GothamBold,
@@ -14459,7 +15628,7 @@ local function __initAdminPanelLiteralReplacement()
     rpui.spamBaseBtn = rpMake("TextButton", {
         Size = UDim2.fromOffset(90, 24),
         Position = UDim2.fromOffset(62, 7),
-        BackgroundColor3 = Color3.fromRGB(20, 22, 28),
+        BackgroundColor3 = Color3.fromRGB(4, 6, 18),
         AutoButtonColor = false,
         Text = "Spam Base Owner",
         Font = Enum.Font.GothamBold,
@@ -14482,7 +15651,7 @@ local function __initAdminPanelLiteralReplacement()
     })
 
     rpui.proxSliderBg = rpMake("Frame", {
-        BackgroundColor3 = Color3.fromRGB(44, 48, 57),
+        BackgroundColor3 = Color3.fromRGB(10, 20, 50),
         BorderSizePixel = 0,
         Position = UDim2.fromOffset(198, 17),
         Size = UDim2.fromOffset(170, 6),
@@ -14507,7 +15676,7 @@ local function __initAdminPanelLiteralReplacement()
         Parent = rpui.proxSliderBg
     })
     rpCorner(rpui.proxKnob, 3)
-    rpui.proxKnobStroke = rpStroke(rpui.proxKnob, Color3.fromRGB(18, 21, 27), 1.2, 0.35)
+    rpui.proxKnobStroke = rpStroke(rpui.proxKnob, Color3.fromRGB(3, 5, 15), 1.2, 0.35)
 
     rpui.listHolder = rpMake("Frame", {
         Name = "ListHolder",
@@ -14542,9 +15711,9 @@ local function __initAdminPanelLiteralReplacement()
 
     local function updateProxButton()
         local enabled = ProximityAPActive == true
-        rpui.proxBtn.BackgroundColor3 = enabled and Color3.fromRGB(58, 63, 74) or Color3.fromRGB(20, 22, 28)
+        rpui.proxBtn.BackgroundColor3 = enabled and Color3.fromRGB(0, 80, 180) or Color3.fromRGB(3, 5, 15)
         rpui.proxBtn.TextColor3 = RP_COLORS.Text
-        rpui.proxBtnStroke.Color = enabled and Color3.fromRGB(220, 225, 235) or RP_COLORS.ButtonStroke
+        rpui.proxBtnStroke.Color = enabled and Color3.fromRGB(0, 210, 255) or RP_COLORS.ButtonStroke
     end
 
     local proxViz = nil
@@ -14698,7 +15867,7 @@ local function __initAdminPanelLiteralReplacement()
             return
         end
 
-        rpui.spamBaseBtn.BackgroundColor3 = Color3.fromRGB(58, 63, 74)
+        rpui.spamBaseBtn.BackgroundColor3 = Color3.fromRGB(8, 18, 45)
         rpui.spamBaseBtn.TextColor3 = RP_COLORS.Text
         ShowNotification("SPAM OWNER", "Spamming " .. targetPlayer.DisplayName)
 
@@ -14714,7 +15883,7 @@ local function __initAdminPanelLiteralReplacement()
             end
 
             task.wait(0)
-            rpui.spamBaseBtn.BackgroundColor3 = Color3.fromRGB(20, 22, 28)
+            rpui.spamBaseBtn.BackgroundColor3 = Color3.fromRGB(3, 5, 15)
             rpui.spamBaseBtn.TextColor3 = RP_COLORS.Text
             ShowNotification("SPAM OWNER", "Sent " .. cmdCount .. " commands to " .. targetPlayer.DisplayName)
         end)
@@ -14756,7 +15925,7 @@ local function __initAdminPanelLiteralReplacement()
 
     local function createUserTag(parent, kind, xOffset)
         local labelText = kind == "kawaifu" and "KAWAIFU" or "MOBY"
-        local bgColor = kind == "kawaifu" and Color3.fromRGB(228, 91, 176) or Color3.fromRGB(68, 136, 255)
+        local bgColor = kind == "kawaifu" and Color3.fromRGB(100, 0, 180) or Color3.fromRGB(0, 120, 255)
         local width = kind == "kawaifu" and 58 or 38
 
         local existing = parent:FindFirstChild("UserTag_MOBY") or parent:FindFirstChild("UserTag_KAWAIFU")
@@ -15009,7 +16178,7 @@ local function __initAdminPanelLiteralReplacement()
         end)
 
         local avatarHolder = rpMake("Frame", {
-            BackgroundColor3 = Color3.fromRGB(9, 10, 14),
+            BackgroundColor3 = Color3.fromRGB(2, 4, 12),
             BorderSizePixel = 0,
             Size = UDim2.fromOffset(34, 34),
             Position = UDim2.fromOffset(8, 10),
@@ -15264,4 +16433,3 @@ __initAdminPanelLiteralReplacement()
             return
         end
     end)
-end)
