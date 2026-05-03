@@ -5299,10 +5299,6 @@ local function runAutoSnipe()
     
     if State.carpetSpeedEnabled then
         setCarpetSpeed(false)
-        if _carpetStatusLabel then
-            _carpetStatusLabel.Text = "OFF"
-            _carpetStatusLabel.TextColor3 = Theme.Error
-        end
     end
 
     local targetPetData = nil
@@ -5589,10 +5585,6 @@ local function executeResetWithAntiDieBypass(onAfterAntiDieRestore)
     end
     if State.carpetSpeedEnabled then
         setCarpetSpeed(false)
-        if _carpetStatusLabel then
-            _carpetStatusLabel.Text = "OFF"
-            _carpetStatusLabel.TextColor3 = Theme.Error
-        end
     end
 
     local antiDieWasOff = _G.AntiDieDisabled == true
@@ -5843,10 +5835,6 @@ UserInputService.InputBegan:Connect(function(input, processed)
     if input.KeyCode == (Enum.KeyCode[NormalizeKeyName(Config.TpSettings.CarpetSpeedKey, "Q")] or Enum.KeyCode.Q) then
         carpetSpeedEnabled = not carpetSpeedEnabled
         setCarpetSpeed(carpetSpeedEnabled)
-        if _carpetStatusLabel then
-            _carpetStatusLabel.Text = carpetSpeedEnabled and "ON" or "OFF"
-            _carpetStatusLabel.TextColor3 = carpetSpeedEnabled and Theme.Success or Theme.Error
-        end
         ShowNotification("CARPET SPEED", carpetSpeedEnabled and ("ON  |  "..Config.TpSettings.Tool.."  |  140") or "OFF")
     end
 
@@ -7309,6 +7297,10 @@ end
 
 
 
+
+    -- ============================================================
+    -- SETTINGS GUI - STYLE LETHAL HUB (VERTICAL SIMPLE)
+    -- ============================================================
     settingsGui = Instance.new("ScreenGui")
     settingsGui.Name = "SettingsUI"
     settingsGui.ResetOnSpawn = false
@@ -7320,60 +7312,38 @@ end
     local UI_SCALE = 1
     local function s(n) return math.floor(n * UI_SCALE + 0.5) end
 
-    local BASE_MAIN_W = 808
-    local MAIN_H = 456
-    local HEADER_H = 52
-    local SIDE_W = 163
-    local RIGHT_REDUCE = 0.15
-    local RIGHT_AVAILABLE = BASE_MAIN_W - SIDE_W - 20
-    local RIGHT_W = math.floor(RIGHT_AVAILABLE * (1 - RIGHT_REDUCE))
-    local CUT = RIGHT_AVAILABLE - RIGHT_W
-    local MAIN_W = BASE_MAIN_W - CUT
-
-    HAZE.BG = Color3.fromRGB(3, 3, 13)
-    HAZE.SURF = Color3.fromRGB(6, 8, 24)
+    HAZE.BG    = Color3.fromRGB(3, 3, 13)
+    HAZE.SURF  = Color3.fromRGB(6, 8, 24)
     HAZE.SURF2 = Color3.fromRGB(10, 15, 35)
-    HAZE.SIDE = Color3.fromRGB(8, 18, 45)
+    HAZE.SIDE  = Color3.fromRGB(8, 18, 45)
     HAZE.SIDE2 = Color3.fromRGB(12, 25, 60)
-    HAZE.TEXT = Color3.fromRGB(200, 230, 255)
-    HAZE.DIM = Color3.fromRGB(100, 170, 210)
-    HAZE.TOP = Color3.fromRGB(0, 180, 255)
-    HAZE.MID = Color3.fromRGB(0, 120, 200)
-    HAZE.BOT = Color3.fromRGB(12, 25, 60)
-    HAZE.ACCENT = Color3.fromRGB(0, 210, 255)
+    HAZE.TEXT  = Color3.fromRGB(200, 230, 255)
+    HAZE.DIM   = Color3.fromRGB(100, 170, 210)
+    HAZE.TOP   = Color3.fromRGB(0, 180, 255)
+    HAZE.MID   = Color3.fromRGB(0, 120, 200)
+    HAZE.BOT   = Color3.fromRGB(12, 25, 60)
+    HAZE.ACCENT  = Color3.fromRGB(0, 210, 255)
     HAZE.ACCENT2 = Color3.fromRGB(0, 130, 210)
-    HAZE.STROKE = Color3.fromRGB(0, 190, 255)
-    HAZE.GLOW = Color3.fromRGB(120, 220, 255)
-    Theme.Background = HAZE.BG
-    Theme.Surface = HAZE.SURF
+    HAZE.STROKE  = Color3.fromRGB(0, 190, 255)
+    HAZE.GLOW    = Color3.fromRGB(120, 220, 255)
+    Theme.Background       = HAZE.BG
+    Theme.Surface          = HAZE.SURF
     Theme.SurfaceHighlight = HAZE.SURF2
-    Theme.Accent1 = HAZE.ACCENT
-    Theme.Accent2 = HAZE.ACCENT2
-    Theme.TextPrimary = HAZE.TEXT
-    Theme.TextSecondary = HAZE.DIM
-    Theme.Success = HAZE.ACCENT2
-    Theme.Error = HAZE.ACCENT2
+    Theme.Accent1          = HAZE.ACCENT
+    Theme.Accent2          = HAZE.ACCENT2
+    Theme.TextPrimary      = HAZE.TEXT
+    Theme.TextSecondary    = HAZE.DIM
+    Theme.Success          = HAZE.ACCENT2
+    Theme.Error            = HAZE.ACCENT2
 
     local function HazePad(parent, l, t, r, b)
         local p = Instance.new("UIPadding")
-        p.PaddingLeft = UDim.new(0, l or 0)
-        p.PaddingTop = UDim.new(0, t or 0)
-        p.PaddingRight = UDim.new(0, r or 0)
+        p.PaddingLeft   = UDim.new(0, l or 0)
+        p.PaddingTop    = UDim.new(0, t or 0)
+        p.PaddingRight  = UDim.new(0, r or 0)
         p.PaddingBottom = UDim.new(0, b or 0)
         p.Parent = parent
         return p
-    end
-
-    local function HazeBgTriGradient(parent)
-        local g = Instance.new("UIGradient")
-        g.Rotation = 90
-        g.Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0.00, HAZE.TOP),
-            ColorSequenceKeypoint.new(0.50, HAZE.MID),
-            ColorSequenceKeypoint.new(1.00, HAZE.BOT),
-        })
-        g.Parent = parent
-        return g
     end
 
     local function HazeAccentGradient(parent)
@@ -7408,25 +7378,30 @@ end
         return g
     end
 
+    local function HazeTween(obj, ti, props, style, dir)
+        TweenService:Create(obj, TweenInfo.new(ti or 0.2, style or Enum.EasingStyle.Quint, dir or Enum.EasingDirection.Out), props):Play()
+    end
+
+    -- ============================================================
+    -- FRAME PRINCIPAL - STYLE LETHAL HUB : vertical, compact
+    -- ============================================================
     sFrame = Instance.new("Frame")
     sFrame.Name = "sFrame"
-    sFrame.Size = UDim2.fromOffset(MAIN_W, MAIN_H)
-    sFrame.Position = UDim2.new(Config.Positions.Settings.X, Config.Positions.Settings.OffsetX or 0, Config.Positions.Settings.Y, Config.Positions.Settings.OffsetY or 0)
+    sFrame.Size = UDim2.fromOffset(300, 650)
+    sFrame.Position = UDim2.new(
+        Config.Positions.Settings.X,
+        Config.Positions.Settings.OffsetX or 0,
+        Config.Positions.Settings.Y,
+        Config.Positions.Settings.OffsetY or 0
+    )
     sFrame.BackgroundColor3 = HAZE.BG
-    sFrame.BackgroundTransparency = 0.03
+    sFrame.BackgroundTransparency = 0.05
     sFrame.BorderSizePixel = 0
+    sFrame.ClipsDescendants = true
     sFrame.Parent = settingsGui
-    HazeCorner(sFrame, 18)
+    HazeCorner(sFrame, 12)
 
-    local outline = HazeStroke(sFrame, 2, Color3.fromRGB(0, 180, 255), 0)
-    outline.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-
-    local glow = Instance.new("UIStroke")
-    glow.Color = Color3.fromRGB(0, 200, 255)
-    glow.Thickness = 4
-    glow.Transparency = 0.75
-    glow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-    glow.Parent = sFrame
+    local sStroke = HazeStroke(sFrame, 1.5, HAZE.STROKE, 0.4)
 
     local shadow = Instance.new("ImageLabel")
     shadow.Name = "Shadow"
@@ -7442,113 +7417,25 @@ end
     shadow.ZIndex = 0
     shadow.Parent = sFrame
 
-    ApplyViewportUIScale(sFrame, MAIN_W, MAIN_H, 0.45, 0.85)
+    ApplyViewportUIScale(sFrame, 300, 650, 0.45, 0.85)
+    AddMobileMinimize(sFrame, "SETTINGS")
 
+    -- HEADER
+    local sHeader = Instance.new("Frame", sFrame)
+    sHeader.Size = UDim2.new(1, 0, 0, 40)
+    sHeader.BackgroundTransparency = 1
 
-    local sidebar = Instance.new("Frame")
-    sidebar.Name = "Sidebar"
-    sidebar.Size = UDim2.fromOffset(SIDE_W, MAIN_H)
-    sidebar.BackgroundColor3 = HAZE.SURF
-    sidebar.BackgroundTransparency = 0
-    sidebar.BorderSizePixel = 0
-    sidebar.Parent = sFrame
-    HazeCorner(sidebar, 18)
-    HazeStroke(sidebar, 1, HAZE.STROKE, 0.50)
+    MakeDraggable(sHeader, sFrame, "Settings")
 
-    local brand = Instance.new("Frame")
-    brand.Name = "Brand"
-    brand.Size = UDim2.new(1, -16, 0, 60)
-    brand.Position = UDim2.fromOffset(8, 8)
-    brand.BackgroundColor3 = HAZE.SURF2
-    brand.BackgroundTransparency = 0
-    brand.BorderSizePixel = 0
-    brand.Parent = sidebar
-    HazeCorner(brand, 14)
-    HazeStroke(brand, 1, HAZE.STROKE, 0.45)
-
-    local orb = Instance.new("Frame")
-    orb.Name = "Orb"
-    orb.Size = UDim2.fromOffset(38, 38)
-    orb.AnchorPoint = Vector2.new(0.5, 0.5)
-    orb.Position = UDim2.new(0.5, 0, 0.5, 0)
-    orb.BackgroundColor3 = HAZE.ACCENT2
-    orb.BorderSizePixel = 0
-    orb.Parent = brand
-    HazeCorner(orb, 12)
-    HazeAccentGradient(orb)
-    HazeStroke(orb, 1, HAZE.GLOW, 0.45)
-
-    task.spawn(function()
-        while orb.Parent do
-            HazeTween(orb, 1.6, {Rotation = 8}, Enum.EasingStyle.Sine)
-            task.wait(1.6)
-            if not orb.Parent then break end
-            HazeTween(orb, 1.6, {Rotation = -8}, Enum.EasingStyle.Sine)
-            task.wait(1.6)
-        end
-    end)
-
-    local tabHolder = Instance.new("Frame")
-    tabHolder.Name = "TabHolder"
-    tabHolder.BackgroundTransparency = 1
-    tabHolder.Position = UDim2.fromOffset(8, 76)
-    tabHolder.Size = UDim2.new(1, -16, 0, 312)
-    tabHolder.Parent = sidebar
-
-    local tabLayout = Instance.new("UIListLayout")
-    tabLayout.Padding = UDim.new(0, 6)
-    tabLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    tabLayout.Parent = tabHolder
-
-    local footer = Instance.new("Frame")
-    footer.Name = "Footer"
-    footer.Size = UDim2.new(1, -16, 0, 42)
-    footer.Position = UDim2.new(0, 8, 1, -50)
-    footer.BackgroundColor3 = HAZE.SURF2
-    footer.BackgroundTransparency = 0
-    footer.BorderSizePixel = 0
-    footer.Parent = sidebar
-    HazeCorner(footer, 12)
-    HazeStroke(footer, 1, HAZE.STROKE, 0.48)
-
-    local footerText = Instance.new("TextLabel")
-    footerText.BackgroundTransparency = 1
-    footerText.Size = UDim2.new(1, -14, 1, 0)
-    footerText.Position = UDim2.fromOffset(7, 0)
-    footerText.Font = Enum.Font.GothamMedium
-    footerText.Text = "V 1.0"
-    footerText.TextSize = 11
-    footerText.TextColor3 = HAZE.DIM
-    footerText.TextXAlignment = Enum.TextXAlignment.Left
-    footerText.Parent = footer
-
-    local right = Instance.new("Frame")
-    right.Name = "Right"
-    right.BackgroundTransparency = 1
-    right.Position = UDim2.fromOffset(SIDE_W + 10, 10)
-    right.Size = UDim2.new(0, RIGHT_W, 1, -20)
-    right.Parent = sFrame
-
-    local sHeader = Instance.new("Frame")
-    sHeader.Name = "Header"
-    sHeader.Size = UDim2.new(1, 0, 0, HEADER_H)
-    sHeader.BackgroundColor3 = HAZE.SURF
-    sHeader.BackgroundTransparency = 0
-    sHeader.BorderSizePixel = 0
-    sHeader.Parent = right
-    HazeCorner(sHeader, 16)
-    HazeStroke(sHeader, 1, HAZE.STROKE, 0.42)
-
-    local sTitle = Instance.new("TextLabel")
+    local sTitle = Instance.new("TextLabel", sHeader)
+    sTitle.Size = UDim2.new(1, -50, 1, 0)
+    sTitle.Position = UDim2.new(0, 15, 0, 0)
     sTitle.BackgroundTransparency = 1
-    sTitle.Position = UDim2.fromOffset(16, 0)
-    sTitle.Size = UDim2.new(1, -72, 1, 0)
-    sTitle.Font = Enum.Font.GothamBold
-    sTitle.Text = "Wispaxx Hub"
+    sTitle.Text = "WISPAXX HUB"
+    sTitle.Font = Enum.Font.GothamBlack
+    sTitle.TextSize = 16
     sTitle.TextColor3 = HAZE.TEXT
-    sTitle.TextSize = 21
     sTitle.TextXAlignment = Enum.TextXAlignment.Left
-    sTitle.Parent = sHeader
 
     do
         local titleGradient = HazeRgbGradient(sTitle)
@@ -7566,444 +7453,101 @@ end
         end)
     end
 
-    local sClose = Instance.new("TextButton")
+    local sClose = Instance.new("TextButton", sHeader)
     sClose.AutoButtonColor = false
-    sClose.Size = UDim2.fromOffset(30, 30)
-    sClose.Position = UDim2.new(1, -40, 0.5, -15)
+    sClose.Size = UDim2.fromOffset(26, 26)
+    sClose.Position = UDim2.new(1, -32, 0.5, -13)
     sClose.BackgroundColor3 = HAZE.SURF2
     sClose.BackgroundTransparency = 0
     sClose.BorderSizePixel = 0
     sClose.Text = "X"
     sClose.Font = Enum.Font.GothamBold
-    sClose.TextSize = 13
+    sClose.TextSize = 12
     sClose.TextColor3 = HAZE.TEXT
-    sClose.Parent = sHeader
-    HazeCorner(sClose, 10)
+    HazeCorner(sClose, 8)
     HazeStroke(sClose, 1, HAZE.STROKE, 0.36)
 
     sClose.MouseEnter:Connect(function()
-        HazeTween(sClose, 0.16, {BackgroundTransparency = 0.00, BackgroundColor3 = Color3.fromRGB(64, 74, 108)})
+        HazeTween(sClose, 0.16, {BackgroundColor3 = Color3.fromRGB(64, 74, 108)})
     end)
     sClose.MouseLeave:Connect(function()
-        HazeTween(sClose, 0.16, {BackgroundTransparency = 0.00, BackgroundColor3 = HAZE.SURF2})
+        HazeTween(sClose, 0.16, {BackgroundColor3 = HAZE.SURF2})
     end)
     sClose.MouseButton1Click:Connect(function()
         settingsGui.Enabled = false
     end)
 
-    MakeDraggable(sHeader, sFrame, "Settings")
+    -- SCROLLING FRAME UNIQUE (style Lethal Hub)
+    sList = Instance.new("ScrollingFrame", sFrame)
+    sList.Size = UDim2.new(1, -20, 1, -50)
+    sList.Position = UDim2.new(0, 10, 0, 45)
+    sList.BackgroundTransparency = 1
+    sList.BorderSizePixel = 0
+    sList.ScrollBarThickness = 2
+    sList.ScrollBarImageColor3 = HAZE.ACCENT2
+    sList.ScrollingDirection = Enum.ScrollingDirection.Y
+    sList.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    sList.CanvasSize = UDim2.new(0, 0, 0, 0)
 
-    local content = Instance.new("Frame")
-    content.Name = "Content"
-    content.BackgroundTransparency = 1
-    content.Position = UDim2.fromOffset(0, HEADER_H + 10)
-    content.Size = UDim2.new(1, 0, 1, -(HEADER_H + 10))
-    content.Parent = right
+    sLayout = Instance.new("UIListLayout", sList)
+    sLayout.Padding = UDim.new(0, 8)
+    sLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
-    local function makePage(name)
-        local page = Instance.new("Frame")
-        page.Name = name
-        page.BackgroundTransparency = 1
-        page.Size = UDim2.fromScale(1, 1)
-        page.Visible = false
-        page.Parent = content
-
-        local card = Instance.new("Frame")
-        card.Name = "Card"
-        card.BackgroundColor3 = HAZE.SURF
-        card.BackgroundTransparency = 0
-        card.BorderSizePixel = 0
-        card.Size = UDim2.fromScale(1, 1)
-        card.Parent = page
-        HazeCorner(card, 16)
-        HazeStroke(card, 1, HAZE.STROKE, 0.48)
-
-        local sc = Instance.new("ScrollingFrame")
-        sc.Name = "Scroll"
-        sc.Size = UDim2.new(1, -12, 1, -12)
-        sc.Position = UDim2.fromOffset(6, 6)
-        sc.BackgroundTransparency = 1
-        sc.BorderSizePixel = 0
-        sc.ScrollBarThickness = 4
-        sc.ScrollBarImageColor3 = HAZE.ACCENT2
-        sc.CanvasSize = UDim2.new(0, 0, 0, 0)
-        sc.Parent = card
-
-        local pad = Instance.new("UIPadding")
-        pad.PaddingLeft = UDim.new(0, 6)
-        pad.PaddingRight = UDim.new(0, 6)
-        pad.PaddingTop = UDim.new(0, 6)
-        pad.PaddingBottom = UDim.new(0, 10)
-        pad.Parent = sc
-
-        local lay = Instance.new("UIListLayout")
-        lay.Padding = UDim.new(0, 8)
-        lay.SortOrder = Enum.SortOrder.LayoutOrder
-        lay.Parent = sc
-
-        lay:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-            sc.CanvasSize = UDim2.new(0, 0, 0, lay.AbsoluteContentSize.Y + 18)
-        end)
-
-        do
-            local row = Instance.new("Frame")
-            row.Name = "PageTitleRow"
-            row.Size = UDim2.new(1, 0, 0, s(30))
-            row.BackgroundTransparency = 1
-            row.Parent = sc
-
-            local accent = Instance.new("Frame")
-            accent.Size = UDim2.new(0, s(4), 0, s(18))
-            accent.Position = UDim2.new(0, s(4), 0.5, -s(9))
-            accent.BackgroundColor3 = HAZE.ACCENT
-            accent.BorderSizePixel = 0
-            accent.Parent = row
-            HazeCorner(accent, 3)
-            HazeAccentGradient(accent)
-
-            local lbl = Instance.new("TextLabel")
-            lbl.BackgroundTransparency = 1
-            lbl.Size = UDim2.new(0, 150, 1, 0)
-            lbl.Position = UDim2.new(0, s(16), 0, 0)
-            lbl.Text = tostring(name)
-            lbl.TextColor3 = HAZE.TEXT
-            lbl.TextSize = s(15)
-            lbl.Font = Enum.Font.GothamBold
-            lbl.TextXAlignment = Enum.TextXAlignment.Left
-            lbl.Parent = row
-
-            local line = Instance.new("Frame")
-            line.Size = UDim2.new(1, -s(160), 0, 1)
-            line.Position = UDim2.new(0, s(158), 0.5, 0)
-            line.AnchorPoint = Vector2.new(0, 0.5)
-            line.BackgroundColor3 = HAZE.ACCENT2
-            line.BackgroundTransparency = 0.35
-            line.BorderSizePixel = 0
-            line.Parent = row
-            HazeCorner(line, 999)
-        end
-
-        return page, card, sc, lay
-    end
-
-    local Pages = {}
-    PageCards = {}
-    local settingsPage, settingsCard; settingsPage, settingsCard, sList, sLayout = makePage("Settings")
-    Pages.Settings = settingsPage
-    PageCards.Settings = settingsCard
     _G.HazePageScrolls = _G.HazePageScrolls or {}
-    _G.HazePageScrolls.Settings = sList
     _G.HazeActiveScroll = sList
+    -- Toutes les pages pointent vers le meme scroll (style lethal hub)
+    _G.HazePageScrolls.Main     = sList
+    _G.HazePageScrolls.Misc     = sList
+    _G.HazePageScrolls.Player   = sList
+    _G.HazePageScrolls.Priority = sList
+    _G.HazePageScrolls.Keybinds = sList
+    _G.HazePageScrolls.Settings = sList
+    _G.HazePageScrolls.Credits  = sList
 
-    do
-        local page, card, sc = makePage("Main")
-        Pages.Main = page
-        PageCards.Main = card
-        _G.HazePageScrolls.Main = sc
-    end
-    do
-        local page, card, sc = makePage("Misc")
-        Pages.Misc = page
-        PageCards.Misc = card
-        _G.HazePageScrolls.Misc = sc
-    end
-    do
-        local page, card, sc = makePage("Player")
-        Pages.Player = page
-        PageCards.Player = card
-        _G.HazePageScrolls.Player = sc
-    end
-    do
-        local page, card, sc = makePage("Priority")
-        Pages.Priority = page
-        PageCards.Priority = card
-        _G.HazePageScrolls.Priority = sc
-    end
-    do
-        local page, card, sc = makePage("Keybinds")
-        Pages.Keybinds = page
-        PageCards.Keybinds = card
-        _G.HazePageScrolls.Keybinds = sc
-    end
-    do
-        local page, card, sc = makePage("Credits")
-        Pages.Credits = page
-        PageCards.Credits = card
-        _G.HazePageScrolls.Credits = sc
-    end
-
-    local TABS = {
-        { key = "Main",     label = "Main"     },
-        { key = "Misc",     label = "Misc"     },
-        { key = "Player",   label = "Player"   },
-        { key = "Priority", label = "Priority" },
-        { key = "Keybinds", label = "Keybinds" },
-        { key = "Settings", label = "Settings" },
-        { key = "Credits",  label = "Credits"  },
-    }
-
-    local tabButtons = {}
-    local currentKey = nil
-
-    local showTab
-
-    local function makeSideTab(def, order)
-        local btn = Instance.new("TextButton")
-        btn.Name = def.key .. "Tab"
-        btn.AutoButtonColor = false
-        btn.Size = UDim2.new(1, 0, 0, 40)
-        btn.BackgroundTransparency = 1
-        btn.Text = ""
-        btn.LayoutOrder = order
-        btn.Parent = tabHolder
-
-        local bg = Instance.new("Frame")
-        bg.Size = UDim2.fromScale(1, 1)
-        bg.BackgroundColor3 = HAZE.SIDE2
-        bg.BackgroundTransparency = 0.32
-        bg.BorderSizePixel = 0
-        bg.Parent = btn
-        HazeCorner(bg, 11)
-
-        local bgStroke = HazeStroke(bg, 1, HAZE.STROKE, 0.52)
-
-        local bar = Instance.new("Frame")
-        bar.Size = UDim2.fromOffset(4, 10)
-        bar.Position = UDim2.new(0, 7, 0.5, 0)
-        bar.AnchorPoint = Vector2.new(0, 0.5)
-        bar.BackgroundColor3 = HAZE.ACCENT
-        bar.BorderSizePixel = 0
-        bar.Parent = bg
-        HazeCorner(bar, 999)
-        HazeAccentGradient(bar)
-
-        local label = Instance.new("TextLabel")
-        label.BackgroundTransparency = 1
-        label.Position = UDim2.fromOffset(22, 0)
-        label.Size = UDim2.new(1, -32, 1, 0)
-        label.Font = Enum.Font.GothamBold
-        label.Text = def.label
-        label.TextColor3 = HAZE.DIM
-        label.TextSize = 13
-        label.TextXAlignment = Enum.TextXAlignment.Left
-        label.Parent = bg
-
-        local bottomLine = Instance.new("Frame")
-        bottomLine.Size = UDim2.new(0.35, 0, 0, 1)
-        bottomLine.Position = UDim2.new(0, 22, 1, -5)
-        bottomLine.BackgroundColor3 = HAZE.ACCENT
-        bottomLine.BorderSizePixel = 0
-        bottomLine.Parent = bg
-        HazeAccentGradient(bottomLine)
-
-        btn.MouseEnter:Connect(function()
-            if currentKey ~= def.key then
-                HazeTween(bg, 0.16, {BackgroundTransparency = 0.09, BackgroundColor3 = Color3.fromRGB(52, 61, 90)})
-                HazeTween(label, 0.16, {TextColor3 = HAZE.TEXT})
-                HazeTween(bottomLine, 0.16, {Size = UDim2.new(0.50, 0, 0, 1)})
-            end
-        end)
-
-        btn.MouseLeave:Connect(function()
-            if currentKey ~= def.key then
-                HazeTween(bg, 0.16, {BackgroundTransparency = 0.32, BackgroundColor3 = HAZE.SIDE2})
-                HazeTween(label, 0.16, {TextColor3 = HAZE.DIM})
-                HazeTween(bottomLine, 0.16, {Size = UDim2.new(0.35, 0, 0, 1)})
-            end
-        end)
-
-        btn.MouseButton1Click:Connect(function()
-            showTab(def.key)
-        end)
-
-        tabButtons[def.key] = {
-            ButtonBack = bg,
-            Stroke = bgStroke,
-            Bar = bar,
-            Label = label,
-            BottomLine = bottomLine,
-        }
-    end
-
-    showTab = function(key)
-        currentKey = key
-
-        for name, page in pairs(Pages) do
-            page.Visible = (name == key)
-        end
-
-        for name, refs in pairs(tabButtons) do
-            local selected = (name == key)
-            HazeTween(refs.ButtonBack, 0.20, {
-                BackgroundTransparency = selected and 0.03 or 0.18,
-                BackgroundColor3 = selected and Color3.fromRGB(56, 66, 98) or HAZE.SIDE2
-            })
-            HazeTween(refs.Stroke, 0.20, {
-                Transparency = selected and 0.18 or 0.52
-            })
-            HazeTween(refs.Bar, 0.20, {
-                Size = selected and UDim2.fromOffset(4, 24) or UDim2.fromOffset(4, 10)
-            })
-            HazeTween(refs.Label, 0.20, {
-                TextColor3 = selected and HAZE.TEXT or HAZE.DIM,
-                Position = selected and UDim2.fromOffset(24, 0) or UDim2.fromOffset(22, 0)
-            })
-            HazeTween(refs.BottomLine, 0.20, {
-                Size = selected and UDim2.new(1, -26, 0, 1) or UDim2.new(0.35, 0, 0, 1)
-            })
-        end
-
-        local pages = _G.HazePageScrolls
-        if pages and pages[key] then
-            _G.HazeActiveScroll = pages[key]
-        else
-            _G.HazeActiveScroll = sList
-        end
-
-        if key == "Priority" and _G.ReloadEmbeddedPriorityUi then
-            _G.ReloadEmbeddedPriorityUi()
-        end
-    end
-
-    for i, def in ipairs(TABS) do
-        makeSideTab(def, i)
-    end
-
-    task.defer(function()
-        task.wait()
-        showTab("Main")
-    end)
+    PageCards = {}
 
     function _G.SetHazeUIPage(name)
-        local pages = _G.HazePageScrolls
-        if pages and pages[name] then
-            _G.HazeActiveScroll = pages[name]
-            showTab(name)
-        else
-            _G.HazeActiveScroll = sList
-        end
+        _G.HazeActiveScroll = sList
     end
+
+    -- ============================================================
+    -- COMPOSANTS UI (identique Wispaxx mais parente dans sList)
+    -- ============================================================
 
     local function CreateToggleSwitch(parent, initialState, callback)
         local sw = Instance.new("Frame")
-        sw.Size = UDim2.new(0, 62, 0, 24)
-        sw.Position = UDim2.new(1, -74, 0.5, -12)
-        sw.BackgroundColor3 = Color3.fromRGB(40, 44, 62)
-        sw.BackgroundTransparency = 0.02
+        sw.Size = UDim2.new(0, 40, 0, 20)
+        sw.Position = UDim2.new(1, -50, 0.5, -10)
+        sw.BackgroundColor3 = initialState and Theme.Success or Theme.SurfaceHighlight
         sw.BorderSizePixel = 0
         sw.Parent = parent
-        HazeCorner(sw, 7)
+        Instance.new("UICorner", sw).CornerRadius = UDim.new(1, 0)
 
-        local stBase = HazeStroke(sw, 1, HAZE.STROKE, 0.60)
-
-        local stGlow = Instance.new("UIStroke")
-        stGlow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-        stGlow.Thickness = 2
-        stGlow.Color = HAZE.GLOW
-        stGlow.Transparency = 1
-        stGlow.Parent = sw
-
-        local fill = Instance.new("Frame")
-        fill.Size = initialState and UDim2.new(1, 0, 1, 0) or UDim2.new(0, 0, 1, 0)
-        fill.BackgroundColor3 = HAZE.ACCENT2
-        fill.BackgroundTransparency = initialState and 0.18 or 0.60
-        fill.BorderSizePixel = 0
-        fill.Parent = sw
-        HazeCorner(fill, 7)
-        HazeAccentGradient(fill)
-
-        local dot = Instance.new("Frame")
-        dot.Size = UDim2.fromOffset(22, 22)
-        dot.Position = initialState and UDim2.new(1, -23, 0.5, -11) or UDim2.new(0, 1, 0.5, -11)
-        dot.BackgroundColor3 = Color3.fromRGB(210, 215, 235)
+        local dot = Instance.new("Frame", sw)
+        dot.Size = UDim2.new(0, 16, 0, 16)
+        dot.Position = initialState and UDim2.new(1, -18, 0.5, -8) or UDim2.new(0, 2, 0.5, -8)
+        dot.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
         dot.BorderSizePixel = 0
-        dot.Parent = sw
-        HazeCorner(dot, 7)
-        HazeKnobGradient(dot)
-        local knobStroke = HazeStroke(dot, 1, HAZE.STROKE, 0.65)
+        Instance.new("UICorner", dot).CornerRadius = UDim.new(1, 0)
 
-        local btn = Instance.new("TextButton")
+        local btn = Instance.new("TextButton", sw)
         btn.Size = UDim2.new(1, 0, 1, 0)
         btn.BackgroundTransparency = 1
         btn.Text = ""
         btn.AutoButtonColor = false
-        btn.Parent = sw
 
-        local pulseId = 0
         local isOn = initialState == true
 
-        local function startPulse()
-            pulseId += 1
-            local myId = pulseId
-            task.spawn(function()
-                while sw.Parent and isOn and pulseId == myId do
-                    HazeTween(stGlow, 0.85, {Transparency = 0.08}, Enum.EasingStyle.Sine)
-                    task.wait(0.9)
-                    if not (sw.Parent and isOn and pulseId == myId) then break end
-                    HazeTween(stGlow, 0.85, {Transparency = 0.20}, Enum.EasingStyle.Sine)
-                    task.wait(0.9)
-                end
-            end)
-        end
-
-        local function SetState(state)
-            isOn = state == true
-            if isOn then
-                fill.Size = UDim2.new(1, 0, 1, 0)
-                fill.BackgroundTransparency = 0.32
-                dot.Position = UDim2.new(1, -23, 0.5, -11)
-                stGlow.Transparency = 0.10
-                stBase.Transparency = 0.85
-                knobStroke.Transparency = 0.35
-                sw.BackgroundTransparency = 0.00
-                startPulse()
-            else
-                pulseId += 1
-                fill.Size = UDim2.new(0, 0, 1, 0)
-                fill.BackgroundTransparency = 0.60
-                dot.Position = UDim2.new(0, 1, 0.5, -11)
-                stGlow.Transparency = 1
-                stBase.Transparency = 0.60
-                knobStroke.Transparency = 0.65
-                sw.BackgroundTransparency = 0.02
-            end
-        end
-
-        if isOn then
-            fill.Size = UDim2.new(1, 0, 1, 0)
-            fill.BackgroundTransparency = 0.32
-            dot.Position = UDim2.new(1, -23, 0.5, -11)
-            stGlow.Transparency = 0.10
-            stBase.Transparency = 0.85
-            knobStroke.Transparency = 0.35
-            sw.BackgroundTransparency = 0.00
-            startPulse()
-        else
-            SetState(false)
+        local function SetState(s)
+            isOn = s == true
+            local tp = isOn and UDim2.new(1, -18, 0.5, -8) or UDim2.new(0, 2, 0.5, -8)
+            local tc = isOn and Theme.Success or Theme.SurfaceHighlight
+            TweenService:Create(dot, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = tp}):Play()
+            TweenService:Create(sw,  TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = tc}):Play()
         end
 
         btn.MouseButton1Click:Connect(function()
-            callback(not isOn, function(state)
-                HazeTween(fill, 0.22, {
-                    Size = state and UDim2.new(1, 0, 1, 0) or UDim2.new(0, 0, 1, 0),
-                    BackgroundTransparency = state and 0.18 or 0.60
-                })
-                HazeTween(dot, 0.22, {
-                    Position = state and UDim2.new(1, -23, 0.5, -11) or UDim2.new(0, 1, 0.5, -11)
-                })
-                HazeTween(stBase, 0.22, {Transparency = state and 0.85 or 0.60})
-                HazeTween(knobStroke, 0.22, {Transparency = state and 0.35 or 0.65})
-                HazeTween(sw, 0.22, {BackgroundTransparency = state and 0.00 or 0.02})
-                if state then
-                    isOn = true
-                    startPulse()
-                    HazeTween(stGlow, 0.22, {Transparency = 0.10})
-                else
-                    isOn = false
-                    pulseId += 1
-                    HazeTween(stGlow, 0.12, {Transparency = 1}, Enum.EasingStyle.Sine)
-                end
-            end)
+            callback(not isOn, SetState)
         end)
 
         return {Set = SetState, Container = sw}
@@ -8011,106 +7555,89 @@ end
 
     local function CreateRow(text, height)
         local row = Instance.new("Frame")
-        row.Size = UDim2.new(1, 0, 0, height or s(46))
-        row.BackgroundColor3 = HAZE.SURF2
-        row.BackgroundTransparency = 0.12
+        row.Size = UDim2.new(1, 0, 0, height or 34)
+        row.BackgroundColor3 = Theme.Surface
         row.BorderSizePixel = 0
-        row.Parent = (_G.HazeActiveScroll or sList)
-        HazeCorner(row, s(10))
-        HazeStroke(row, 1, HAZE.STROKE, 0.55)
-        HazePad(row, s(12), s(8), s(12), s(8))
+        row.Parent = sList
+        Instance.new("UICorner", row).CornerRadius = UDim.new(0, 6)
 
-        local lbl = Instance.new("TextLabel")
+        local lbl = Instance.new("TextLabel", row)
+        lbl.Size = UDim2.new(0.6, 0, 1, 0)
+        lbl.Position = UDim2.new(0, 10, 0, 0)
         lbl.BackgroundTransparency = 1
-        lbl.Size = UDim2.new(1, -(s(67) + s(14)), 1, 0)
         lbl.Text = text
         lbl.Font = Enum.Font.GothamMedium
-        lbl.TextSize = s(14)
-        lbl.TextColor3 = HAZE.TEXT
+        lbl.TextSize = 12
+        lbl.TextColor3 = Theme.TextPrimary
         lbl.TextXAlignment = Enum.TextXAlignment.Left
-        lbl.Parent = row
-
-        return row
-    end
-
-    local function CreatePageHeader(text)
-        local row = Instance.new("Frame")
-        row.Size = UDim2.new(1, 0, 0, s(30))
-        row.BackgroundTransparency = 1
-        row.Parent = (_G.HazeActiveScroll or sList)
-
-        local accent = Instance.new("Frame")
-        accent.Size = UDim2.new(0, s(4), 0, s(18))
-        accent.Position = UDim2.new(0, s(4), 0.5, -s(9))
-        accent.BackgroundColor3 = HAZE.ACCENT
-        accent.BorderSizePixel = 0
-        accent.Parent = row
-        HazeCorner(accent, 3)
-        HazeAccentGradient(accent)
-
-        local lbl = Instance.new("TextLabel")
-        lbl.Size = UDim2.new(1, -s(24), 1, 0)
-        lbl.Position = UDim2.new(0, s(16), 0, 0)
-        lbl.BackgroundTransparency = 1
-        lbl.Text = text
-        lbl.TextColor3 = HAZE.TEXT
-        lbl.TextSize = s(12)
-        lbl.Font = Enum.Font.GothamBlack
-        lbl.TextXAlignment = Enum.TextXAlignment.Left
-        lbl.Parent = row
-
-        local line = Instance.new("Frame")
-        line.Size = UDim2.new(1, -s(90), 0, 1)
-        line.Position = UDim2.new(0, s(82), 0.5, 0)
-        line.BackgroundColor3 = HAZE.ACCENT
-        line.BackgroundTransparency = 0.7
-        line.BorderSizePixel = 0
-        line.Parent = row
 
         return row
     end
 
     local function CreateSectionHeader(text)
         local row = Instance.new("Frame")
-        row.Size = UDim2.new(1, 0, 0, s(22))
+        row.Size = UDim2.new(1, 0, 0, 28)
         row.BackgroundTransparency = 1
-        row.Parent = (_G.HazeActiveScroll or sList)
+        row.Parent = sList
 
-        local lbl = Instance.new("TextLabel")
-        lbl.Size = UDim2.new(1, -s(8), 1, 0)
-        lbl.Position = UDim2.new(0, s(2), 0, 0)
+        local accent = Instance.new("Frame", row)
+        accent.Size = UDim2.new(0, 3, 0, 16)
+        accent.Position = UDim2.new(0, 4, 0.5, -8)
+        accent.BackgroundColor3 = HAZE.ACCENT
+        accent.BorderSizePixel = 0
+        Instance.new("UICorner", accent).CornerRadius = UDim.new(0, 2)
+
+        local lbl = Instance.new("TextLabel", row)
+        lbl.Size = UDim2.new(1, -20, 1, 0)
+        lbl.Position = UDim2.new(0, 14, 0, 0)
         lbl.BackgroundTransparency = 1
         lbl.Text = text
         lbl.TextColor3 = HAZE.ACCENT
-        lbl.TextSize = s(12)
+        lbl.TextSize = 11
         lbl.Font = Enum.Font.GothamBlack
         lbl.TextXAlignment = Enum.TextXAlignment.Left
-        lbl.Parent = row
+
+        local line = Instance.new("Frame", row)
+        line.Size = UDim2.new(1, -80, 0, 1)
+        line.Position = UDim2.new(0, 75, 0.5, 0)
+        line.BackgroundColor3 = HAZE.ACCENT
+        line.BackgroundTransparency = 0.7
+        line.BorderSizePixel = 0
 
         return row
     end
 
     local function CreateSubHeader(text)
         local row = Instance.new("Frame")
-        row.Size = UDim2.new(1, 0, 0, s(18))
+        row.Size = UDim2.new(1, 0, 0, 18)
         row.BackgroundTransparency = 1
-        row.Parent = (_G.HazeActiveScroll or sList)
+        row.Parent = sList
 
-        local lbl = Instance.new("TextLabel")
-        lbl.Size = UDim2.new(1, -s(14), 1, 0)
-        lbl.Position = UDim2.new(0, s(10), 0, 0)
+        local lbl = Instance.new("TextLabel", row)
+        lbl.Size = UDim2.new(1, -14, 1, 0)
+        lbl.Position = UDim2.new(0, 10, 0, 0)
         lbl.BackgroundTransparency = 1
         lbl.Text = text
         lbl.TextColor3 = Theme.TextSecondary
-        lbl.TextSize = s(11)
+        lbl.TextSize = 11
         lbl.Font = Enum.Font.GothamBold
         lbl.TextXAlignment = Enum.TextXAlignment.Left
-        lbl.Parent = row
 
         return row
     end
-    do
-    _G.SetHazeUIPage("Main")
+
+    local function CreatePageHeader(text)
+        -- Style Lethal Hub : header de page = simple section header
+        return CreateSectionHeader(text)
+    end
+
+    -- ============================================================
+    -- CONTENU : toutes les features dans UN seul scroll
+    -- Organisation : sections dans l'ordre logique
+    -- ============================================================
+
+    -- ======================== AUTO TP ========================
+    CreateSectionHeader("AUTO TP")
     _G.HazeLastAutoTpLoadRow = CreateRow("Auto TP on Script Load")
     CreateToggleSwitch(_G.HazeLastAutoTpLoadRow, Config.TpSettings.TpOnLoad, function(ns, set)
         set(ns); Config.TpSettings.TpOnLoad = ns; SaveConfig()
@@ -8135,7 +7662,118 @@ end
         ShowNotification("MIN GEN FOR TP", Config.TpSettings.MinGenForTp == "" and "No minimum" or "Min: " .. (Config.TpSettings.MinGenForTp or ""))
     end)
 
-    _G.SetHazeUIPage("Misc")
+    local rTeleportV2 = CreateRow("Teleport V2")
+    CreateToggleSwitch(rTeleportV2, Config.TpSettings.TeleportV2 == true, function(ns, set)
+        set(ns); Config.TpSettings.TeleportV2 = ns; SaveConfig()
+        ShowNotification("TELEPORT V2", ns and "ENABLED" or "DISABLED")
+    end)
+
+    local toolOptions = {"Flying Carpet", "Cupid's Wings", "Santa's Sleigh", "Witch's Broom"}
+    local toolSwitches = {}
+    for _, toolName in ipairs(toolOptions) do
+        local r = CreateRow(toolName)
+        local ts = CreateToggleSwitch(r, Config.TpSettings.Tool == toolName, function(rs, set)
+            if rs then
+                Config.TpSettings.Tool = toolName; SaveConfig(); set(true)
+                for n, sw in pairs(toolSwitches) do if n ~= toolName then sw.Set(false) end end
+                ShowNotification("TP TOOL", toolName)
+            else
+                set(Config.TpSettings.Tool == toolName)
+            end
+        end)
+        toolSwitches[toolName] = ts
+    end
+
+    local rSpeed = CreateRow("Auto Snipe Delay")
+    local speedCont = Instance.new("Frame", rSpeed)
+    speedCont.Size = UDim2.new(0, 100, 0, 24); speedCont.Position = UDim2.new(1, -110, 0.5, -12); speedCont.BackgroundTransparency = 1
+    local speedBtns = {}
+    local selectedDelayOption = math.clamp(tonumber(Config.TpSettings.Speed) or 1, 1, 4)
+    Config.TpSettings.Speed = selectedDelayOption
+    for i = 1, 4 do
+        local b = Instance.new("TextButton", speedCont)
+        b.Size = UDim2.new(0.22, 0, 1, 0); b.Position = UDim2.new((i - 1) * 0.26, 0, 0, 0)
+        local act = selectedDelayOption == i
+        b.BackgroundColor3 = act and Theme.Accent1 or Theme.SurfaceHighlight
+        b.Text = tostring(i); b.TextColor3 = act and Color3.new(0, 0, 0) or Theme.TextPrimary
+        b.Font = Enum.Font.GothamBold; b.TextSize = 12
+        Instance.new("UICorner", b).CornerRadius = UDim.new(0, 4)
+        b.MouseButton1Click:Connect(function()
+            Config.TpSettings.Speed = i; SaveConfig()
+            for idx, btn in ipairs(speedBtns) do
+                local a = (idx == i)
+                btn.BackgroundColor3 = a and Theme.Accent1 or Theme.SurfaceHighlight
+                btn.TextColor3 = a and Color3.new(0, 0, 0) or Theme.TextPrimary
+            end
+            ShowNotification("AUTO SNIPE DELAY", string.format("%.2fs", getAutoSnipeDelayFromOption(i)))
+        end)
+        table.insert(speedBtns, b)
+    end
+
+    -- ======================== AUTO STEAL DEFAULTS ========================
+    CreateSectionHeader("AUTO STEAL DEFAULTS")
+    local nearestToggleRef = {}
+    local highestToggleRef = {}
+    local priorityToggleRef = {}
+    autoTPPriorityToggleRef = autoTPPriorityToggleRef or {setFn = nil}
+
+    local rDefaultNearest = CreateRow("Default To Nearest")
+    local nearestToggleSwitch = CreateToggleSwitch(rDefaultNearest, Config.DefaultToNearest, function(ns, set)
+        if ns then
+            Config.DefaultToNearest = true; Config.DefaultToHighest = false; Config.DefaultToPriority = false
+            set(true)
+            if highestToggleRef.setFn then highestToggleRef.setFn(false) end
+            if priorityToggleRef.setFn then priorityToggleRef.setFn(false) end
+            Config.AutoTPPriority = true
+            if autoTPPriorityToggleRef and autoTPPriorityToggleRef.setFn then autoTPPriorityToggleRef.setFn(true) end
+        else
+            set(Config.DefaultToNearest)
+        end
+        SaveConfig()
+        ShowNotification("DEFAULT TO NEAREST", ns and "ENABLED" or "DISABLED")
+    end)
+    nearestToggleRef.setFn = function(v) nearestToggleSwitch.Set(v) end
+
+    local rDefaultHighest = CreateRow("Default To Highest")
+    local highestToggleSwitch = CreateToggleSwitch(rDefaultHighest, Config.DefaultToHighest, function(ns, set)
+        if ns then
+            Config.DefaultToHighest = true; Config.DefaultToNearest = false; Config.DefaultToPriority = false
+            set(true)
+            if nearestToggleRef.setFn then nearestToggleRef.setFn(false) end
+            if priorityToggleRef.setFn then priorityToggleRef.setFn(false) end
+        else
+            set(Config.DefaultToHighest)
+        end
+        SaveConfig()
+        ShowNotification("DEFAULT TO HIGHEST", ns and "ENABLED" or "DISABLED")
+    end)
+    highestToggleRef.setFn = function(v) highestToggleSwitch.Set(v) end
+
+    local rDefaultPriority = CreateRow("Default To Priority")
+    local priorityToggleSwitch = CreateToggleSwitch(rDefaultPriority, Config.DefaultToPriority, function(ns, set)
+        if ns then
+            Config.DefaultToPriority = true; Config.DefaultToNearest = false; Config.DefaultToHighest = false
+            set(true)
+            if nearestToggleRef.setFn then nearestToggleRef.setFn(false) end
+            if highestToggleRef.setFn then highestToggleRef.setFn(false) end
+        else
+            set(Config.DefaultToPriority)
+        end
+        SaveConfig()
+        ShowNotification("DEFAULT TO PRIORITY", ns and "ENABLED" or "DISABLED")
+    end)
+    priorityToggleRef.setFn = function(v) priorityToggleSwitch.Set(v) end
+
+    -- ======================== AUTO UNLOCK ========================
+    CreateSectionHeader("AUTO UNLOCK")
+    local rAutoUnlock = CreateRow("Auto Unlock on Steal")
+    CreateToggleSwitch(rAutoUnlock, Config.AutoUnlockOnSteal, function(ns, set)
+        set(ns); Config.AutoUnlockOnSteal = ns; SaveConfig()
+        ShowNotification("AUTO UNLOCK", ns and "ENABLED" or "DISABLED")
+    end)
+
+    -- ======================== PERFORMANCE ========================
+    CreateSectionHeader("PERFORMANCE")
     local rFPS = CreateRow("FPS Boost V1")
     CreateToggleSwitch(rFPS, Config.FPSBoost, function(ns, set)
         set(ns); setFPSBoost(ns)
@@ -8148,6 +7786,8 @@ end
         ShowNotification("FPS BOOST V2", ns and "ENABLED" or "DISABLED")
     end)
 
+    -- ======================== VISUALS ========================
+    CreateSectionHeader("VISUALS")
     local rTrace = CreateRow("Tracer Best Brainrot")
     CreateToggleSwitch(rTrace, Config.TracerEnabled, function(ns, set)
         set(ns); Config.TracerEnabled = ns; SaveConfig()
@@ -8161,291 +7801,17 @@ end
         ShowNotification("LINE TO BASE", ns and "ENABLED" or "DISABLED")
     end)
 
-    local rXray = CreateRow("X-Ray")
-    CreateToggleSwitch(rXray, Config.XrayEnabled, function(ns, set)
-        set(ns); Config.XrayEnabled = ns; if ns then enableXray() else disableXray() end; SaveConfig()
-        ShowNotification("X-RAY", ns and "ENABLED" or "DISABLED")
-    end)
-
-    end
-    autoTPPriorityToggleRef = autoTPPriorityToggleRef or {setFn = nil}
-    do
-    _G.SetHazeUIPage("Main")
-    CreateSectionHeader("Teleport")
-    local rTeleportV2 = CreateRow("Teleport V2")
-    CreateToggleSwitch(rTeleportV2, Config.TpSettings.TeleportV2 == true, function(ns, set)
-        set(ns)
-        Config.TpSettings.TeleportV2 = ns
-        SaveConfig()
-        ShowNotification("TELEPORT V2", ns and "ENABLED" or "DISABLED")
-    end)
-
-    local toolOptions = {"Flying Carpet", "Cupid's Wings", "Santa's Sleigh", "Witch's Broom"}
-    local toolSwitches = {}
-    for _, toolName in ipairs(toolOptions) do
-        local r = CreateRow(toolName)
-        local ts = CreateToggleSwitch(r, Config.TpSettings.Tool==toolName, function(rs, set)
-            if rs then
-                Config.TpSettings.Tool=toolName; SaveConfig(); set(true)
-                for n, sw in pairs(toolSwitches) do if n~=toolName then sw.Set(false) end end
-                ShowNotification("TP TOOL", toolName)
-            else
-                set(Config.TpSettings.Tool==toolName)
-            end
-        end)
-        toolSwitches[toolName] = ts
-    end
-
-    
-    local rSpeed = CreateRow("Auto Snipe Delay")
-    local speedCont = Instance.new("Frame", rSpeed)
-    speedCont.Size = UDim2.new(0,100,0,24); speedCont.Position = UDim2.new(1,-110,0.5,-12); speedCont.BackgroundTransparency=1
-    local speedBtns = {}
-    local selectedDelayOption = math.clamp(tonumber(Config.TpSettings.Speed) or 1, 1, 4)
-    Config.TpSettings.Speed = selectedDelayOption
-    for i = 1, 4 do
-        local b = Instance.new("TextButton", speedCont)
-        b.Size = UDim2.new(0.22,0,1,0); b.Position = UDim2.new((i-1)*0.26,0,0,0)
-        local act = selectedDelayOption == i
-        b.BackgroundColor3 = act and Theme.Accent1 or Theme.SurfaceHighlight
-        b.Text = tostring(i); b.TextColor3 = act and Color3.new(0,0,0) or Theme.TextPrimary
-        b.Font = Enum.Font.GothamBold; b.TextSize = 12
-        Instance.new("UICorner",b).CornerRadius = UDim.new(0,4)
-        b.MouseButton1Click:Connect(function()
-            Config.TpSettings.Speed = i
-            SaveConfig()
-            for idx, btn in ipairs(speedBtns) do
-                local a = (idx == i)
-                btn.BackgroundColor3 = a and Theme.Accent1 or Theme.SurfaceHighlight
-                btn.TextColor3 = a and Color3.new(0,0,0) or Theme.TextPrimary
-            end
-            ShowNotification("AUTO SNIPE DELAY", string.format("%.2fs", getAutoSnipeDelayFromOption(i)))
-        end)
-        table.insert(speedBtns,b)
-    end
-
-    _G.SetHazeUIPage("Keybinds")
-    CreateSectionHeader("Teleport")
-    local rBind = CreateRow("TP Keybind")
-    local bBind = Instance.new("TextButton", rBind)
-    bBind.Size=UDim2.new(0,60,0,24); bBind.Position=UDim2.new(1,-70,0.5,-12)
-    bBind.BackgroundColor3=Theme.SurfaceHighlight; bBind.Text=PrettyKeyName(Config.TpSettings.TpKey)
-    bBind.Font=Enum.Font.GothamBold; bBind.TextColor3=Theme.TextPrimary; bBind.TextSize=12
-    Instance.new("UICorner",bBind).CornerRadius=UDim.new(0,4)
-    bBind.MouseButton1Click:Connect(function()
-        bBind.Text="..."; bBind.TextColor3=Theme.Accent1
-        local con; con=UserInputService.InputBegan:Connect(function(inp)
-            if inp.UserInputType==Enum.UserInputType.Keyboard then
-                Config.TpSettings.TpKey=NormalizeKeyName(inp.KeyCode.Name, Config.TpSettings.TpKey or "T"); Config.SavedKeybinds.TpKey = Config.TpSettings.TpKey; bBind.Text=PrettyKeyName(Config.TpSettings.TpKey)
-                bBind.TextColor3=Theme.TextPrimary; SaveConfig(); con:Disconnect()
-                ShowNotification("TP KEYBIND", PrettyKeyName(Config.TpSettings.TpKey))
-            end
-        end)
-    end)
-
-    local rBindClone = CreateRow("Auto Clone Keybind")
-    local bBindClone = Instance.new("TextButton", rBindClone)
-    bBindClone.Size=UDim2.new(0,60,0,24); bBindClone.Position=UDim2.new(1,-70,0.5,-12)
-    bBindClone.BackgroundColor3=Theme.SurfaceHighlight; bBindClone.Text=PrettyKeyName(Config.TpSettings.CloneKey)
-    bBindClone.Font=Enum.Font.GothamBold; bBindClone.TextColor3=Theme.TextPrimary; bBindClone.TextSize=12
-    Instance.new("UICorner",bBindClone).CornerRadius=UDim.new(0,4)
-    bBindClone.MouseButton1Click:Connect(function()
-        bBindClone.Text="..."; bBindClone.TextColor3=Theme.Accent1
-        local con; con=UserInputService.InputBegan:Connect(function(inp)
-            if inp.UserInputType==Enum.UserInputType.Keyboard then
-                Config.TpSettings.CloneKey=NormalizeKeyName(inp.KeyCode.Name, Config.TpSettings.CloneKey or "V"); Config.SavedKeybinds.CloneKey = Config.TpSettings.CloneKey; bBindClone.Text=PrettyKeyName(Config.TpSettings.CloneKey)
-                bBindClone.TextColor3=Theme.TextPrimary; SaveConfig(); con:Disconnect()
-                ShowNotification("CLONE KEYBIND", PrettyKeyName(Config.TpSettings.CloneKey))
-            end
-        end)
-    end)
-
-    end
-    do
-    _G.SetHazeUIPage("Keybinds")
-    CreateSectionHeader("Carpet Speed")
-    local rCarpetBind = CreateRow("Carpet Speed Keybind")
-    local bCarpet = Instance.new("TextButton", rCarpetBind)
-    bCarpet.Size=UDim2.new(0,60,0,24); bCarpet.Position=UDim2.new(1,-70,0.5,-12)
-    bCarpet.BackgroundColor3=Theme.SurfaceHighlight; bCarpet.Text=PrettyKeyName(Config.TpSettings.CarpetSpeedKey)
-    bCarpet.Font=Enum.Font.GothamBold; bCarpet.TextColor3=Theme.TextPrimary; bCarpet.TextSize=12
-    Instance.new("UICorner",bCarpet).CornerRadius=UDim.new(0,4)
-    bCarpet.MouseButton1Click:Connect(function()
-        bCarpet.Text="..."; bCarpet.TextColor3=Theme.Accent1
-        local con; con=UserInputService.InputBegan:Connect(function(inp)
-            if inp.UserInputType==Enum.UserInputType.Keyboard then
-                Config.TpSettings.CarpetSpeedKey=NormalizeKeyName(inp.KeyCode.Name, Config.TpSettings.CarpetSpeedKey or "Q"); Config.SavedKeybinds.CarpetSpeedKey = Config.TpSettings.CarpetSpeedKey; bCarpet.Text=PrettyKeyName(Config.TpSettings.CarpetSpeedKey)
-                bCarpet.TextColor3=Theme.TextPrimary; SaveConfig(); con:Disconnect()
-                ShowNotification("CARPET SPEED KEYBIND", PrettyKeyName(Config.TpSettings.CarpetSpeedKey))
-            end
-        end)
-    end)
-
-    local rRagdollSelf = CreateRow("Ragdoll Self Keybind")
-    local bRagdollSelf = Instance.new("TextButton", rRagdollSelf)
-    bRagdollSelf.Size=UDim2.new(0,60,0,24); bRagdollSelf.Position=UDim2.new(1,-70,0.5,-12)
-    bRagdollSelf.BackgroundColor3=Theme.SurfaceHighlight; bRagdollSelf.Text=Config.RagdollSelfKey ~= "" and PrettyKeyName(Config.RagdollSelfKey) or "NONE"
-    bRagdollSelf.Font=Enum.Font.GothamBold; bRagdollSelf.TextColor3=Theme.TextPrimary; bRagdollSelf.TextSize=12
-    Instance.new("UICorner",bRagdollSelf).CornerRadius=UDim.new(0,4)
-    bRagdollSelf.MouseButton1Click:Connect(function()
-        bRagdollSelf.Text="..."; bRagdollSelf.TextColor3=Theme.Accent1
-        local con; con=UserInputService.InputBegan:Connect(function(inp)
-            if inp.UserInputType==Enum.UserInputType.Keyboard then
-                Config.RagdollSelfKey=NormalizeKeyName(inp.KeyCode.Name, ""); Config.SavedKeybinds.RagdollSelfKey = Config.RagdollSelfKey; bRagdollSelf.Text=Config.RagdollSelfKey ~= "" and PrettyKeyName(Config.RagdollSelfKey) or "NONE"
-                bRagdollSelf.TextColor3=Theme.TextPrimary; SaveConfig(); con:Disconnect()
-                ShowNotification("RAGDOLL SELF KEYBIND", Config.RagdollSelfKey ~= "" and PrettyKeyName(Config.RagdollSelfKey) or "NONE")
-            end
-        end)
-    end)
-
-    local rCarpetStatus = CreateRow("Carpet Speed Status")
-    local carpetStatusLbl = Instance.new("TextLabel", rCarpetStatus)
-    carpetStatusLbl.Size=UDim2.new(0,50,0,20); carpetStatusLbl.Position=UDim2.new(1,-60,0.5,-10)
-    carpetStatusLbl.BackgroundTransparency=1
-    carpetStatusLbl.Text=carpetSpeedEnabled and "ON" or "OFF"
-    carpetStatusLbl.TextColor3=carpetSpeedEnabled and Theme.Success or Theme.Error
-    carpetStatusLbl.Font=Enum.Font.GothamBlack; carpetStatusLbl.TextSize=13
-    carpetStatusLbl.TextXAlignment=Enum.TextXAlignment.Right
-    _carpetStatusLabel = carpetStatusLbl
-
-    end
-    do
-    _G.SetHazeUIPage("Player")
-    CreateSectionHeader("Movement")
-    local rInfJump = CreateRow("Infinite Jump")
-    CreateToggleSwitch(rInfJump, infiniteJumpEnabled, function(ns, set)
-        set(ns); setInfiniteJump(ns)
-        ShowNotification("INFINITE JUMP", ns and "ENABLED" or "DISABLED")
-    end)
-    local rAutoStealSpeed = CreateRow("Auto Steal Speed")
-    CreateToggleSwitch(rAutoStealSpeed, Config.AutoStealSpeed, function(ns, set)
-        set(ns); Config.AutoStealSpeed = ns; SaveConfig()
-        ShowNotification("AUTO STEAL SPEED", ns and "ENABLED" or "DISABLED")
-    end)
-    local rFloat = CreateRow("Float")
-    local floatToggleSwitch = CreateToggleSwitch(rFloat, State.floatActive, function(ns, set)
-        set(ns)
-        setFloatEnabled(ns, true)
-        ShowNotification("FLOAT", ns and "ENABLED" or "DISABLED")
-    end)
-    floatToggleRef.setFn = function(enabled)
-        if floatToggleSwitch and floatToggleSwitch.Set then
-            floatToggleSwitch.Set(enabled, true, true)
-        end
-    end
-    local rAutoResetBalloon = CreateRow("Auto reset on balloon")
-    CreateToggleSwitch(rAutoResetBalloon, Config.AutoResetOnBalloon, function(ns, set)
-        set(ns); Config.AutoResetOnBalloon = ns; SaveConfig()
-        ShowNotification("AUTO RESET ON BALLOON", ns and "ENABLED" or "DISABLED")
-    end)
-
-    _G.SetHazeUIPage("Keybinds")
-    CreateSectionHeader("Movement")
-    local rStealSpeedKey = CreateRow("Steal Speed Keybind")
-    local bStealSpeedKey = Instance.new("TextButton", rStealSpeedKey)
-    bStealSpeedKey.Size=UDim2.new(0,60,0,24); bStealSpeedKey.Position=UDim2.new(1,-70,0.5,-12)
-    bStealSpeedKey.BackgroundColor3=Theme.SurfaceHighlight; bStealSpeedKey.Text=PrettyKeyName(Config.StealSpeedKey)
-    bStealSpeedKey.Font=Enum.Font.GothamBold; bStealSpeedKey.TextColor3=Theme.TextPrimary; bStealSpeedKey.TextSize=12
-    Instance.new("UICorner",bStealSpeedKey).CornerRadius=UDim.new(0,4)
-    bStealSpeedKey.MouseButton1Click:Connect(function()
-        bStealSpeedKey.Text="..."; bStealSpeedKey.TextColor3=Theme.Accent1
-        local con; con=UserInputService.InputBegan:Connect(function(inp)
-            if inp.UserInputType==Enum.UserInputType.Keyboard then
-                Config.StealSpeedKey=NormalizeKeyName(inp.KeyCode.Name, Config.StealSpeedKey or "C"); Config.SavedKeybinds.StealSpeedKey = Config.StealSpeedKey; bStealSpeedKey.Text=PrettyKeyName(Config.StealSpeedKey)
-                bStealSpeedKey.TextColor3=Theme.TextPrimary; SaveConfig(); con:Disconnect()
-                ShowNotification("STEAL SPEED KEYBIND", PrettyKeyName(Config.StealSpeedKey))
-            end
-        end)
-    end)
-
-    local rFloatKeybind = CreateRow("Float Keybind")
-    local bFloatKeybind = Instance.new("TextButton", rFloatKeybind)
-    bFloatKeybind.Size=UDim2.new(0,60,0,24); bFloatKeybind.Position=UDim2.new(1,-70,0.5,-12)
-    bFloatKeybind.BackgroundColor3=Theme.SurfaceHighlight; bFloatKeybind.Text=PrettyKeyName(Config.FloatKeybind or "Z")
-    bFloatKeybind.Font=Enum.Font.GothamBold; bFloatKeybind.TextColor3=Theme.TextPrimary; bFloatKeybind.TextSize=12
-    Instance.new("UICorner",bFloatKeybind).CornerRadius=UDim.new(0,4)
-    bFloatKeybind.MouseButton1Click:Connect(function()
-        bFloatKeybind.Text="..."; bFloatKeybind.TextColor3=Theme.Accent1
-        local con; con=UserInputService.InputBegan:Connect(function(inp)
-            if inp.UserInputType==Enum.UserInputType.Keyboard then
-                Config.FloatKeybind=NormalizeKeyName(inp.KeyCode.Name, Config.FloatKeybind or "Z"); Config.SavedKeybinds.FloatKeybind = Config.FloatKeybind; bFloatKeybind.Text=PrettyKeyName(Config.FloatKeybind)
-                bFloatKeybind.TextColor3=Theme.TextPrimary; SaveConfig(); con:Disconnect()
-                ShowNotification("FLOAT KEYBIND", PrettyKeyName(Config.FloatKeybind))
-            end
-        end)
-    end)
-
-    end
-    do
-    _G.SetHazeUIPage("Main")
-    CreateSectionHeader("AUTO UNLOCK")
-    local rAutoUnlock = CreateRow("Auto Unlock on Steal")
-    CreateToggleSwitch(rAutoUnlock, Config.AutoUnlockOnSteal, function(ns, set)
-        set(ns); Config.AutoUnlockOnSteal = ns; SaveConfig()
-        ShowNotification("AUTO UNLOCK", ns and "ENABLED" or "DISABLED")
-    end)
-
-    _G.SetHazeUIPage("Misc")
-    local rShowUnlockHUD = CreateRow("Show Unlock Buttons HUD")
-    CreateToggleSwitch(rShowUnlockHUD, Config.ShowUnlockButtonsHUD, function(ns, set)
-        set(ns); Config.ShowUnlockButtonsHUD = ns; SaveConfig()
-        toggleUnlockBaseMenu(ns)
-        ShowNotification("UNLOCK BUTTONS", ns and "VISIBLE" or "HIDDEN")
-    end)
-
-    local rShowMobileActions = CreateRow("Show Mobile Buttons")
-    CreateToggleSwitch(rShowMobileActions, Config.ShowMobileActionButtons ~= false, function(ns, set)
-        set(ns); Config.ShowMobileActionButtons = ns; SaveConfig()
-        if SharedState.RefreshMobileActionButtons then
-            SharedState.RefreshMobileActionButtons()
-        end
-        ShowNotification("MOBILE BUTTONS", ns and "VISIBLE" or "HIDDEN")
-    end)
-    end
-    do
-    _G.SetHazeUIPage("Player")
-    local rArV2 = CreateRow("Anti Ragdoll")
-    CreateToggleSwitch(rArV2, Config.AntiRagdollV2, function(ns, set)
-        set(ns)
-        Config.AntiRagdollV2 = ns
-        SaveConfig()
-        startAntiRagdollV2(ns)
-        ShowNotification("ANTI-RAGDOLL", ns and "ENABLED" or "DISABLED")
-    end)
-
-
-
-
-
-
-
-
-
-
-
-
-    end
-
-    -- Shared toggle refs for ESP systems
-
-    do
-    _G.SetHazeUIPage("Player")
+    -- ======================== ESP ========================
     CreateSectionHeader("ESP")
-
-    _G.SetHazeUIPage("Settings")
     local rXray = CreateRow("Base X-Ray")
     local xrayToggle = CreateToggleSwitch(rXray, xrayEnabled, function(ns, set)
         set(ns)
-        if ns then
-            enableXray()
-        else
-            disableXray()
-        end
+        if ns then enableXray() else disableXray() end
         Config.XrayEnabled = ns; SaveConfig()
         ShowNotification("BASE X-RAY", ns and "ENABLED" or "DISABLED")
     end)
-    playerESPToggleRef = playerESPToggleRef or {setFn=nil}
-    _G.SetHazeUIPage("Player")
+
+    playerESPToggleRef = playerESPToggleRef or {setFn = nil}
     local rPlayerEsp = CreateRow("Player ESP (Hides Names)")
     CreateToggleSwitch(rPlayerEsp, Config.PlayerESP, function(ns, set)
         set(ns); Config.PlayerESP = ns; SaveConfig()
@@ -8453,281 +7819,93 @@ end
         ShowNotification("PLAYER ESP", ns and "ENABLED" or "DISABLED")
     end)
 
-    espToggleRef = espToggleRef or {enabled=true, setFn=nil}
+    espToggleRef = espToggleRef or {enabled = true, setFn = nil}
     local rEsp = CreateRow("Brainrot ESP")
     local espSettingsSwitch = CreateToggleSwitch(rEsp, Config.BrainrotESP, function(ns, set)
         set(ns); Config.BrainrotESP = ns; SaveConfig()
         if espToggleRef.setFn then espToggleRef.setFn(ns) end
         ShowNotification("BRAINROT ESP", ns and "ENABLED" or "DISABLED")
     end)
-    timerESPToggleRef = timerESPToggleRef or {setFn=nil}
+
+    timerESPToggleRef = timerESPToggleRef or {setFn = nil}
     local rTimerEsp = CreateRow("Timer ESP")
     CreateToggleSwitch(rTimerEsp, Config.TimerESP, function(ns, set)
         set(ns); Config.TimerESP = ns; SaveConfig()
         if timerESPToggleRef.setFn then timerESPToggleRef.setFn(ns) end
         ShowNotification("TIMER ESP", ns and "ENABLED" or "DISABLED")
     end)
-    subspaceMineESPToggleRef = subspaceMineESPToggleRef or {setFn=nil}
-    local rSubspaceMineEsp = CreateRow("Subspace Mine Esp")
+
+    subspaceMineESPToggleRef = subspaceMineESPToggleRef or {setFn = nil}
+    local rSubspaceMineEsp = CreateRow("Subspace Mine ESP")
     CreateToggleSwitch(rSubspaceMineEsp, Config.SubspaceMineESP, function(ns, set)
         set(ns); Config.SubspaceMineESP = ns; SaveConfig()
         if subspaceMineESPToggleRef.setFn then subspaceMineESPToggleRef.setFn(ns) end
         ShowNotification("SUBSPACE MINE ESP", ns and "ENABLED" or "DISABLED")
     end)
 
-    end
-    do
-    _G.SetHazeUIPage("Main")
-    CreateSectionHeader("AUTO STEAL DEFAULTS")
-    local nearestToggleRef = {}
-    local highestToggleRef = {}
-    local priorityToggleRef = {}
-    autoTPPriorityToggleRef = autoTPPriorityToggleRef or {setFn = nil}
+    -- ======================== MOVEMENT ========================
+    CreateSectionHeader("MOVEMENT")
+    local rInfJump = CreateRow("Infinite Jump")
+    CreateToggleSwitch(rInfJump, infiniteJumpEnabled, function(ns, set)
+        set(ns); setInfiniteJump(ns)
+        ShowNotification("INFINITE JUMP", ns and "ENABLED" or "DISABLED")
+    end)
 
-    local rDefaultNearest = CreateRow("Default To Nearest")
-    local nearestToggleSwitch = CreateToggleSwitch(rDefaultNearest, Config.DefaultToNearest, function(ns, set)
+    local rAutoStealSpeed = CreateRow("Auto Steal Speed")
+    CreateToggleSwitch(rAutoStealSpeed, Config.AutoStealSpeed, function(ns, set)
+        set(ns); Config.AutoStealSpeed = ns; SaveConfig()
+        ShowNotification("AUTO STEAL SPEED", ns and "ENABLED" or "DISABLED")
+    end)
+
+    local rFloat = CreateRow("Float")
+    local floatToggleSwitch = CreateToggleSwitch(rFloat, State.floatActive, function(ns, set)
+        set(ns); setFloatEnabled(ns, true)
+        ShowNotification("FLOAT", ns and "ENABLED" or "DISABLED")
+    end)
+    floatToggleRef.setFn = function(enabled)
+        if floatToggleSwitch and floatToggleSwitch.Set then floatToggleSwitch.Set(enabled, true, true) end
+    end
+
+    local rAutoResetBalloon = CreateRow("Auto reset on balloon")
+    CreateToggleSwitch(rAutoResetBalloon, Config.AutoResetOnBalloon, function(ns, set)
+        set(ns); Config.AutoResetOnBalloon = ns; SaveConfig()
+        ShowNotification("AUTO RESET ON BALLOON", ns and "ENABLED" or "DISABLED")
+    end)
+
+    -- ======================== PROTECTION ========================
+    CreateSectionHeader("PROTECTION")
+    local rArV2 = CreateRow("Anti Ragdoll")
+    CreateToggleSwitch(rArV2, Config.AntiRagdollV2, function(ns, set)
+        set(ns); Config.AntiRagdollV2 = ns; SaveConfig()
+        startAntiRagdollV2(ns)
+        ShowNotification("ANTI-RAGDOLL", ns and "ENABLED" or "DISABLED")
+    end)
+
+    local rAntiBeeDisco = CreateRow("Anti-Bee & Anti-Disco")
+    CreateToggleSwitch(rAntiBeeDisco, Config.AntiBeeDisco, function(ns, set)
+        set(ns); Config.AntiBeeDisco = ns; SaveConfig()
         if ns then
-            Config.DefaultToNearest = true
-            Config.DefaultToHighest = false
-            Config.DefaultToPriority = false
-            set(true)
-            if highestToggleRef.setFn then highestToggleRef.setFn(false) end
-            if priorityToggleRef.setFn then priorityToggleRef.setFn(false) end
-            
-            Config.AutoTPPriority = true
-            if autoTPPriorityToggleRef and autoTPPriorityToggleRef.setFn then
-                autoTPPriorityToggleRef.setFn(true)
-            end
+            if _G.ANTI_BEE_DISCO and _G.ANTI_BEE_DISCO.Enable then _G.ANTI_BEE_DISCO.Enable() end
         else
-            local otherDefaults = Config.DefaultToHighest or Config.DefaultToPriority
-            if not otherDefaults then
-                set(true)
-                ShowNotification("DEFAULT MODE", "At least one default must be enabled")
-                return
-            end
-            Config.DefaultToNearest = false
-            set(false)
+            if _G.ANTI_BEE_DISCO and _G.ANTI_BEE_DISCO.Disable then _G.ANTI_BEE_DISCO.Disable() end
         end
-        SaveConfig()
-        ShowNotification("DEFAULT TO NEAREST", ns and "ENABLED" or "DISABLED")
-    end)
-    nearestToggleRef.setFn = nearestToggleSwitch.Set
-
-    local rDefaultHighest = CreateRow("Default To Highest")
-    local highestToggleSwitch = CreateToggleSwitch(rDefaultHighest, Config.DefaultToHighest, function(ns, set)
-        if ns then
-            Config.DefaultToNearest = false
-            Config.DefaultToHighest = true
-            Config.DefaultToPriority = false
-            set(true)
-            if nearestToggleRef.setFn then nearestToggleRef.setFn(false) end
-            if priorityToggleRef.setFn then priorityToggleRef.setFn(false) end
-            
-            Config.AutoTPPriority = false
-            if autoTPPriorityToggleRef and autoTPPriorityToggleRef.setFn then
-                autoTPPriorityToggleRef.setFn(false)
-            end
-        else
-            local otherDefaults = Config.DefaultToNearest or Config.DefaultToPriority
-            if not otherDefaults then
-                set(true)
-                ShowNotification("DEFAULT MODE", "At least one default must be enabled")
-                return
-            end
-            Config.DefaultToHighest = false
-            set(false)
-        end
-        SaveConfig()
-        ShowNotification("DEFAULT TO HIGHEST", ns and "ENABLED" or "DISABLED")
-    end)
-    highestToggleRef.setFn = highestToggleSwitch.Set
-
-    local rDefaultPriority = CreateRow("Default To Priority")
-    local priorityToggleSwitch = CreateToggleSwitch(rDefaultPriority, Config.DefaultToPriority, function(ns, set)
-        if ns then
-            Config.DefaultToNearest = false
-            Config.DefaultToHighest = false
-            Config.DefaultToPriority = true
-            set(true)
-            if nearestToggleRef.setFn then nearestToggleRef.setFn(false) end
-            if highestToggleRef.setFn then highestToggleRef.setFn(false) end
-            
-            Config.AutoTPPriority = true
-            if autoTPPriorityToggleRef and autoTPPriorityToggleRef.setFn then
-                autoTPPriorityToggleRef.setFn(true)
-            end
-        else
-            local otherDefaults = Config.DefaultToNearest or Config.DefaultToHighest
-            if not otherDefaults then
-                set(true)
-                ShowNotification("DEFAULT MODE", "At least one default must be enabled")
-                return
-            end
-            Config.DefaultToPriority = false
-            set(false)
-        end
-        SaveConfig()
-        ShowNotification("DEFAULT TO PRIORITY", ns and "ENABLED" or "DISABLED")
-    end)
-    priorityToggleRef.setFn = priorityToggleSwitch.Set
-
-    end
-    do
-    _G.SetHazeUIPage("Main")
-    CreateSectionHeader("AUTOMATION")
-    local rAutoInvis = CreateRow("Auto Invis During Steal")
-    local autoInvisDuringStealToggleSwitch = CreateToggleSwitch(rAutoInvis, Config.AutoInvisDuringSteal, function(ns, set)
-        set(ns)
-        Config.AutoInvisDuringSteal = ns
-        _G.AutoInvisDuringSteal = ns
-        if _G.syncMiniInvisAutoStealToggle then
-            pcall(_G.syncMiniInvisAutoStealToggle, ns)
-        end
-        SaveConfig()
-        ShowNotification("AUTO INVIS", ns and "ENABLED" or "DISABLED")
-    end)
-    _G.syncMainAutoInvisToggle = autoInvisDuringStealToggleSwitch.Set
-    _G.SetHazeUIPage("Main")
-    local rAutoTpFail = CreateRow("Auto TP on Failed Steal")
-    CreateToggleSwitch(rAutoTpFail, Config.AutoTpOnFailedSteal, function(ns, set)
-        set(ns); Config.AutoTpOnFailedSteal = ns; SaveConfig()
-        ShowNotification("AUTO TP ON FAILED STEAL", ns and "ENABLED" or "DISABLED")
-    end)
-    local rAutoTpPriority = CreateRow("Auto TP Priority Mode")
-    local autoTPPriorityToggleSwitch = CreateToggleSwitch(rAutoTpPriority, Config.AutoTPPriority, function(ns, set)
-        set(ns); Config.AutoTPPriority = ns; SaveConfig()
-        ShowNotification("AUTO TP PRIORITY", ns and "PRIORITY" or "HIGHEST")
-    end)
-    autoTPPriorityToggleRef.setFn = autoTPPriorityToggleSwitch.Set
-    local rAutoKick = CreateRow("Auto-Kick on Steal")
-    CreateToggleSwitch(rAutoKick, Config.AutoKickOnSteal, function(ns, set)
-        set(ns); Config.AutoKickOnSteal = ns; SaveConfig()
-        ShowNotification("AUTO-KICK ON STEAL", ns and "ENABLED" or "DISABLED")
+        ShowNotification("ANTI-BEE & DISCO", ns and "ENABLED" or "DISABLED")
     end)
 
-    end
-    do
-    _G.SetHazeUIPage("Misc")
-    CreateSectionHeader("Hide GUIs")
-    local rHideAdminPanel = CreateRow("Hide Admin Panel GUI")
-    CreateToggleSwitch(rHideAdminPanel, Config.HideAdminPanel, function(ns, set)
-        set(ns); Config.HideAdminPanel = ns; SaveConfig()
-        local adUI = PlayerGui:FindFirstChild("XiAdminPanel")
-        if adUI then adUI.Enabled = not ns end
-        ShowNotification("HIDE ADMIN PANEL", ns and "ENABLED" or "DISABLED")
-    end)
-    local rHideAutoSteal = CreateRow("Hide Auto Steal GUI")
-    CreateToggleSwitch(rHideAutoSteal, Config.HideAutoSteal, function(ns, set)
-        set(ns); Config.HideAutoSteal = ns; SaveConfig()
-        local asUI = PlayerGui:FindFirstChild("AutoStealUI")
-        if asUI then asUI.Enabled = not ns end
-        ShowNotification("HIDE AUTO STEAL", ns and "ENABLED" or "DISABLED")
-    end)
-    local rCompactAutoSteal = CreateRow("Compact Auto Steal GUI")
-    CreateToggleSwitch(rCompactAutoSteal, Config.CompactAutoSteal, function(ns, set)
-        set(ns); Config.CompactAutoSteal = ns; SaveConfig()
-        local asUI = PlayerGui:FindFirstChild("AutoStealUI")
-        if asUI and asUI:FindFirstChild("Frame") then
-            local frame = asUI.Frame
-            local mobileScale = IS_MOBILE and 0.6 or 1
-            local targetHeight = ns and (5 * 44 + 135) or (630 * mobileScale)
-            
-            local tween = TweenService:Create(
-                frame,
-                TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),
-                {Size = UDim2.new(frame.Size.X.Scale, frame.Size.X.Offset, 0, targetHeight)}
-            )
-            tween:Play()
-            
-            tween.Completed:Connect(function()
-                SharedState.ListNeedsRedraw = true
-                if SharedState.UpdateAutoStealUI then
-                    SharedState.UpdateAutoStealUI()
-                end
-            end)
-        end
-        ShowNotification("COMPACT AUTO STEAL", ns and "ENABLED" or "DISABLED")
+    local rAutoDestroyTurrets = CreateRow("Auto-Destroy Turrets")
+    CreateToggleSwitch(rAutoDestroyTurrets, Config.AutoDestroyTurrets, function(ns, set)
+        set(ns); Config.AutoDestroyTurrets = ns; SaveConfig()
+        ShowNotification("AUTO-DESTROY TURRETS", ns and "ENABLED" or "DISABLED")
     end)
 
-    end
-    do
-    _G.SetHazeUIPage("Settings")
-    CreateSectionHeader("EXTRAS")   
-
-    _G.SetHazeUIPage("Keybinds")
-    local rResetKey = CreateRow("Reset")
-    local bResetKey = Instance.new("TextButton", rResetKey)
-    bResetKey.Size=UDim2.new(0,60,0,24); bResetKey.Position=UDim2.new(1,-70,0.5,-12)
-    bResetKey.BackgroundColor3=Theme.SurfaceHighlight; bResetKey.Text=PrettyKeyName(Config.ResetKey)
-    bResetKey.Font=Enum.Font.GothamBold; bResetKey.TextColor3=Theme.TextPrimary; bResetKey.TextSize=12
-    Instance.new("UICorner",bResetKey).CornerRadius=UDim.new(0,4)
-    bResetKey.MouseButton1Click:Connect(function()
-        bResetKey.Text="..."; bResetKey.TextColor3=Theme.Accent1
-        local con; con=UserInputService.InputBegan:Connect(function(inp)
-            if inp.UserInputType==Enum.UserInputType.Keyboard then
-                Config.ResetKey=NormalizeKeyName(inp.KeyCode.Name, Config.ResetKey or "X"); Config.SavedKeybinds.ResetKey = Config.ResetKey; bResetKey.Text=PrettyKeyName(Config.ResetKey)
-                bResetKey.TextColor3=Theme.TextPrimary; SaveConfig(); con:Disconnect()
-                ShowNotification("RESET KEYBIND", PrettyKeyName(Config.ResetKey))
-            end
-        end)
-    end)
-
-    _G.SetHazeUIPage("Keybinds")
-    CreateSectionHeader("Extras")
-    local rKickKey = CreateRow("Kick")
-    local bKickKey = Instance.new("TextButton", rKickKey)
-    bKickKey.Size=UDim2.new(0,60,0,24); bKickKey.Position=UDim2.new(1,-70,0.5,-12)
-    bKickKey.BackgroundColor3=Theme.SurfaceHighlight; bKickKey.Text=Config.KickKey ~= "" and PrettyKeyName(Config.KickKey) or "NONE"
-    bKickKey.Font=Enum.Font.GothamBold; bKickKey.TextColor3=Theme.TextPrimary; bKickKey.TextSize=12
-    Instance.new("UICorner",bKickKey).CornerRadius=UDim.new(0,4)
-    bKickKey.MouseButton1Click:Connect(function()
-        bKickKey.Text="..."; bKickKey.TextColor3=Theme.Accent1
-        local con; con=UserInputService.InputBegan:Connect(function(inp)
-            if inp.UserInputType==Enum.UserInputType.Keyboard then
-                Config.KickKey=NormalizeKeyName(inp.KeyCode.Name, ""); Config.SavedKeybinds.KickKey = Config.KickKey; bKickKey.Text=Config.KickKey ~= "" and PrettyKeyName(Config.KickKey) or "NONE"
-                bKickKey.TextColor3=Theme.TextPrimary; SaveConfig(); con:Disconnect()
-                ShowNotification("KICK KEYBIND", Config.KickKey ~= "" and PrettyKeyName(Config.KickKey) or "NONE")
-            end
-        end)
-    end)
-
-    _G.SetHazeUIPage("Misc")
-    local rCleanErrors = CreateRow("Clean Error GUIs")
-    CreateToggleSwitch(rCleanErrors, Config.CleanErrorGUIs, function(ns, set)
-        set(ns); Config.CleanErrorGUIs = ns; SaveConfig()
-        ShowNotification("CLEAN ERROR GUIS", ns and "ENABLED" or "DISABLED")
-    end)
-
-    CreateSectionHeader("Detection")
-    local rGriefDetector = CreateRow("Grief Detector")
-    CreateToggleSwitch(rGriefDetector, Config.GriefDetector or false, function(ns, set)
-        set(ns); Config.GriefDetector = ns; SaveConfig()
-        if ns then
-            if not _G._GriefDetectorRunning then
-                _G._GriefDetectorRunning = true
-                task.spawn(function()
-                    _G._GriefDetectorTask()
-                end)
-            end
-        else
-            if getgenv().GriefDetectorCleanup then
-                pcall(getgenv().GriefDetectorCleanup)
-            end
-            _G._GriefDetectorRunning = false
-        end
-        ShowNotification("GRIEF DETECTOR", ns and "ENABLED" or "DISABLED")
-    end)
-
-
-    end
-    do
-    _G.SetHazeUIPage("Misc")
-    CreateSectionHeader("Admin Panel")
+    -- ======================== ADMIN PANEL ========================
+    CreateSectionHeader("ADMIN PANEL")
     local rClickToAP = CreateRow("Click To Admin Panel")
     CreateToggleSwitch(rClickToAP, Config.ClickToAP, function(ns, set)
         set(ns); Config.ClickToAP = ns; SaveConfig()
         ShowNotification("CLICK TO AP", ns and "ENABLED" or "DISABLED")
     end)
+
     local rClickToAPSingle = CreateRow("Click To AP Single Command")
     CreateToggleSwitch(rClickToAPSingle, Config.ClickToAPSingleCommand, function(ns, set)
         set(ns); Config.ClickToAPSingleCommand = ns; SaveConfig()
@@ -8740,11 +7918,13 @@ end
         set(ns); Config.DisableClickToAPOnMoby = ns; SaveConfig()
         ShowNotification("DISABLE CLICK TO AP ON MOBY", ns and "ENABLED" or "DISABLED")
     end)
+
     local rDisableProximitySpamOnMoby = CreateRow("Disable Proximity AP On Moby")
     CreateToggleSwitch(rDisableProximitySpamOnMoby, Config.DisableProximitySpamOnMoby, function(ns, set)
         set(ns); Config.DisableProximitySpamOnMoby = ns; SaveConfig()
         ShowNotification("DISABLE PROXIMITY AP ON MOBY", ns and "ENABLED" or "DISABLED")
     end)
+
     local rCancelAPPanelOnMoby = CreateRow("Cancel AP Panel on Moby")
     CreateToggleSwitch(rCancelAPPanelOnMoby, Config.CancelAPPanelOnMoby, function(ns, set)
         set(ns); Config.CancelAPPanelOnMoby = ns; SaveConfig()
@@ -8757,64 +7937,76 @@ end
         set(ns); Config.DisableClickToAPOnKawaifu = ns; SaveConfig()
         ShowNotification("DISABLE CLICK TO AP ON KAWAIFU", ns and "ENABLED" or "DISABLED")
     end)
+
     local rDisableProximitySpamOnKawaifu = CreateRow("Disable Proximity AP On Kawaifu")
     CreateToggleSwitch(rDisableProximitySpamOnKawaifu, Config.DisableProximitySpamOnKawaifu, function(ns, set)
         set(ns); Config.DisableProximitySpamOnKawaifu = ns; SaveConfig()
         ShowNotification("DISABLE PROXIMITY AP ON KAWAIFU", ns and "ENABLED" or "DISABLED")
     end)
+
     local rCancelAPPanelOnKawaifu = CreateRow("Cancel AP Panel on Kawaifu")
     CreateToggleSwitch(rCancelAPPanelOnKawaifu, Config.CancelAPPanelOnKawaifu, function(ns, set)
         set(ns); Config.CancelAPPanelOnKawaifu = ns; SaveConfig()
         ShowNotification("CANCEL AP PANEL ON KAWAIFU", ns and "ENABLED" or "DISABLED")
     end)
-    _G.SetHazeUIPage("Keybinds")
-    CreateSectionHeader("Admin Panel")
-    local rClickToAPKeybind = CreateRow("Click To AP Keybind")
-    local bClickToAPKeybind = Instance.new("TextButton", rClickToAPKeybind)
-    bClickToAPKeybind.Size=UDim2.new(0,60,0,24); bClickToAPKeybind.Position=UDim2.new(1,-65,0.5,-12)
-    bClickToAPKeybind.BackgroundColor3=Theme.SurfaceHighlight; bClickToAPKeybind.Text=PrettyKeyName(Config.ClickToAPKeybind or "L")
-    bClickToAPKeybind.Font=Enum.Font.GothamBold; bClickToAPKeybind.TextColor3=Theme.TextPrimary; bClickToAPKeybind.TextSize=12
-    Instance.new("UICorner",bClickToAPKeybind).CornerRadius=UDim.new(0,4)
-    bClickToAPKeybind.MouseButton1Click:Connect(function()
-        bClickToAPKeybind.Text="..."; bClickToAPKeybind.TextColor3=Theme.Accent1
-        local con; con=UserInputService.InputBegan:Connect(function(inp)
-            if inp.UserInputType==Enum.UserInputType.Keyboard then
-                Config.ClickToAPKeybind=NormalizeKeyName(inp.KeyCode.Name, Config.ClickToAPKeybind or "L"); Config.SavedKeybinds.ClickToAPKeybind = Config.ClickToAPKeybind; bClickToAPKeybind.Text=PrettyKeyName(Config.ClickToAPKeybind)
-                bClickToAPKeybind.TextColor3=Theme.TextPrimary; SaveConfig(); con:Disconnect()
-                ShowNotification("CLICK TO AP KEYBIND", PrettyKeyName(Config.ClickToAPKeybind))
-            end
-        end)
-    end)
-    local rProximityAPKeybind = CreateRow("Proximity AP Keybind")
-    local bProximityAPKeybind = Instance.new("TextButton", rProximityAPKeybind)
-    bProximityAPKeybind.Size=UDim2.new(0,60,0,24); bProximityAPKeybind.Position=UDim2.new(1,-70,0.5,-12)
-    bProximityAPKeybind.BackgroundColor3=Theme.SurfaceHighlight; bProximityAPKeybind.Text=PrettyKeyName(Config.ProximityAPKeybind or "P")
-    bProximityAPKeybind.Font=Enum.Font.GothamBold; bProximityAPKeybind.TextColor3=Theme.TextPrimary; bProximityAPKeybind.TextSize=12
-    Instance.new("UICorner",bProximityAPKeybind).CornerRadius=UDim.new(0,4)
-    bProximityAPKeybind.MouseButton1Click:Connect(function()
-        bProximityAPKeybind.Text="..."; bProximityAPKeybind.TextColor3=Theme.Accent1
-        local con; con=UserInputService.InputBegan:Connect(function(inp)
-            if inp.UserInputType==Enum.UserInputType.Keyboard then
-                Config.ProximityAPKeybind=NormalizeKeyName(inp.KeyCode.Name, Config.ProximityAPKeybind or "P"); Config.SavedKeybinds.ProximityAPKeybind = Config.ProximityAPKeybind; bProximityAPKeybind.Text=PrettyKeyName(Config.ProximityAPKeybind)
-                bProximityAPKeybind.TextColor3=Theme.TextPrimary; SaveConfig(); con:Disconnect()
-                ShowNotification("PROXIMITY AP KEYBIND", PrettyKeyName(Config.ProximityAPKeybind))
-            end
-        end)
+
+    -- ======================== HIDE GUIs ========================
+    CreateSectionHeader("HIDE GUIs")
+    local rHideAdminPanel = CreateRow("Hide Admin Panel GUI")
+    CreateToggleSwitch(rHideAdminPanel, Config.HideAdminPanel, function(ns, set)
+        set(ns); Config.HideAdminPanel = ns; SaveConfig()
+        local adUI = PlayerGui:FindFirstChild("XiAdminPanel")
+        if adUI then adUI.Enabled = not ns end
+        ShowNotification("HIDE ADMIN PANEL", ns and "ENABLED" or "DISABLED")
     end)
 
-    end
-    do
-    _G.SetHazeUIPage("Settings")
+    local rHideAutoSteal = CreateRow("Hide Auto Steal GUI")
+    CreateToggleSwitch(rHideAutoSteal, Config.HideAutoSteal, function(ns, set)
+        set(ns); Config.HideAutoSteal = ns; SaveConfig()
+        local asUI = PlayerGui:FindFirstChild("AutoStealUI")
+        if asUI then asUI.Enabled = not ns end
+        ShowNotification("HIDE AUTO STEAL", ns and "ENABLED" or "DISABLED")
+    end)
+
+    local rCompactAutoSteal = CreateRow("Compact Auto Steal GUI")
+    CreateToggleSwitch(rCompactAutoSteal, Config.CompactAutoSteal, function(ns, set)
+        set(ns); Config.CompactAutoSteal = ns; SaveConfig()
+        local asUI = PlayerGui:FindFirstChild("AutoStealUI")
+        if asUI and asUI:FindFirstChild("Frame") then
+            local frame = asUI.Frame
+            local mobileScale = IS_MOBILE and 0.6 or 1
+            local targetHeight = ns and (5 * 44 + 135) or (630 * mobileScale)
+            TweenService:Create(frame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {Size = UDim2.new(frame.Size.X.Scale, frame.Size.X.Offset, 0, targetHeight)}):Play()
+        end
+        ShowNotification("COMPACT AUTO STEAL", ns and "ENABLED" or "DISABLED")
+    end)
+
+    local rShowMobileActions = CreateRow("Show Mobile Buttons")
+    CreateToggleSwitch(rShowMobileActions, Config.ShowMobileActionButtons ~= false, function(ns, set)
+        set(ns); Config.ShowMobileActionButtons = ns; SaveConfig()
+        if SharedState.RefreshMobileActionButtons then SharedState.RefreshMobileActionButtons() end
+        ShowNotification("MOBILE BUTTONS", ns and "VISIBLE" or "HIDDEN")
+    end)
+
+    local rShowUnlockHUD = CreateRow("Show Unlock Buttons HUD")
+    CreateToggleSwitch(rShowUnlockHUD, Config.ShowUnlockButtonsHUD, function(ns, set)
+        set(ns); Config.ShowUnlockButtonsHUD = ns; SaveConfig()
+        toggleUnlockBaseMenu(ns)
+        ShowNotification("UNLOCK BUTTONS", ns and "VISIBLE" or "HIDDEN")
+    end)
+
+    -- ======================== ALERTS ========================
     CreateSectionHeader("ALERTS")
     local rAlertsEnabled = CreateRow("Enable Alerts")
     CreateToggleSwitch(rAlertsEnabled, Config.AlertsEnabled, function(ns, set)
         set(ns); Config.AlertsEnabled = ns; SaveConfig()
         ShowNotification("PRIORITY ALERTS", ns and "ENABLED" or "DISABLED")
     end)
+
     local rAlertSound = CreateRow("Alert Sound ID")
     local soundBox = Instance.new("TextBox", rAlertSound)
-    soundBox.Size = UDim2.new(0, 180, 0, 24)
-    soundBox.Position = UDim2.new(1, -185, 0.5, -12)
+    soundBox.Size = UDim2.new(0, 130, 0, 22)
+    soundBox.Position = UDim2.new(1, -140, 0.5, -11)
     soundBox.BackgroundColor3 = Theme.SurfaceHighlight
     soundBox.Text = Config.AlertSoundID or "rbxassetid://6518811702"
     soundBox.Font = Enum.Font.Gotham
@@ -8823,14 +8015,11 @@ end
     soundBox.PlaceholderText = "Sound ID"
     Instance.new("UICorner", soundBox).CornerRadius = UDim.new(0, 4)
     soundBox.FocusLost:Connect(function()
-        Config.AlertSoundID = soundBox.Text
-        SaveConfig()
+        Config.AlertSoundID = soundBox.Text; SaveConfig()
         ShowNotification("ALERT SOUND", "Updated")
     end)
 
-    end
-    do
-    _G.SetHazeUIPage("Settings")
+    -- ======================== JOB JOINER ========================
     CreateSectionHeader("JOB JOINER")
     local rJoinerRow = CreateRow("Job ID Joiner")
     CreateToggleSwitch(rJoinerRow, Config.ShowJobJoiner, function(ns, set)
@@ -8839,58 +8028,13 @@ end
         if gui then gui.Enabled = Config.ShowJobJoiner end
         ShowNotification("JOB ID JOINER", ns and "ENABLED" or "DISABLED")
     end)
-    _G.SetHazeUIPage("Keybinds")
-    CreateSectionHeader("Job Joiner")
-    local rJoinerKey = CreateRow("Job Joiner Keybind")
-    local bJoinerKey = Instance.new("TextButton", rJoinerKey)
-    bJoinerKey.Size=UDim2.new(0,60,0,24); bJoinerKey.Position=UDim2.new(1,-70,0.5,-12)
-    bJoinerKey.BackgroundColor3=Theme.SurfaceHighlight; bJoinerKey.Text=PrettyKeyName(Config.JobJoinerKey or "J")
-    bJoinerKey.Font=Enum.Font.GothamBold; bJoinerKey.TextColor3=Theme.TextPrimary; bJoinerKey.TextSize=12
-    Instance.new("UICorner",bJoinerKey).CornerRadius=UDim.new(0,4)
-    bJoinerKey.MouseButton1Click:Connect(function()
-        bJoinerKey.Text="..."; bJoinerKey.TextColor3=Theme.Accent1
-        local con; con=UserInputService.InputBegan:Connect(function(inp)
-            if inp.UserInputType==Enum.UserInputType.Keyboard then
-                Config.JobJoinerKey=NormalizeKeyName(inp.KeyCode.Name, Config.JobJoinerKey or "J"); Config.SavedKeybinds.JobJoinerKey = Config.JobJoinerKey; bJoinerKey.Text=PrettyKeyName(Config.JobJoinerKey)
-                bJoinerKey.TextColor3=Theme.TextPrimary; SaveConfig(); con:Disconnect()
-                ShowNotification("JOB JOINER KEYBIND", PrettyKeyName(Config.JobJoinerKey))
-            end
-        end)
-    end)
 
-    end
-    do
-    _G.SetHazeUIPage("Player")
-    CreateSectionHeader("Protection")
-    local rAntiBeeDisco = CreateRow("Anti-Bee & Anti-Disco")
-    CreateToggleSwitch(rAntiBeeDisco, Config.AntiBeeDisco, function(ns, set)
-        set(ns); Config.AntiBeeDisco = ns; SaveConfig()
-        if ns then
-            if _G.ANTI_BEE_DISCO and _G.ANTI_BEE_DISCO.Enable then
-                _G.ANTI_BEE_DISCO.Enable()
-            end
-        else
-            if _G.ANTI_BEE_DISCO and _G.ANTI_BEE_DISCO.Disable then
-                _G.ANTI_BEE_DISCO.Disable()
-            end
-        end
-        ShowNotification("ANTI-BEE & DISCO", ns and "ENABLED" or "DISABLED")
-    end)
-
-    local rAutoDestroyTurrets = CreateRow("Auto-Destroy Turrets")
-    CreateToggleSwitch(rAutoDestroyTurrets, Config.AutoDestroyTurrets, function(ns, set)
-        set(ns); Config.AutoDestroyTurrets = ns; SaveConfig()
-        ShowNotification("AUTO-DESTROY TURRETS", ns and "ENABLED" or "DISABLED")
-    end)
-
-    end
-    do
-    _G.SetHazeUIPage("Settings")
+    -- ======================== CAMERA ========================
     CreateSectionHeader("CAMERA")
-    local rFOV = CreateRow("FOV")
+    local rFOV = CreateRow("FOV", 40)
     local fovSliderBg = Instance.new("Frame", rFOV)
-    fovSliderBg.Size = UDim2.new(0, 140, 0, 5)
-    fovSliderBg.Position = UDim2.new(1, -200, 0.5, -2.5)
+    fovSliderBg.Size = UDim2.new(0, 120, 0, 5)
+    fovSliderBg.Position = UDim2.new(1, -175, 0.5, -2.5)
     fovSliderBg.BackgroundColor3 = Color3.fromRGB(30, 32, 38)
     Instance.new("UICorner", fovSliderBg).CornerRadius = UDim.new(1, 0)
     local fovFill = Instance.new("Frame", fovSliderBg)
@@ -8904,33 +8048,24 @@ end
     fovKnob.Position = UDim2.new(0, 0, 0.5, 0)
     Instance.new("UICorner", fovKnob).CornerRadius = UDim.new(1, 0)
     local fovKnobStroke = Instance.new("UIStroke", fovKnob)
-    fovKnobStroke.Color = Theme.Accent1
-    fovKnobStroke.Thickness = 1.5
-    fovKnobStroke.Transparency = 0.2
+    fovKnobStroke.Color = Theme.Accent1; fovKnobStroke.Thickness = 1.5; fovKnobStroke.Transparency = 0.2
     local fovValLbl = Instance.new("TextLabel", rFOV)
     fovValLbl.Size = UDim2.new(0, 40, 0, 20)
-    fovValLbl.Position = UDim2.new(1, -50, 0.5, -10)
+    fovValLbl.Position = UDim2.new(1, -46, 0.5, -10)
     fovValLbl.BackgroundTransparency = 1
     fovValLbl.Text = string.format("%.1f", Config.FOV)
     fovValLbl.TextColor3 = Theme.TextPrimary
-    fovValLbl.Font = Enum.Font.GothamBold
-    fovValLbl.TextSize = 13
-
+    fovValLbl.Font = Enum.Font.GothamBold; fovValLbl.TextSize = 12
     local function updateFOVSlider(val)
-        val = math.clamp(val, 30, 180)
-        Config.FOV = val
-        SaveConfig()
+        val = math.clamp(val, 30, 180); Config.FOV = val; SaveConfig()
         fovValLbl.Text = string.format("%.1f", val)
         local pct = (val - 30) / 150
         fovFill.Size = UDim2.new(pct, 0, 1, 0)
         fovKnob.Position = UDim2.new(pct, 0, 0.5, 0)
-        if Workspace.CurrentCamera then
-            Workspace.CurrentCamera.FieldOfView = val
-        end
+        if Workspace.CurrentCamera then Workspace.CurrentCamera.FieldOfView = val end
         ShowNotification("FIELD OF VIEW", string.format("%.1f", val))
     end
     updateFOVSlider(Config.FOV)
-
     local fovDragging = false
     fovSliderBg.InputBegan:Connect(function(i)
         if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then fovDragging = true end
@@ -8940,60 +8075,252 @@ end
     end)
     UserInputService.InputChanged:Connect(function(i)
         if fovDragging and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then
-            local x = i.Position.X
-            local r = fovSliderBg.AbsolutePosition.X
-            local w = fovSliderBg.AbsoluteSize.X
-            local p = (x - r) / w
-            updateFOVSlider(30 + (p * 150))
+            local x = i.Position.X; local r = fovSliderBg.AbsolutePosition.X; local w = fovSliderBg.AbsoluteSize.X
+            updateFOVSlider(30 + ((x - r) / w * 150))
         end
     end)
 
     local rFOVReset = CreateRow("Reset FOV")
     local bFOVReset = Instance.new("TextButton", rFOVReset)
-    bFOVReset.Size = UDim2.new(0, 60, 0, 24)
-    bFOVReset.Position = UDim2.new(1, -70, 0.5, -12)
-    bFOVReset.BackgroundColor3 = Theme.SurfaceHighlight
-    bFOVReset.Text = "Reset"
-    bFOVReset.Font = Enum.Font.GothamBold
-    bFOVReset.TextColor3 = Theme.TextPrimary
-    bFOVReset.TextSize = 12
+    bFOVReset.Size = UDim2.new(0, 60, 0, 22); bFOVReset.Position = UDim2.new(1, -70, 0.5, -11)
+    bFOVReset.BackgroundColor3 = Theme.SurfaceHighlight; bFOVReset.Text = "Reset"
+    bFOVReset.Font = Enum.Font.GothamBold; bFOVReset.TextColor3 = Theme.TextPrimary; bFOVReset.TextSize = 12
     Instance.new("UICorner", bFOVReset).CornerRadius = UDim.new(0, 4)
-    bFOVReset.MouseButton1Click:Connect(function()
-        updateFOVSlider(70)
-        ShowNotification("FIELD OF VIEW", "Reset to 70")
+    bFOVReset.MouseButton1Click:Connect(function() updateFOVSlider(70); ShowNotification("FIELD OF VIEW", "Reset to 70") end)
+
+    -- ======================== DETECTION ========================
+    CreateSectionHeader("DETECTION")
+    local rGriefDetector = CreateRow("Grief Detector")
+    CreateToggleSwitch(rGriefDetector, Config.GriefDetector or false, function(ns, set)
+        set(ns); Config.GriefDetector = ns; SaveConfig()
+        if ns then
+            if not _G._GriefDetectorRunning then
+                _G._GriefDetectorRunning = true
+                task.spawn(function() _G._GriefDetectorTask() end)
+            end
+        else
+            if getgenv().GriefDetectorCleanup then pcall(getgenv().GriefDetectorCleanup) end
+            _G._GriefDetectorRunning = false
+        end
+        ShowNotification("GRIEF DETECTOR", ns and "ENABLED" or "DISABLED")
     end)
 
-    end
-    do
-    _G.SetHazeUIPage("Keybinds")
-    CreateSectionHeader("Menu")
+    local rCleanErrors = CreateRow("Clean Error GUIs")
+    CreateToggleSwitch(rCleanErrors, Config.CleanErrorGUIs, function(ns, set)
+        set(ns); Config.CleanErrorGUIs = ns; SaveConfig()
+        ShowNotification("CLEAN ERROR GUIS", ns and "ENABLED" or "DISABLED")
+    end)
+
+    -- ======================== KEYBINDS ========================
+    CreateSectionHeader("KEYBINDS")
+    local rBind = CreateRow("TP Keybind")
+    local bBind = Instance.new("TextButton", rBind)
+    bBind.Size = UDim2.new(0, 60, 0, 22); bBind.Position = UDim2.new(1, -70, 0.5, -11)
+    bBind.BackgroundColor3 = Theme.SurfaceHighlight; bBind.Text = PrettyKeyName(Config.TpSettings.TpKey)
+    bBind.Font = Enum.Font.GothamBold; bBind.TextColor3 = Theme.TextPrimary; bBind.TextSize = 12
+    Instance.new("UICorner", bBind).CornerRadius = UDim.new(0, 4)
+    bBind.MouseButton1Click:Connect(function()
+        bBind.Text = "..."; bBind.TextColor3 = Theme.Accent1
+        local con; con = UserInputService.InputBegan:Connect(function(inp)
+            if inp.UserInputType == Enum.UserInputType.Keyboard then
+                Config.TpSettings.TpKey = NormalizeKeyName(inp.KeyCode.Name, Config.TpSettings.TpKey or "T"); Config.SavedKeybinds.TpKey = Config.TpSettings.TpKey; bBind.Text = PrettyKeyName(Config.TpSettings.TpKey)
+                bBind.TextColor3 = Theme.TextPrimary; SaveConfig(); con:Disconnect()
+                ShowNotification("TP KEYBIND", PrettyKeyName(Config.TpSettings.TpKey))
+            end
+        end)
+    end)
+
+    local rBindClone = CreateRow("Auto Clone Keybind")
+    local bBindClone = Instance.new("TextButton", rBindClone)
+    bBindClone.Size = UDim2.new(0, 60, 0, 22); bBindClone.Position = UDim2.new(1, -70, 0.5, -11)
+    bBindClone.BackgroundColor3 = Theme.SurfaceHighlight; bBindClone.Text = PrettyKeyName(Config.TpSettings.CloneKey)
+    bBindClone.Font = Enum.Font.GothamBold; bBindClone.TextColor3 = Theme.TextPrimary; bBindClone.TextSize = 12
+    Instance.new("UICorner", bBindClone).CornerRadius = UDim.new(0, 4)
+    bBindClone.MouseButton1Click:Connect(function()
+        bBindClone.Text = "..."; bBindClone.TextColor3 = Theme.Accent1
+        local con; con = UserInputService.InputBegan:Connect(function(inp)
+            if inp.UserInputType == Enum.UserInputType.Keyboard then
+                Config.TpSettings.CloneKey = NormalizeKeyName(inp.KeyCode.Name, Config.TpSettings.CloneKey or "V"); Config.SavedKeybinds.CloneKey = Config.TpSettings.CloneKey; bBindClone.Text = PrettyKeyName(Config.TpSettings.CloneKey)
+                bBindClone.TextColor3 = Theme.TextPrimary; SaveConfig(); con:Disconnect()
+                ShowNotification("CLONE KEYBIND", PrettyKeyName(Config.TpSettings.CloneKey))
+            end
+        end)
+    end)
+
+    local rCarpetBind = CreateRow("Carpet Speed Keybind")
+    local bCarpet = Instance.new("TextButton", rCarpetBind)
+    bCarpet.Size = UDim2.new(0, 60, 0, 22); bCarpet.Position = UDim2.new(1, -70, 0.5, -11)
+    bCarpet.BackgroundColor3 = Theme.SurfaceHighlight; bCarpet.Text = PrettyKeyName(Config.TpSettings.CarpetSpeedKey)
+    bCarpet.Font = Enum.Font.GothamBold; bCarpet.TextColor3 = Theme.TextPrimary; bCarpet.TextSize = 12
+    Instance.new("UICorner", bCarpet).CornerRadius = UDim.new(0, 4)
+    bCarpet.MouseButton1Click:Connect(function()
+        bCarpet.Text = "..."; bCarpet.TextColor3 = Theme.Accent1
+        local con; con = UserInputService.InputBegan:Connect(function(inp)
+            if inp.UserInputType == Enum.UserInputType.Keyboard then
+                Config.TpSettings.CarpetSpeedKey = NormalizeKeyName(inp.KeyCode.Name, Config.TpSettings.CarpetSpeedKey or "Q"); Config.SavedKeybinds.CarpetSpeedKey = Config.TpSettings.CarpetSpeedKey; bCarpet.Text = PrettyKeyName(Config.TpSettings.CarpetSpeedKey)
+                bCarpet.TextColor3 = Theme.TextPrimary; SaveConfig(); con:Disconnect()
+                ShowNotification("CARPET SPEED KEYBIND", PrettyKeyName(Config.TpSettings.CarpetSpeedKey))
+            end
+        end)
+    end)
+
+    local rStealSpeedKey = CreateRow("Steal Speed Keybind")
+    local bStealSpeedKey = Instance.new("TextButton", rStealSpeedKey)
+    bStealSpeedKey.Size = UDim2.new(0, 60, 0, 22); bStealSpeedKey.Position = UDim2.new(1, -70, 0.5, -11)
+    bStealSpeedKey.BackgroundColor3 = Theme.SurfaceHighlight; bStealSpeedKey.Text = PrettyKeyName(Config.StealSpeedKey)
+    bStealSpeedKey.Font = Enum.Font.GothamBold; bStealSpeedKey.TextColor3 = Theme.TextPrimary; bStealSpeedKey.TextSize = 12
+    Instance.new("UICorner", bStealSpeedKey).CornerRadius = UDim.new(0, 4)
+    bStealSpeedKey.MouseButton1Click:Connect(function()
+        bStealSpeedKey.Text = "..."; bStealSpeedKey.TextColor3 = Theme.Accent1
+        local con; con = UserInputService.InputBegan:Connect(function(inp)
+            if inp.UserInputType == Enum.UserInputType.Keyboard then
+                Config.StealSpeedKey = NormalizeKeyName(inp.KeyCode.Name, Config.StealSpeedKey or "C"); Config.SavedKeybinds.StealSpeedKey = Config.StealSpeedKey; bStealSpeedKey.Text = PrettyKeyName(Config.StealSpeedKey)
+                bStealSpeedKey.TextColor3 = Theme.TextPrimary; SaveConfig(); con:Disconnect()
+                ShowNotification("STEAL SPEED KEYBIND", PrettyKeyName(Config.StealSpeedKey))
+            end
+        end)
+    end)
+
+    local rFloatKeybind = CreateRow("Float Keybind")
+    local bFloatKeybind = Instance.new("TextButton", rFloatKeybind)
+    bFloatKeybind.Size = UDim2.new(0, 60, 0, 22); bFloatKeybind.Position = UDim2.new(1, -70, 0.5, -11)
+    bFloatKeybind.BackgroundColor3 = Theme.SurfaceHighlight; bFloatKeybind.Text = PrettyKeyName(Config.FloatKeybind or "Z")
+    bFloatKeybind.Font = Enum.Font.GothamBold; bFloatKeybind.TextColor3 = Theme.TextPrimary; bFloatKeybind.TextSize = 12
+    Instance.new("UICorner", bFloatKeybind).CornerRadius = UDim.new(0, 4)
+    bFloatKeybind.MouseButton1Click:Connect(function()
+        bFloatKeybind.Text = "..."; bFloatKeybind.TextColor3 = Theme.Accent1
+        local con; con = UserInputService.InputBegan:Connect(function(inp)
+            if inp.UserInputType == Enum.UserInputType.Keyboard then
+                Config.FloatKeybind = NormalizeKeyName(inp.KeyCode.Name, Config.FloatKeybind or "Z"); Config.SavedKeybinds.FloatKeybind = Config.FloatKeybind; bFloatKeybind.Text = PrettyKeyName(Config.FloatKeybind)
+                bFloatKeybind.TextColor3 = Theme.TextPrimary; SaveConfig(); con:Disconnect()
+                ShowNotification("FLOAT KEYBIND", PrettyKeyName(Config.FloatKeybind))
+            end
+        end)
+    end)
+
+    local rRagdollSelf = CreateRow("Ragdoll Self Keybind")
+    local bRagdollSelf = Instance.new("TextButton", rRagdollSelf)
+    bRagdollSelf.Size = UDim2.new(0, 60, 0, 22); bRagdollSelf.Position = UDim2.new(1, -70, 0.5, -11)
+    bRagdollSelf.BackgroundColor3 = Theme.SurfaceHighlight; bRagdollSelf.Text = Config.RagdollSelfKey ~= "" and PrettyKeyName(Config.RagdollSelfKey) or "NONE"
+    bRagdollSelf.Font = Enum.Font.GothamBold; bRagdollSelf.TextColor3 = Theme.TextPrimary; bRagdollSelf.TextSize = 12
+    Instance.new("UICorner", bRagdollSelf).CornerRadius = UDim.new(0, 4)
+    bRagdollSelf.MouseButton1Click:Connect(function()
+        bRagdollSelf.Text = "..."; bRagdollSelf.TextColor3 = Theme.Accent1
+        local con; con = UserInputService.InputBegan:Connect(function(inp)
+            if inp.UserInputType == Enum.UserInputType.Keyboard then
+                Config.RagdollSelfKey = NormalizeKeyName(inp.KeyCode.Name, ""); Config.SavedKeybinds.RagdollSelfKey = Config.RagdollSelfKey; bRagdollSelf.Text = Config.RagdollSelfKey ~= "" and PrettyKeyName(Config.RagdollSelfKey) or "NONE"
+                bRagdollSelf.TextColor3 = Theme.TextPrimary; SaveConfig(); con:Disconnect()
+                ShowNotification("RAGDOLL SELF KEYBIND", Config.RagdollSelfKey ~= "" and PrettyKeyName(Config.RagdollSelfKey) or "NONE")
+            end
+        end)
+    end)
+
+    local rClickToAPKeybind = CreateRow("Click To AP Keybind")
+    local bClickToAPKeybind = Instance.new("TextButton", rClickToAPKeybind)
+    bClickToAPKeybind.Size = UDim2.new(0, 60, 0, 22); bClickToAPKeybind.Position = UDim2.new(1, -70, 0.5, -11)
+    bClickToAPKeybind.BackgroundColor3 = Theme.SurfaceHighlight; bClickToAPKeybind.Text = PrettyKeyName(Config.ClickToAPKeybind or "L")
+    bClickToAPKeybind.Font = Enum.Font.GothamBold; bClickToAPKeybind.TextColor3 = Theme.TextPrimary; bClickToAPKeybind.TextSize = 12
+    Instance.new("UICorner", bClickToAPKeybind).CornerRadius = UDim.new(0, 4)
+    bClickToAPKeybind.MouseButton1Click:Connect(function()
+        bClickToAPKeybind.Text = "..."; bClickToAPKeybind.TextColor3 = Theme.Accent1
+        local con; con = UserInputService.InputBegan:Connect(function(inp)
+            if inp.UserInputType == Enum.UserInputType.Keyboard then
+                Config.ClickToAPKeybind = NormalizeKeyName(inp.KeyCode.Name, Config.ClickToAPKeybind or "L"); Config.SavedKeybinds.ClickToAPKeybind = Config.ClickToAPKeybind; bClickToAPKeybind.Text = PrettyKeyName(Config.ClickToAPKeybind)
+                bClickToAPKeybind.TextColor3 = Theme.TextPrimary; SaveConfig(); con:Disconnect()
+                ShowNotification("CLICK TO AP KEYBIND", PrettyKeyName(Config.ClickToAPKeybind))
+            end
+        end)
+    end)
+
+    local rProximityAPKeybind = CreateRow("Proximity AP Keybind")
+    local bProximityAPKeybind = Instance.new("TextButton", rProximityAPKeybind)
+    bProximityAPKeybind.Size = UDim2.new(0, 60, 0, 22); bProximityAPKeybind.Position = UDim2.new(1, -70, 0.5, -11)
+    bProximityAPKeybind.BackgroundColor3 = Theme.SurfaceHighlight; bProximityAPKeybind.Text = PrettyKeyName(Config.ProximityAPKeybind or "P")
+    bProximityAPKeybind.Font = Enum.Font.GothamBold; bProximityAPKeybind.TextColor3 = Theme.TextPrimary; bProximityAPKeybind.TextSize = 12
+    Instance.new("UICorner", bProximityAPKeybind).CornerRadius = UDim.new(0, 4)
+    bProximityAPKeybind.MouseButton1Click:Connect(function()
+        bProximityAPKeybind.Text = "..."; bProximityAPKeybind.TextColor3 = Theme.Accent1
+        local con; con = UserInputService.InputBegan:Connect(function(inp)
+            if inp.UserInputType == Enum.UserInputType.Keyboard then
+                Config.ProximityAPKeybind = NormalizeKeyName(inp.KeyCode.Name, Config.ProximityAPKeybind or "P"); Config.SavedKeybinds.ProximityAPKeybind = Config.ProximityAPKeybind; bProximityAPKeybind.Text = PrettyKeyName(Config.ProximityAPKeybind)
+                bProximityAPKeybind.TextColor3 = Theme.TextPrimary; SaveConfig(); con:Disconnect()
+                ShowNotification("PROXIMITY AP KEYBIND", PrettyKeyName(Config.ProximityAPKeybind))
+            end
+        end)
+    end)
+
+    local rJoinerKey = CreateRow("Job Joiner Keybind")
+    local bJoinerKey = Instance.new("TextButton", rJoinerKey)
+    bJoinerKey.Size = UDim2.new(0, 60, 0, 22); bJoinerKey.Position = UDim2.new(1, -70, 0.5, -11)
+    bJoinerKey.BackgroundColor3 = Theme.SurfaceHighlight; bJoinerKey.Text = PrettyKeyName(Config.JobJoinerKey or "J")
+    bJoinerKey.Font = Enum.Font.GothamBold; bJoinerKey.TextColor3 = Theme.TextPrimary; bJoinerKey.TextSize = 12
+    Instance.new("UICorner", bJoinerKey).CornerRadius = UDim.new(0, 4)
+    bJoinerKey.MouseButton1Click:Connect(function()
+        bJoinerKey.Text = "..."; bJoinerKey.TextColor3 = Theme.Accent1
+        local con; con = UserInputService.InputBegan:Connect(function(inp)
+            if inp.UserInputType == Enum.UserInputType.Keyboard then
+                Config.JobJoinerKey = NormalizeKeyName(inp.KeyCode.Name, Config.JobJoinerKey or "J"); Config.SavedKeybinds.JobJoinerKey = Config.JobJoinerKey; bJoinerKey.Text = PrettyKeyName(Config.JobJoinerKey)
+                bJoinerKey.TextColor3 = Theme.TextPrimary; SaveConfig(); con:Disconnect()
+                ShowNotification("JOB JOINER KEYBIND", PrettyKeyName(Config.JobJoinerKey))
+            end
+        end)
+    end)
+
+    local rResetKey = CreateRow("Reset")
+    local bResetKey = Instance.new("TextButton", rResetKey)
+    bResetKey.Size = UDim2.new(0, 60, 0, 22); bResetKey.Position = UDim2.new(1, -70, 0.5, -11)
+    bResetKey.BackgroundColor3 = Theme.SurfaceHighlight; bResetKey.Text = PrettyKeyName(Config.ResetKey)
+    bResetKey.Font = Enum.Font.GothamBold; bResetKey.TextColor3 = Theme.TextPrimary; bResetKey.TextSize = 12
+    Instance.new("UICorner", bResetKey).CornerRadius = UDim.new(0, 4)
+    bResetKey.MouseButton1Click:Connect(function()
+        bResetKey.Text = "..."; bResetKey.TextColor3 = Theme.Accent1
+        local con; con = UserInputService.InputBegan:Connect(function(inp)
+            if inp.UserInputType == Enum.UserInputType.Keyboard then
+                Config.ResetKey = NormalizeKeyName(inp.KeyCode.Name, Config.ResetKey or "X"); Config.SavedKeybinds.ResetKey = Config.ResetKey; bResetKey.Text = PrettyKeyName(Config.ResetKey)
+                bResetKey.TextColor3 = Theme.TextPrimary; SaveConfig(); con:Disconnect()
+                ShowNotification("RESET KEYBIND", PrettyKeyName(Config.ResetKey))
+            end
+        end)
+    end)
+
+    local rKickKey = CreateRow("Kick")
+    local bKickKey = Instance.new("TextButton", rKickKey)
+    bKickKey.Size = UDim2.new(0, 60, 0, 22); bKickKey.Position = UDim2.new(1, -70, 0.5, -11)
+    bKickKey.BackgroundColor3 = Theme.SurfaceHighlight; bKickKey.Text = Config.KickKey ~= "" and PrettyKeyName(Config.KickKey) or "NONE"
+    bKickKey.Font = Enum.Font.GothamBold; bKickKey.TextColor3 = Theme.TextPrimary; bKickKey.TextSize = 12
+    Instance.new("UICorner", bKickKey).CornerRadius = UDim.new(0, 4)
+    bKickKey.MouseButton1Click:Connect(function()
+        bKickKey.Text = "..."; bKickKey.TextColor3 = Theme.Accent1
+        local con; con = UserInputService.InputBegan:Connect(function(inp)
+            if inp.UserInputType == Enum.UserInputType.Keyboard then
+                Config.KickKey = NormalizeKeyName(inp.KeyCode.Name, ""); Config.SavedKeybinds.KickKey = Config.KickKey; bKickKey.Text = Config.KickKey ~= "" and PrettyKeyName(Config.KickKey) or "NONE"
+                bKickKey.TextColor3 = Theme.TextPrimary; SaveConfig(); con:Disconnect()
+                ShowNotification("KICK KEYBIND", Config.KickKey ~= "" and PrettyKeyName(Config.KickKey) or "NONE")
+            end
+        end)
+    end)
+
     Config.MenuKey = NormalizeKeyName((Config.SavedKeybinds and Config.SavedKeybinds.MenuKey) or Config.MenuKey, "LeftControl")
     if not IS_MOBILE then
         local rMenu = CreateRow("Menu Toggle Key")
         local bMenu = Instance.new("TextButton", rMenu)
-        bMenu.Size=UDim2.new(0,80,0,24); bMenu.Position=UDim2.new(1,-90,0.5,-12)
-        bMenu.BackgroundColor3=Theme.SurfaceHighlight; bMenu.Text=PrettyKeyName(Config.MenuKey or "LeftControl")
-        bMenu.Font=Enum.Font.GothamBold; bMenu.TextColor3=Theme.TextPrimary; bMenu.TextSize=12
-        Instance.new("UICorner",bMenu).CornerRadius=UDim.new(0,4)
+        bMenu.Size = UDim2.new(0, 80, 0, 22); bMenu.Position = UDim2.new(1, -90, 0.5, -11)
+        bMenu.BackgroundColor3 = Theme.SurfaceHighlight; bMenu.Text = PrettyKeyName(Config.MenuKey or "LeftControl")
+        bMenu.Font = Enum.Font.GothamBold; bMenu.TextColor3 = Theme.TextPrimary; bMenu.TextSize = 12
+        Instance.new("UICorner", bMenu).CornerRadius = UDim.new(0, 4)
         bMenu.MouseButton1Click:Connect(function()
-            bMenu.Text="..."; bMenu.TextColor3=Theme.Accent1
-            local con; con=UserInputService.InputBegan:Connect(function(inp)
-                if inp.UserInputType==Enum.UserInputType.Keyboard then
-                    Config.MenuKey=NormalizeKeyName(inp.KeyCode.Name, Config.MenuKey or "LeftControl"); Config.SavedKeybinds.MenuKey = Config.MenuKey; bMenu.Text=PrettyKeyName(Config.MenuKey)
-                    bMenu.TextColor3=Theme.TextPrimary; SaveConfig(); con:Disconnect()
+            bMenu.Text = "..."; bMenu.TextColor3 = Theme.Accent1
+            local con; con = UserInputService.InputBegan:Connect(function(inp)
+                if inp.UserInputType == Enum.UserInputType.Keyboard then
+                    Config.MenuKey = NormalizeKeyName(inp.KeyCode.Name, Config.MenuKey or "LeftControl"); Config.SavedKeybinds.MenuKey = Config.MenuKey; bMenu.Text = PrettyKeyName(Config.MenuKey)
+                    bMenu.TextColor3 = Theme.TextPrimary; SaveConfig(); con:Disconnect()
                     ShowNotification("MENU KEYBIND", PrettyKeyName(Config.MenuKey))
                 end
             end)
         end)
-    else
-        _G.SetHazeUIPage("Settings")
-    CreatePageHeader("Settings")
-        CreateRow("Menu Toggle: Touch Icon")
     end
 
-    end
-    do
-    _G.SetHazeUIPage("Settings")
+    -- ======================== UI CONTROLS ========================
     CreateSectionHeader("UI CONTROLS")
     local rLock = CreateRow("Lock UI Dragging")
     CreateToggleSwitch(rLock, Config.UILocked, function(ns, set)
@@ -9005,43 +8332,24 @@ end
         local scaleUI = {}
         scaleUI.row = CreateRow("Mobile GUI Scale")
         scaleUI.bg = Instance.new("Frame", scaleUI.row)
-        scaleUI.bg.Size = UDim2.new(0, 140, 0, 5)
-        scaleUI.bg.Position = UDim2.new(1, -200, 0.5, -2.5)
+        scaleUI.bg.Size = UDim2.new(0, 120, 0, 5); scaleUI.bg.Position = UDim2.new(1, -175, 0.5, -2.5)
         scaleUI.bg.BackgroundColor3 = Color3.fromRGB(30, 32, 38)
         Instance.new("UICorner", scaleUI.bg).CornerRadius = UDim.new(1, 0)
         scaleUI.fill = Instance.new("Frame", scaleUI.bg)
-        scaleUI.fill.BackgroundColor3 = Theme.Accent1
-        scaleUI.fill.BorderSizePixel = 0
-        scaleUI.fill.Size = UDim2.new(0, 0, 1, 0)
+        scaleUI.fill.BackgroundColor3 = Theme.Accent1; scaleUI.fill.BorderSizePixel = 0; scaleUI.fill.Size = UDim2.new(0, 0, 1, 0)
         Instance.new("UICorner", scaleUI.fill).CornerRadius = UDim.new(1, 0)
         scaleUI.knob = Instance.new("Frame", scaleUI.bg)
-        scaleUI.knob.Size = UDim2.new(0, 14, 0, 14)
-        scaleUI.knob.AnchorPoint = Vector2.new(0.5, 0.5)
-        scaleUI.knob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        scaleUI.knob.BorderSizePixel = 0
+        scaleUI.knob.Size = UDim2.new(0, 14, 0, 14); scaleUI.knob.AnchorPoint = Vector2.new(0.5, 0.5); scaleUI.knob.BackgroundColor3 = Color3.fromRGB(255, 255, 255); scaleUI.knob.BorderSizePixel = 0
         Instance.new("UICorner", scaleUI.knob).CornerRadius = UDim.new(1, 0)
-        scaleUI.stroke = Instance.new("UIStroke", scaleUI.knob)
-        scaleUI.stroke.Color = Theme.Accent1
-        scaleUI.stroke.Thickness = 2
+        scaleUI.stroke = Instance.new("UIStroke", scaleUI.knob); scaleUI.stroke.Color = Theme.Accent1; scaleUI.stroke.Thickness = 2
         scaleUI.readout = Instance.new("TextLabel", scaleUI.row)
-        scaleUI.readout.Size = UDim2.new(0, 50, 0, 20)
-        scaleUI.readout.Position = UDim2.new(1, -145, 0.5, -10)
-        scaleUI.readout.BackgroundTransparency = 1
-        scaleUI.readout.Text = string.format("%.1f", Config.MobileGuiScale or 0.5)
-        scaleUI.readout.Font = Enum.Font.GothamBold
-        scaleUI.readout.TextSize = 11
-        scaleUI.readout.TextColor3 = Theme.Accent1
-        scaleUI.readout.TextXAlignment = Enum.TextXAlignment.Right
-        scaleUI.dragging = false
-        scaleUI.min = 0.1
-        scaleUI.max = 1.0
-        scaleUI.scaleToT = function(s)
-            return math.clamp((s - scaleUI.min) / (scaleUI.max - scaleUI.min), 0, 1)
-        end
+        scaleUI.readout.Size = UDim2.new(0, 50, 0, 20); scaleUI.readout.Position = UDim2.new(1, -145, 0.5, -10); scaleUI.readout.BackgroundTransparency = 1
+        scaleUI.readout.Text = string.format("%.1f", Config.MobileGuiScale or 0.5); scaleUI.readout.Font = Enum.Font.GothamBold; scaleUI.readout.TextSize = 11
+        scaleUI.readout.TextColor3 = Theme.Accent1; scaleUI.readout.TextXAlignment = Enum.TextXAlignment.Right
+        scaleUI.dragging = false; scaleUI.min = 0.1; scaleUI.max = 1.0
+        scaleUI.scaleToT = function(sv) return math.clamp((sv - scaleUI.min) / (scaleUI.max - scaleUI.min), 0, 1) end
         scaleUI.updateScaleSlider = function(val)
-            local c = math.clamp(val, scaleUI.min, scaleUI.max)
-            Config.MobileGuiScale = c
-            SaveConfig()
+            local c = math.clamp(val, scaleUI.min, scaleUI.max); Config.MobileGuiScale = c; SaveConfig()
             scaleUI.fill.Size = UDim2.new(scaleUI.scaleToT(c), 0, 1, 0)
             scaleUI.knob.Position = UDim2.new(0, scaleUI.scaleToT(c) * scaleUI.bg.AbsoluteSize.X, 0.5, 0)
             scaleUI.readout.Text = string.format("%.2f", c)
@@ -9052,80 +8360,44 @@ end
             scaleUI.updateScaleSlider(scaleUI.min + math.clamp((pos.X - scaleUI.bg.AbsolutePosition.X) / scaleUI.bg.AbsoluteSize.X, 0, 1) * (scaleUI.max - scaleUI.min))
         end
         scaleUI.bg.InputBegan:Connect(function(inp)
-            if inp.UserInputType == Enum.UserInputType.MouseButton1 or inp.UserInputType == Enum.UserInputType.Touch then
-                scaleUI.dragging = true
-                scaleUI.onScaleInput(inp.Position)
-            end
+            if inp.UserInputType == Enum.UserInputType.MouseButton1 or inp.UserInputType == Enum.UserInputType.Touch then scaleUI.dragging = true; scaleUI.onScaleInput(inp.Position) end
         end)
         scaleUI.knob.InputBegan:Connect(function(inp)
-            if inp.UserInputType == Enum.UserInputType.MouseButton1 or inp.UserInputType == Enum.UserInputType.Touch then
-                scaleUI.dragging = true
-            end
+            if inp.UserInputType == Enum.UserInputType.MouseButton1 or inp.UserInputType == Enum.UserInputType.Touch then scaleUI.dragging = true end
         end)
         UserInputService.InputEnded:Connect(function(inp)
-            if inp.UserInputType == Enum.UserInputType.MouseButton1 or inp.UserInputType == Enum.UserInputType.Touch then
-                scaleUI.dragging = false
-            end
+            if inp.UserInputType == Enum.UserInputType.MouseButton1 or inp.UserInputType == Enum.UserInputType.Touch then scaleUI.dragging = false end
         end)
         UserInputService.InputChanged:Connect(function(inp)
-            if scaleUI.dragging and (inp.UserInputType == Enum.UserInputType.MouseMovement or inp.UserInputType == Enum.UserInputType.Touch) then
-                scaleUI.onScaleInput(inp.Position)
-            end
+            if scaleUI.dragging and (inp.UserInputType == Enum.UserInputType.MouseMovement or inp.UserInputType == Enum.UserInputType.Touch) then scaleUI.onScaleInput(inp.Position) end
         end)
     end
 
     local rReset = CreateRow("Reset UI Positions")
     local bReset = Instance.new("TextButton", rReset)
-    bReset.Size=UDim2.new(0,80,0,24); bReset.Position=UDim2.new(1,-90,0.5,-12)
-    bReset.BackgroundColor3=Theme.Error; bReset.Text="RESET"
-    bReset.Font=Enum.Font.GothamBold; bReset.TextColor3=Theme.TextPrimary; bReset.TextSize=12
-    Instance.new("UICorner",bReset).CornerRadius=UDim.new(0,4)
+    bReset.Size = UDim2.new(0, 80, 0, 22); bReset.Position = UDim2.new(1, -90, 0.5, -11)
+    bReset.BackgroundColor3 = Theme.Error; bReset.Text = "RESET"
+    bReset.Font = Enum.Font.GothamBold; bReset.TextColor3 = Theme.TextPrimary; bReset.TextSize = 12
+    Instance.new("UICorner", bReset).CornerRadius = UDim.new(0, 4)
     bReset.MouseButton1Click:Connect(function()
-        Config.Positions = DeepCopy(DefaultConfig.Positions)
-        SaveConfig()
+        Config.Positions = DeepCopy(DefaultConfig.Positions); SaveConfig()
         ShowNotification("UI RESET", "Positions restored")
-        sFrame.Position = UDim2.new(
-            DefaultConfig.Positions.Settings.X,
-            DefaultConfig.Positions.Settings.OffsetX or 0,
-            DefaultConfig.Positions.Settings.Y,
-            DefaultConfig.Positions.Settings.OffsetY or 0
-        )
+        sFrame.Position = UDim2.new(DefaultConfig.Positions.Settings.X, DefaultConfig.Positions.Settings.OffsetX or 0, DefaultConfig.Positions.Settings.Y, DefaultConfig.Positions.Settings.OffsetY or 0)
         if PlayerGui:FindFirstChild("AutoStealUI") and PlayerGui.AutoStealUI:FindFirstChild("Frame") then
-            PlayerGui.AutoStealUI.Frame.Position = UDim2.new(
-                DefaultConfig.Positions.AutoSteal.X,
-                DefaultConfig.Positions.AutoSteal.OffsetX or 0,
-                DefaultConfig.Positions.AutoSteal.Y,
-                DefaultConfig.Positions.AutoSteal.OffsetY or 0
-            )
+            PlayerGui.AutoStealUI.Frame.Position = UDim2.new(DefaultConfig.Positions.AutoSteal.X, DefaultConfig.Positions.AutoSteal.OffsetX or 0, DefaultConfig.Positions.AutoSteal.Y, DefaultConfig.Positions.AutoSteal.OffsetY or 0)
         end
         if PlayerGui:FindFirstChild("XiAdminPanel") and PlayerGui.XiAdminPanel:FindFirstChild("Frame") then
-            PlayerGui.XiAdminPanel.Frame.Position = UDim2.new(
-                DefaultConfig.Positions.AdminPanel.X,
-                DefaultConfig.Positions.AdminPanel.OffsetX or 0,
-                DefaultConfig.Positions.AdminPanel.Y,
-                DefaultConfig.Positions.AdminPanel.OffsetY or 0
-            )
+            PlayerGui.XiAdminPanel.Frame.Position = UDim2.new(DefaultConfig.Positions.AdminPanel.X, DefaultConfig.Positions.AdminPanel.OffsetX or 0, DefaultConfig.Positions.AdminPanel.Y, DefaultConfig.Positions.AdminPanel.OffsetY or 0)
         end
         if PlayerGui:FindFirstChild("XiInvisPanel") and PlayerGui.XiInvisPanel:FindFirstChild("Frame") then
-            PlayerGui.XiInvisPanel.Frame.Position = UDim2.new(
-                DefaultConfig.Positions.InvisPanel.X,
-                DefaultConfig.Positions.InvisPanel.OffsetX or 0,
-                DefaultConfig.Positions.InvisPanel.Y,
-                DefaultConfig.Positions.InvisPanel.OffsetY or 0
-            )
+            PlayerGui.XiInvisPanel.Frame.Position = UDim2.new(DefaultConfig.Positions.InvisPanel.X, DefaultConfig.Positions.InvisPanel.OffsetX or 0, DefaultConfig.Positions.InvisPanel.Y, DefaultConfig.Positions.InvisPanel.OffsetY or 0)
         end
         if PlayerGui:FindFirstChild("AutoStealTargetControls") and PlayerGui.AutoStealTargetControls:FindFirstChild("TargetControlsFrame") then
-            PlayerGui.AutoStealTargetControls.TargetControlsFrame.Position = UDim2.new(
-                DefaultConfig.Positions.TargetControls.X,
-                DefaultConfig.Positions.TargetControls.OffsetX or 0,
-                DefaultConfig.Positions.TargetControls.Y,
-                DefaultConfig.Positions.TargetControls.OffsetY or 0
-            )
+            PlayerGui.AutoStealTargetControls.TargetControlsFrame.Position = UDim2.new(DefaultConfig.Positions.TargetControls.X, DefaultConfig.Positions.TargetControls.OffsetX or 0, DefaultConfig.Positions.TargetControls.Y, DefaultConfig.Positions.TargetControls.OffsetY or 0)
         end
         ShowNotification("UI RESET", "Positions restored to default")
     end)
 
-    end
 end
 
 BuildSettingsAndMobileUI()
@@ -12685,34 +11957,32 @@ task.spawn(function()
         persistPriorityRealtime(selectedOrder)
     end
 
-    local priorityCard = nil
-    repeat
-        task.wait()
-        priorityCard = PageCards and PageCards.Priority
-    until priorityCard and priorityCard.Parent
+    -- Style Lethal Hub: Priority embed dans la ScrollingFrame unique
+    local priorityCard = sList
+    repeat task.wait() until priorityCard and priorityCard.Parent
 
-    local oldScroll = priorityCard:FindFirstChild("Scroll")
-    if oldScroll then
-        oldScroll:Destroy()
-    end
+    local oldRoot = sList.Parent and sList:FindFirstChild("EmbeddedPriorityManager")
+    if oldRoot then oldRoot:Destroy() end
 
-    local root = priorityCard:FindFirstChild("EmbeddedPriorityManager")
-    if root then
-        root:Destroy()
+    -- Supprimer ancien embed s'il existe
+    for _, ch in ipairs(sList:GetChildren()) do
+        if ch.Name == "EmbeddedPriorityManager" then ch:Destroy() end
     end
 
     root = Instance.new("Frame")
     root.Name = "EmbeddedPriorityManager"
     root.BackgroundColor3 = C.BG
     root.BorderSizePixel = 0
-    root.Size = UDim2.new(1, -12, 1, -12)
-    root.Position = UDim2.fromOffset(6, 6)
-    root.Parent = priorityCard
+    root.Size = UDim2.new(1, 0, 0, 400)
+    root.AutomaticSize = Enum.AutomaticSize.Y
+    root.Parent = sList
     round(root, 16)
+
+    local PRIORITY_H = 380
 
     local body = Instance.new("Frame")
     body.BackgroundTransparency = 1
-    body.Size = UDim2.new(1, -16, 1, -16)
+    body.Size = UDim2.new(1, -16, 0, PRIORITY_H - 16)
     body.Position = UDim2.fromOffset(8, 8)
     body.Parent = root
 
