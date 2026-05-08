@@ -10956,8 +10956,8 @@ task.spawn(function()
     local outer = new("Frame", {
         Name = "Outer",
         AnchorPoint = Vector2.new(0.5, 0),
-        Size = UDim2.new(0, 470, 0, 44),
-        Position = UDim2.new(0.5, 0, 0, 8),
+        Size = UDim2.new(0, 470, 0, 60),
+        Position = UDim2.new(0.5, 0, 0, 100),
         BackgroundColor3 = Color3.fromRGB(3, 3, 13),
         BorderSizePixel = 0,
         Parent = gui,
@@ -11001,32 +11001,6 @@ task.spawn(function()
         grad.Parent = outer
     end
 
-    local sheen = new("Frame", {
-        Name = "Sheen",
-        Position = UDim2.new(0, 10, 0, 3),
-        Size = UDim2.new(1, -20, 0, 1),
-        BackgroundColor3 = Color3.fromRGB(0, 200, 255),
-        BackgroundTransparency = 0.60,
-        BorderSizePixel = 0,
-        ZIndex = 3,
-        Parent = outer,
-    })
-
-    local dot = new("Frame", {
-        Name = "Dot",
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        Position = UDim2.new(0, 18, 0.5, 0),
-        Size = UDim2.new(0, 8, 0, 8),
-        BackgroundColor3 = Color3.fromRGB(0, 210, 255),
-        BorderSizePixel = 0,
-        ZIndex = 2,
-        Parent = outer,
-    })
-    new("UICorner", {
-        CornerRadius = UDim.new(1, 0),
-        Parent = dot,
-    })
-
     new("UIStroke", {
         Color = Color3.fromRGB(120, 230, 255),
         Thickness = 1,
@@ -11038,11 +11012,11 @@ task.spawn(function()
     local title = new("TextLabel", {
         Name = "Title",
         BackgroundTransparency = 1,
-        Position = UDim2.new(0, 30, 0, 0),
-        Size = UDim2.new(0, 170, 1, 0),
+        Position = UDim2.new(0, 10, 0, 5),
+        Size = UDim2.new(0, 200, 0, 28),
         Font = Enum.Font.GothamBlack,
-        Text = "WISPAXX HUB",
-        TextSize = 14,
+        Text = "Wispaxx Hub",
+        TextSize = 22,
         TextColor3 = Color3.fromRGB(0, 210, 255),
         TextXAlignment = Enum.TextXAlignment.Left,
         TextYAlignment = Enum.TextYAlignment.Center,
@@ -11052,6 +11026,22 @@ task.spawn(function()
     title.AutoLocalize = false
     title.TextStrokeTransparency = 0.75
     title.TextStrokeColor3 = Color3.fromRGB(0, 80, 120)
+
+    local subtitle = new("TextLabel", {
+        Name = "Subtitle",
+        BackgroundTransparency = 1,
+        Position = UDim2.new(0, 10, 0, 34),
+        Size = UDim2.new(0, 300, 0, 18),
+        Font = Enum.Font.GothamMedium,
+        Text = "v1.3  |  by @wispaxx  |  $4.99",
+        TextSize = 11,
+        TextColor3 = Color3.fromRGB(120, 200, 240),
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextYAlignment = Enum.TextYAlignment.Center,
+        ZIndex = 2,
+        Parent = outer,
+    })
+    subtitle.AutoLocalize = false
 
     local clockLabel = new("TextLabel", {
         Name = "Clock",
@@ -11068,51 +11058,6 @@ task.spawn(function()
         Parent = outer,
     })
     clockLabel.AutoLocalize = false
-
-    local signalWrap = new("Frame", {
-        Name = "SignalWrap",
-        BackgroundTransparency = 1,
-        Position = UDim2.new(0, 275, 0.5, -10),
-        Size = UDim2.new(0, 24, 0, 20),
-        ZIndex = 2,
-        Parent = outer,
-    })
-
-    local function makeBar(x, h)
-        local bar = new("Frame", {
-            AnchorPoint = Vector2.new(0, 1),
-            Position = UDim2.new(0, x, 1, 0),
-            Size = UDim2.new(0, 3, 0, h),
-            BackgroundColor3 = Color3.fromRGB(0, 200, 255),
-            BorderSizePixel = 0,
-            ZIndex = 2,
-            Parent = signalWrap,
-        })
-        new("UICorner", {
-            CornerRadius = UDim.new(0, 1),
-            Parent = bar,
-        })
-    end
-
-    makeBar(0, 5)
-    makeBar(6, 9)
-    makeBar(12, 14)
-    makeBar(18, 18)
-
-    local function makeDivider(x)
-        new("Frame", {
-            Position = UDim2.new(0, x, 0.5, -10),
-            Size = UDim2.new(0, 1, 0, 20),
-            BackgroundColor3 = Color3.fromRGB(0, 120, 200),
-            BackgroundTransparency = 0.60,
-            BorderSizePixel = 0,
-            ZIndex = 2,
-            Parent = outer,
-        })
-    end
-
-    makeDivider(310)
-    makeDivider(382)
 
     local fpsTitle = new("TextLabel", {
         BackgroundTransparency = 1,
