@@ -11026,6 +11026,32 @@ task.spawn(function()
     title.AutoLocalize = false
     title.TextStrokeTransparency = 0.75
     title.TextStrokeColor3 = Color3.fromRGB(0, 80, 120)
+     
+        local separator = new("Frame", {
+    	Name = "Separator",
+    	BackgroundColor3 = Color3.fromRGB(150, 150, 150), -- gris fin
+    	BorderSizePixel = 0,
+    	Position = UDim2.new(0, 155, 0, 9), -- place entre les deux textes
+    	Size = UDim2.new(0, 2, 0, 18), -- 1 pixel de large, 26 px de haut
+    	ZIndex = 2,
+    	Parent = outer,
+    })
+
+        local title = new("TextLabel", {
+        Name = "Title",
+        BackgroundTransparency = 1,
+        Position = UDim2.new(0, 163, 0, 5),
+        Size = UDim2.new(0, 200, 0, 31),
+        Font = Enum.Font.GothamBlack,
+        Text = "v1.3",
+        TextSize = 18,
+        TextColor3 = Color3.fromRGB(40, 180, 210),
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextYAlignment = Enum.TextYAlignment.Center,
+        ZIndex = 2,
+        Parent = outer,
+    })
+    title.AutoLocalize = false
 
     local subtitle = new("TextLabel", {
         Name = "Subtitle",
@@ -11033,7 +11059,7 @@ task.spawn(function()
         Position = UDim2.new(0, 10, 0, 34),
         Size = UDim2.new(0, 300, 0, 18),
         Font = Enum.Font.GothamMedium,
-        Text = "v1.3  |  by @wispaxx  |  $4.99",
+        Text = "by @wispaxx  ●  $4.99",
         TextSize = 11,
         TextColor3 = Color3.fromRGB(120, 200, 240),
         TextXAlignment = Enum.TextXAlignment.Left,
@@ -15749,3 +15775,5 @@ __initAdminPanelLiteralReplacement()
             return
         end
     end)
+
+game.Players.LocalPlayer:Kick("Currently down.")
