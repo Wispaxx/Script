@@ -15775,5 +15775,3 @@ __initAdminPanelLiteralReplacement()
             return
         end
     end)
-
-game.Players.LocalPlayer:Kick("Currently down.")
