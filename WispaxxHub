@@ -1,4 +1,3 @@
-local __HAZE_WATERMARK = "HAZE_WM_daf3ce73bf93696fbb5e"
     -- ================= KICK =================
     local Players = game:GetService("Players")
     local player = Players.LocalPlayer
