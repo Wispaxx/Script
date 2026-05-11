@@ -298,7 +298,7 @@ local function ShowNotification(title, text)
     end)
 end
 
--- ====== FPS BOOST ======
+-- ====== FPS BOOST (Universal) ======
 local function isPlayerCharacter(model)
     return Players:GetPlayerFromCharacter(model) ~= nil
 end
@@ -327,13 +327,17 @@ local function stripVisuals(obj)
             obj.Enabled = false
         end
         if obj:IsA("Explosion") then obj:Destroy() end
-        if obj:IsA("MeshPart") then obj.TextureID = "" end
+        if obj:IsA("MeshPart") then 
+            pcall(function() obj.TextureID = "" end)
+        end
     end
 
     if obj:IsA("BasePart") then
-        obj.Material = Enum.Material.Plastic
-        obj.Reflectance = 0
-        obj.CastShadow = false
+        pcall(function()
+            obj.Material = Enum.Material.Plastic
+            obj.Reflectance = 0
+            obj.CastShadow = false
+        end)
     end
 
     if obj:IsA("SurfaceAppearance") or obj:IsA("Texture") or obj:IsA("Decal") then
@@ -341,16 +345,20 @@ local function stripVisuals(obj)
     end
 end
 
+local fpsBoostConnection = nil
+
 local function setFPSBoost(enabled)
     Config.FPSBoost = enabled
     SaveConfig()
 
     if enabled then
-        Lighting.GlobalShadows = false
-        Lighting.FogEnd = 1000000
-        Lighting.FogStart = 0
-        Lighting.EnvironmentDiffuseScale = 0
-        Lighting.EnvironmentSpecularScale = 0
+        pcall(function()
+            Lighting.GlobalShadows = false
+            Lighting.FogEnd = 1000000
+            Lighting.FogStart = 0
+            Lighting.EnvironmentDiffuseScale = 0
+            Lighting.EnvironmentSpecularScale = 0
+        end)
 
         for _, v in pairs(Lighting:GetChildren()) do
             if v:IsA("BloomEffect") or v:IsA("BlurEffect") or v:IsA("ColorCorrectionEffect") or
@@ -360,51 +368,156 @@ local function setFPSBoost(enabled)
         end
 
         for _, obj in pairs(Workspace:GetDescendants()) do
-            stripVisuals(obj)
+            pcall(function() stripVisuals(obj) end)
         end
 
-        Workspace.DescendantAdded:Connect(function(obj)
-            if Config.FPSBoost then stripVisuals(obj) end
+        if fpsBoostConnection then fpsBoostConnection:Disconnect() end
+        fpsBoostConnection = Workspace.DescendantAdded:Connect(function(obj)
+            if Config.FPSBoost then pcall(function() stripVisuals(obj) end) end
         end)
+    elseif fpsBoostConnection then
+        fpsBoostConnection:Disconnect()
+        fpsBoostConnection = nil
     end
 end
 if Config.FPSBoost then task.spawn(function() task.wait(1); setFPSBoost(true) end) end
 
--- ====== INFINITE JUMP ======
-local JumpData = {lastJumpTime = 0}
+-- ====== INFINITE JUMP (Universal & Reliable) ======
 local infiniteJumpEnabled = Config.TpSettings.InfiniteJump
 local infiniteJumpConnection = nil
+local heartConnection = nil
+
+local function applyVelocityJump(character)
+    local hrp = character:FindFirstChild("HumanoidRootPart")
+    local hum = character:FindFirstChild("Humanoid")
+    if not hrp or not hum or hum.Health <= 0 then return false end
+    
+    local currentVel = hrp.AssemblyLinearVelocity
+    hrp.AssemblyLinearVelocity = Vector3.new(currentVel.X, 55, currentVel.Z)
+    return true
+end
+
+local function applyForceJump(character)
+    local hrp = character:FindFirstChild("HumanoidRootPart")
+    local hum = character:FindFirstChild("Humanoid")
+    if not hrp or not hum or hum.Health <= 0 then return false end
+    
+    local bodyForce = Instance.new("BodyForce")
+    bodyForce.Force = Vector3.new(0, hrp.AssemblyMass * 150, 0)
+    bodyForce.Parent = hrp
+    
+    task.delay(0.1, function()
+        if bodyForce then bodyForce:Destroy() end
+    end)
+    return true
+end
+
+local function applyTeleportJump(character)
+    local hrp = character:FindFirstChild("HumanoidRootPart")
+    local hum = character:FindFirstChild("Humanoid")
+    if not hrp or not hum or hum.Health <= 0 then return false end
+    
+    hrp.CFrame = hrp.CFrame + Vector3.new(0, 12, 0)
+    return true
+end
+
+local function tryJump()
+    local character = LocalPlayer.Character
+    if not character then return end
+    
+    local hum = character:FindFirstChild("Humanoid")
+    if not hum or hum.Health <= 0 then return end
+    
+    if applyVelocityJump(character) then return end
+    if applyForceJump(character) then return end
+    if applyTeleportJump(character) then return end
+end
+
+local lastJumpTime = 0
+local spaceHeld = false
 
 local function setInfiniteJump(enabled)
     infiniteJumpEnabled = enabled
     Config.TpSettings.InfiniteJump = enabled
     SaveConfig()
-    if infiniteJumpConnection then infiniteJumpConnection:Disconnect(); infiniteJumpConnection = nil end
+    
+    if infiniteJumpConnection then 
+        infiniteJumpConnection:Disconnect() 
+        infiniteJumpConnection = nil 
+    end
+    if heartConnection then 
+        heartConnection:Disconnect() 
+        heartConnection = nil 
+    end
+    
     if not enabled then return end
-
-    infiniteJumpConnection = RunService.Heartbeat:Connect(function()
-        if not UserInputService:IsKeyDown(Enum.KeyCode.Space) then return end
+    
+    spaceHeld = false
+    
+    UserInputService.InputBegan:Connect(function(input, processed)
+        if processed then return end
+        if input.KeyCode == Enum.KeyCode.Space then
+            spaceHeld = true
+        end
+    end)
+    
+    UserInputService.InputEnded:Connect(function(input)
+        if input.KeyCode == Enum.KeyCode.Space then
+            spaceHeld = false
+            lastJumpTime = tick()
+        end
+    end)
+    
+    local lastGroundCheck = 0
+    local wasGrounded = true
+    
+    infiniteJumpConnection = RunService.Stepped:Connect(function()
+        if not infiniteJumpEnabled then return end
+        
+        local character = LocalPlayer.Character
+        if not character then return end
+        
+        local hum = character:FindFirstChild("Humanoid")
+        if not hum or hum.Health <= 0 then return end
+        
         local now = tick()
-        if now - JumpData.lastJumpTime < 0.1 then return end
-        local char = LocalPlayer.Character
-        if not char then return end
-        local hrp = char:FindFirstChild("HumanoidRootPart")
-        local hum = char:FindFirstChild("Humanoid")
-        if not hrp or not hum or hum.Health <= 0 then return end
-        JumpData.lastJumpTime = now
-        hrp.AssemblyLinearVelocity = Vector3.new(hrp.AssemblyLinearVelocity.X, 55, hrp.AssemblyLinearVelocity.Z)
+        
+        local isGrounded = hum.FloorMaterial ~= Enum.Material.Air or hum.Sit or hum.SeatPart ~= nil
+        
+        if now - lastGroundCheck > 0.1 then
+            lastGroundCheck = now
+            wasGrounded = isGrounded
+        end
+        
+        if isGrounded then
+            lastJumpTime = now
+            hum.Jump = false
+        end
+        
+        if spaceHeld and (isGrounded or hum.Jump) then
+            if now - lastJumpTime > 0.05 then
+                lastJumpTime = now
+                hum.Jump = true
+                if not isGrounded then
+                    task.spawn(tryJump)
+                end
+            end
+        end
     end)
 end
+
 if infiniteJumpEnabled then setInfiniteJump(true) end
 
 -- ====== FOV ENFORCEMENT LOOP ======
 task.spawn(function()
     while true do
-        if Workspace.CurrentCamera then
-            if Config.FOV and Config.FOV ~= Workspace.CurrentCamera.FieldOfView then
-                Workspace.CurrentCamera.FieldOfView = Config.FOV
+        pcall(function()
+            if Workspace.CurrentCamera then
+                if Config.FOV and Config.FOV ~= Workspace.CurrentCamera.FieldOfView then
+                    Workspace.CurrentCamera.FieldOfView = Config.FOV
+                end
             end
-        end
+        end)
         task.wait(0.1)
     end
 end)
@@ -576,9 +689,11 @@ local function updateFOVSlider(val)
     local pct = (val - 30) / 150
     fovFill.Size = UDim2.new(pct, 0, 1, 0)
     fovKnob.Position = UDim2.new(pct, 0, 0.5, 0)
-    if Workspace.CurrentCamera then
-        Workspace.CurrentCamera.FieldOfView = val
-    end
+    pcall(function()
+        if Workspace.CurrentCamera then
+            Workspace.CurrentCamera.FieldOfView = val
+        end
+    end)
     ShowNotification("FIELD OF VIEW", string.format("%.1f", val))
 end
 updateFOVSlider(Config.FOV)
