@@ -638,6 +638,6 @@ author.TextTransparency = 0.2
         stats.Text = string.format(
             "<font color='rgb(180,180,190)'>FPS:</font> <font color='%s'><b>%d</b></font>  <font color='rgb(180,180,190)'>PING:</font> <font color='%s'><b>%dms</b></font>",
             fc, lastFps, pc, ping
+        )
     end)
-end)
 end)
