@@ -40,6 +40,7 @@ local DefaultConfig = {
     MobileGuiScale = 0.5,
     UILocked   = false,
     InfiniteJump = false,
+    Noclip = false,
 }
 
 local Config = DefaultConfig
@@ -155,6 +156,56 @@ end
 -- Applique l'état au chargement
 if Config.InfiniteJump then
     task.spawn(function() setInfiniteJump(true) end)
+end
+
+-- ====== NOCLIP (from source.txt) ======
+local noclipEnabled = Config.Noclip or false
+local noclipConnection = nil
+local Clip = true  -- true = collision activée, false = noclip
+
+local function setNoclip(enabled)
+    noclipEnabled = enabled
+    Config.Noclip = enabled
+    SaveConfig()
+    
+    if noclipConnection then
+        noclipConnection:Disconnect()
+        noclipConnection = nil
+    end
+    
+    Clip = not enabled  -- Si enabled = true, alors Clip = false (noclip actif)
+    
+    if not enabled then
+        -- Restaurer les collisions
+        local char = LocalPlayer.Character
+        if char then
+            for _, child in pairs(char:GetDescendants()) do
+                if child:IsA("BasePart") then
+                    child.CanCollide = true
+                end
+            end
+        end
+        return
+    end
+    
+    -- Activer noclip avec un loop
+    noclipConnection = RunService.Stepped:Connect(function()
+        if not Clip then
+            local char = LocalPlayer.Character
+            if char then
+                for _, child in pairs(char:GetDescendants()) do
+                    if child:IsA("BasePart") and child.CanCollide == true then
+                        child.CanCollide = false
+                    end
+                end
+            end
+        end
+    end)
+end
+
+-- Applique l'état au chargement
+if Config.Noclip then
+    task.spawn(function() setNoclip(true) end)
 end
 
 local function MakeDraggable(handle, target, saveKey)
@@ -448,6 +499,14 @@ local infJumpToggle = CreateToggleSwitch(rowInfJump, Config.InfiniteJump or fals
     set(ns)
     setInfiniteJump(ns)
     ShowNotification("INFINITE JUMP", ns and "ENABLED" or "DISABLED")
+end)
+
+-- Ligne Noclip
+local rowNoclip = CreateRow("Noclip", 34)
+local noclipToggle = CreateToggleSwitch(rowNoclip, Config.Noclip or false, function(ns, set)
+    set(ns)
+    setNoclip(ns)
+    ShowNotification("NOCLIP", ns and "ENABLED" or "DISABLED")
 end)
 
 -- Met à jour la taille du canvas du scrolling frame
