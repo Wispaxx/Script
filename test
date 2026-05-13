@@ -31,7 +31,7 @@ end
 local IS_MOBILE = isMobile()
 
 -- ====== CONFIG ======
-local FileName = "XisPublic_v1.json"
+local FileName = "DogBoundByWispaxx.json"
 local DefaultConfig = {
     Positions = {
         Settings = {X = 0.834375, Y = 0.43590998043052839},
