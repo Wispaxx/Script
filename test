@@ -39,6 +39,7 @@ local DefaultConfig = {
     MenuKey    = "LeftControl",
     MobileGuiScale = 0.5,
     UILocked   = false,
+    InfiniteJump = false,
 }
 
 local Config = DefaultConfig
@@ -115,6 +116,45 @@ SharedState.RefreshMobileScale = function()
             SharedState.MobileScaleObjects[frame] = nil
         end
     end
+end
+
+-- ====== INFINITE JUMP (from source.txt) ======
+local infiniteJumpEnabled = Config.InfiniteJump or false
+local infJumpConnection = nil
+local infJumpDebounce = false
+
+local function setInfiniteJump(enabled)
+    infiniteJumpEnabled = enabled
+    Config.InfiniteJump = enabled
+    SaveConfig()
+    
+    if infJumpConnection then
+        infJumpConnection:Disconnect()
+        infJumpConnection = nil
+    end
+    
+    if not enabled then return end
+    
+    -- Version CORRECTE basée sur source.txt
+    infJumpConnection = UserInputService.JumpRequest:Connect(function()
+        if not infJumpDebounce then
+            infJumpDebounce = true
+            local char = LocalPlayer.Character
+            if char then
+                local hum = char:FindFirstChildWhichIsA("Humanoid")
+                if hum then
+                    hum:ChangeState(Enum.HumanoidStateType.Jumping)
+                end
+            end
+            task.wait()
+            infJumpDebounce = false
+        end
+    end)
+end
+
+-- Applique l'état au chargement
+if Config.InfiniteJump then
+    task.spawn(function() setInfiniteJump(true) end)
 end
 
 local function MakeDraggable(handle, target, saveKey)
@@ -202,7 +242,66 @@ local function AddMobileMinimize(frame, labelText)
     end)
 end
 
--- ====== SETTINGS GUI (vide, mais apparence originale) ======
+-- ====== NOTIFICATION STYLE LETHAL HUB ======
+local function ShowNotification(title, text)
+    local existing = PlayerGui:FindFirstChild("XiNotif")
+    if existing then existing:Destroy() end
+
+    local sg = Instance.new("ScreenGui", PlayerGui)
+    sg.Name = "XiNotif"; sg.ResetOnSpawn = false
+
+    local f = Instance.new("Frame", sg)
+    f.Size = UDim2.new(0, 290, 0, 54)
+    f.Position = UDim2.new(0.5, -145, 0, 80)
+    f.BackgroundColor3 = Color3.fromRGB(6, 6, 12)
+    f.BackgroundTransparency = 1
+    f.BorderSizePixel = 0
+    Instance.new("UICorner", f).CornerRadius = UDim.new(0, 9)
+
+    local stroke = Instance.new("UIStroke", f)
+    stroke.Thickness = 1; stroke.Color = Theme.Accent2; stroke.Transparency = 1
+
+    local bar = Instance.new("Frame", f)
+    bar.Size = UDim2.new(0, 3, 1, -12); bar.Position = UDim2.new(0, 5, 0, 6)
+    bar.BackgroundColor3 = Theme.Accent1; bar.BorderSizePixel = 0
+    bar.BackgroundTransparency = 1
+    Instance.new("UICorner", bar).CornerRadius = UDim.new(1, 0)
+
+    local t1 = Instance.new("TextLabel", f)
+    t1.Size = UDim2.new(1, -22, 0, 18); t1.Position = UDim2.new(0, 16, 0, 7)
+    t1.BackgroundTransparency = 1; t1.Text = title:upper()
+    t1.Font = Enum.Font.GothamBlack; t1.TextSize = 11
+    t1.TextColor3 = Theme.Accent1; t1.TextXAlignment = Enum.TextXAlignment.Left
+    t1.TextTransparency = 1
+
+    local t2 = Instance.new("TextLabel", f)
+    t2.Size = UDim2.new(1, -22, 0, 15); t2.Position = UDim2.new(0, 16, 0, 27)
+    t2.BackgroundTransparency = 1; t2.Text = text
+    t2.Font = Enum.Font.GothamMedium; t2.TextSize = 10
+    t2.TextColor3 = Theme.TextSecondary; t2.TextXAlignment = Enum.TextXAlignment.Left
+    t2.TextTransparency = 1
+
+    local fadeIn = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    TweenService:Create(f,      fadeIn, {BackgroundTransparency = 0.08}):Play()
+    TweenService:Create(stroke, fadeIn, {Transparency = 0.3}):Play()
+    TweenService:Create(bar,    fadeIn, {BackgroundTransparency = 0}):Play()
+    TweenService:Create(t1,     fadeIn, {TextTransparency = 0}):Play()
+    TweenService:Create(t2,     fadeIn, {TextTransparency = 0}):Play()
+
+    task.delay(2, function()
+        if not sg.Parent then return end
+        local fadeOut = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+        TweenService:Create(f,      fadeOut, {BackgroundTransparency = 1}):Play()
+        TweenService:Create(stroke, fadeOut, {Transparency = 1}):Play()
+        TweenService:Create(bar,    fadeOut, {BackgroundTransparency = 1}):Play()
+        TweenService:Create(t1,     fadeOut, {TextTransparency = 1}):Play()
+        local last = TweenService:Create(t2, fadeOut, {TextTransparency = 1})
+        last:Play(); last.Completed:Wait()
+        if sg.Parent then sg:Destroy() end
+    end)
+end
+
+-- ====== SETTINGS GUI avec section Player ======
 local settingsGui = Instance.new("ScreenGui")
 settingsGui.Name = "SettingsUI"
 settingsGui.ResetOnSpawn = false
@@ -210,7 +309,7 @@ settingsGui.Parent = PlayerGui
 settingsGui.Enabled = false
 
 local sFrame = Instance.new("Frame")
-sFrame.Size = UDim2.new(0, 300, 0, 470)
+sFrame.Size = UDim2.new(0, 300, 0, 200)  -- Hauteur augmentée pour la section
 sFrame.Position = UDim2.new(Config.Positions.Settings.X, 0, Config.Positions.Settings.Y, 0)
 sFrame.BackgroundColor3 = Theme.Background
 sFrame.BackgroundTransparency = 0.05
@@ -236,15 +335,129 @@ sTitle.BackgroundTransparency = 1; sTitle.Text = "SETTINGS"
 sTitle.Font = Enum.Font.GothamBlack; sTitle.TextSize = 16
 sTitle.TextColor3 = Theme.TextPrimary; sTitle.TextXAlignment = Enum.TextXAlignment.Left
 
--- Message "aucune feature" mais garde le style original
-local placeholderLabel = Instance.new("TextLabel", sFrame)
-placeholderLabel.Size = UDim2.new(1, -20, 1, -50)
-placeholderLabel.Position = UDim2.new(0, 10, 0, 45)
-placeholderLabel.BackgroundTransparency = 1
-placeholderLabel.Text = "No features available yet."
-placeholderLabel.TextColor3 = Theme.TextSecondary
-placeholderLabel.Font = Enum.Font.GothamMedium
-placeholderLabel.TextSize = 14
+-- ScrollingFrame pour contenir les sections
+local sList = Instance.new("ScrollingFrame", sFrame)
+sList.Size = UDim2.new(1, -20, 1, -50)
+sList.Position = UDim2.new(0, 10, 0, 45)
+sList.BackgroundTransparency = 1
+sList.BorderSizePixel = 0
+sList.ScrollBarThickness = 4
+sList.ScrollBarImageColor3 = Theme.Accent1
+
+local sLayout = Instance.new("UIListLayout", sList)
+sLayout.Padding = UDim.new(0, 8)
+sLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+-- ====== Fonction pour créer un toggle switch (style Lethal Hub) ======
+local function CreateToggleSwitch(parent, initialState, callback)
+    local sw = Instance.new("Frame")
+    sw.Size = UDim2.new(0, 40, 0, 20)
+    sw.Position = UDim2.new(1, -50, 0.5, -10)
+    sw.BackgroundColor3 = initialState and Theme.Success or Theme.SurfaceHighlight
+    Instance.new("UICorner", sw).CornerRadius = UDim.new(1, 0)
+    sw.Parent = parent
+    
+    local dot = Instance.new("Frame")
+    dot.Size = UDim2.new(0, 16, 0, 16)
+    dot.Position = initialState and UDim2.new(1, -18, 0.5, -8) or UDim2.new(0, 2, 0.5, -8)
+    dot.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    Instance.new("UICorner", dot).CornerRadius = UDim.new(1, 0)
+    dot.Parent = sw
+    
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, 0, 1, 0)
+    btn.BackgroundTransparency = 1
+    btn.Text = ""
+    btn.Parent = sw
+    
+    local isOn = initialState
+    
+    local function SetState(s)
+        isOn = s
+        local tp = isOn and UDim2.new(1, -18, 0.5, -8) or UDim2.new(0, 2, 0.5, -8)
+        local tc = isOn and Theme.Success or Theme.SurfaceHighlight
+        TweenService:Create(dot, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = tp}):Play()
+        TweenService:Create(sw, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = tc}):Play()
+    end
+    
+    btn.MouseButton1Click:Connect(function()
+        callback(not isOn, SetState)
+    end)
+    
+    return {Set = SetState, Container = sw}
+end
+
+-- ====== Fonction pour créer une ligne de section ======
+local function CreateSectionHeader(text)
+    local row = Instance.new("Frame", sList)
+    row.Size = UDim2.new(1, 0, 0, 28)
+    row.BackgroundTransparency = 1
+    
+    local accent = Instance.new("Frame", row)
+    accent.Size = UDim2.new(0, 3, 0, 16)
+    accent.Position = UDim2.new(0, 4, 0.5, -8)
+    accent.BackgroundColor3 = Theme.Accent1
+    accent.BorderSizePixel = 0
+    Instance.new("UICorner", accent).CornerRadius = UDim.new(0, 2)
+    
+    local lbl = Instance.new("TextLabel", row)
+    lbl.Size = UDim2.new(1, -20, 1, 0)
+    lbl.Position = UDim2.new(0, 14, 0, 0)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = text
+    lbl.TextColor3 = Theme.Accent1
+    lbl.TextSize = 11
+    lbl.Font = Enum.Font.GothamBlack
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    
+    local line = Instance.new("Frame", row)
+    line.Size = UDim2.new(1, -80, 0, 1)
+    line.Position = UDim2.new(0, 75, 0.5, 0)
+    line.BackgroundColor3 = Theme.Accent1
+    line.BackgroundTransparency = 0.7
+    line.BorderSizePixel = 0
+    
+    return row
+end
+
+local function CreateRow(text, height)
+    local row = Instance.new("Frame", sList)
+    row.Size = UDim2.new(1, 0, 0, height or 34)
+    row.BackgroundColor3 = Theme.Surface
+    Instance.new("UICorner", row).CornerRadius = UDim.new(0, 6)
+    
+    local lbl = Instance.new("TextLabel", row)
+    lbl.Size = UDim2.new(0.6, 0, 1, 0)
+    lbl.Position = UDim2.new(0, 10, 0, 0)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = text
+    lbl.Font = Enum.Font.GothamMedium
+    lbl.TextColor3 = Theme.TextPrimary
+    lbl.TextSize = 12
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    
+    return row
+end
+
+-- ====== SECTION PLAYER ======
+CreateSectionHeader("PLAYER")
+
+-- Ligne Infinite Jump
+local rowInfJump = CreateRow("Infinite Jump", 34)
+local infJumpToggle = CreateToggleSwitch(rowInfJump, Config.InfiniteJump or false, function(ns, set)
+    set(ns)
+    setInfiniteJump(ns)
+    ShowNotification("INFINITE JUMP", ns and "ENABLED" or "DISABLED")
+end)
+
+-- Met à jour la taille du canvas du scrolling frame
+local function updateSettingsCanvasSize()
+    local contentHeight = sLayout.AbsoluteContentSize.Y
+    sList.CanvasSize = UDim2.new(0, 0, 0, math.max(contentHeight + 20, sList.AbsoluteSize.Y))
+end
+
+sLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateSettingsCanvasSize)
+task.defer(updateSettingsCanvasSize)
 
 -- ====== KEY INPUT ======
 UserInputService.InputBegan:Connect(function(input, processed)
@@ -257,7 +470,6 @@ end)
 
 -- ====== HUD (XiStatusHUD - identique à l'original, sans dépendances) ======
 task.spawn(function()
-    if IS_MOBILE then return end
     if PlayerGui:FindFirstChild("XiStatusHUD") then PlayerGui.XiStatusHUD:Destroy() end
 
     local HTheme = {
@@ -279,7 +491,7 @@ task.spawn(function()
     local main = Instance.new("Frame")
     main.Name = "Main"
     main.Size = UDim2.new(0, 500 * SCALE, 0, TOPBAR_H)
-    main.Position = UDim2.new(0.5, 0, 0, 0)
+    main.Position = UDim2.new(0.5, 0, 0, 20)
     main.AnchorPoint = Vector2.new(0.5, 0)
     main.BackgroundColor3 = Color3.fromRGB(20, 22, 28)
     main.BackgroundTransparency = 0.15
@@ -326,6 +538,7 @@ task.spawn(function()
     accentBar.AnchorPoint = Vector2.new(0, 0.5)
     accentBar.BackgroundColor3 = HTheme.Accent1
     accentBar.BorderSizePixel = 0
+    Instance.new("UICorner", accentBar).CornerRadius = UDim.new(0, 4)
 
     local accentGrad = Instance.new("UIGradient", accentBar)
     accentGrad.Color = ColorSequence.new{
@@ -379,11 +592,11 @@ task.spawn(function()
 
 local titleContainer = Instance.new("Frame", topBar)
 titleContainer.Size = UDim2.new(0, 200 * SCALE, 1, 0)
-titleContainer.Position = UDim2.new(0, 28 * SCALE, 0, 0)
+titleContainer.Position = UDim2.new(0, 24 * SCALE, 0, 0)
 titleContainer.BackgroundTransparency = 1
 title.Parent = titleContainer
-title.Position = UDim2.new(0, 0, 0, 12 * SCALE)
-title.AnchorPoint = Vector2.new(0, 0)
+title.Position = UDim2.new(0, 0, 0.5, -8 * SCALE)  -- Centré verticalement (moitié de la hauteur du texte)
+title.AnchorPoint = Vector2.new(0, 0.5)  -- Ancre au milieu vertical
 
 local author = Instance.new("TextLabel", titleContainer)
 author.Text = "by @wispaxx"
@@ -392,8 +605,8 @@ author.TextSize = 11 * SCALE
 author.TextColor3 = HTheme.Gray
 author.BackgroundTransparency = 1
 author.AutomaticSize = Enum.AutomaticSize.X
-author.Position = UDim2.new(0, 0, 0, 28 * SCALE)
-author.AnchorPoint = Vector2.new(0, 0)
+author.Position = UDim2.new(0, 0, 0.5, 10 * SCALE)  -- En dessous du titre, centré
+author.AnchorPoint = Vector2.new(0, 0.5)  -- Ancre au milieu vertical
 author.TextTransparency = 0.2
 
     local statsContainer = Instance.new("Frame", topBar)
