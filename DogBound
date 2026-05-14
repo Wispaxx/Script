@@ -96,6 +96,7 @@ local Translations = {
         TELEPORTED = "Teleported at",
         HUD_TITLE = "Dog Pound",
         HUD_AUTHOR = "by @wispaxx",
+        VISUAL = "Visual",
     },
     French = {
         SETTINGS = "PARAMÈTRES",
@@ -106,6 +107,7 @@ local Translations = {
         ENABLED = "ACTIVER",
         DISABLED = "DÉSACTIVER",
         LANGUAGE = "Langue",
+        VISUAL = "Visuel",
         TELEPORT_PANEL = "PANNEAU TP",
         CAMP = "Camp",
         CAFETARIA = "Cafétéria",
@@ -671,6 +673,9 @@ local noclipToggle = CreateToggleSwitch(rowNoclip, Config.Noclip or false, funct
     ShowNotification("NOCLIP", ns and GetText("ENABLED") or GetText("DISABLED"))
 end)
 
+-- ====== SECTION VISUAL ======
+CreateSectionHeader("VISUAL")
+
 local rowEsp = CreateRow("ESP", 34)
 local espToggle = CreateToggleSwitch(rowEsp, Config.Esp or false, function(ns, set)
     set(ns)
@@ -678,8 +683,24 @@ local espToggle = CreateToggleSwitch(rowEsp, Config.Esp or false, function(ns, s
     ShowNotification("ESP", ns and GetText("ENABLED") or GetText("DISABLED"))
 end)
 
--- ====== LANGUAGE SELECTOR ======
-local rowLanguage = CreateRow("LANGUAGE", 34)
+-- ====== SECTION LANGUAGE ======
+CreateSectionHeader("LANGUAGE")
+
+local rowLanguage = Instance.new("Frame", sList)
+rowLanguage.Size = UDim2.new(1, 0, 0, 34)
+rowLanguage.BackgroundColor3 = Theme.Surface
+Instance.new("UICorner", rowLanguage).CornerRadius = UDim.new(0, 6)
+
+local langLabel = Instance.new("TextLabel", rowLanguage)
+langLabel.Size = UDim2.new(0.6, 0, 1, 0)
+langLabel.Position = UDim2.new(0, 10, 0, 0)
+langLabel.BackgroundTransparency = 1
+langLabel.Text = GetText("LANGUAGE")
+langLabel.Font = Enum.Font.GothamMedium
+langLabel.TextColor3 = Theme.TextPrimary
+langLabel.TextSize = 12
+langLabel.TextXAlignment = Enum.TextXAlignment.Left
+
 local langContainer = Instance.new("Frame", rowLanguage)
 langContainer.Size = UDim2.new(0, 110, 0, 26)
 langContainer.Position = UDim2.new(1, -120, 0.5, -13)
