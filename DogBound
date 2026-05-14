@@ -1,4 +1,4 @@
--- Script universel - apparence 100% identique à l'original
+-- Script universel - apparence 100% identique Ã  l'original
 if not game:IsLoaded() then game.Loaded:Wait() end
 
 local SharedState = {
@@ -34,13 +34,15 @@ local IS_MOBILE = isMobile()
 local FileName = "DogBoundByWispaxx.json"
 local DefaultConfig = {
     Positions = {
-        Settings = {X = 0.834375, Y = 0.43590998043052839},
+        Settings  = {X = 0.834375, Y = 0.43590998043052839},
+        Teleport  = {X = 0.3,      Y = 0.4},
     },
-    MenuKey    = "LeftControl",
+    MenuKey        = "LeftControl",
     MobileGuiScale = 0.5,
-    UILocked   = false,
-    InfiniteJump = false,
-    Noclip = false,
+    UILocked       = false,
+    InfiniteJump   = false,
+    Noclip         = false,
+    Esp            = false,
 }
 
 local Config = DefaultConfig
@@ -69,7 +71,7 @@ local function SaveConfig()
     end
 end
 
--- ====== THEME (original inchangé) ======
+-- ====== THEME ======
 local Theme = {
     Background       = Color3.fromRGB(15, 15, 20),
     Surface          = Color3.fromRGB(22, 22, 30),
@@ -119,7 +121,7 @@ SharedState.RefreshMobileScale = function()
     end
 end
 
--- ====== INFINITE JUMP (from source.txt) ======
+-- ====== INFINITE JUMP ======
 local infiniteJumpEnabled = Config.InfiniteJump or false
 local infJumpConnection = nil
 local infJumpDebounce = false
@@ -128,15 +130,11 @@ local function setInfiniteJump(enabled)
     infiniteJumpEnabled = enabled
     Config.InfiniteJump = enabled
     SaveConfig()
-    
     if infJumpConnection then
         infJumpConnection:Disconnect()
         infJumpConnection = nil
     end
-    
     if not enabled then return end
-    
-    -- Version CORRECTE basée sur source.txt
     infJumpConnection = UserInputService.JumpRequest:Connect(function()
         if not infJumpDebounce then
             infJumpDebounce = true
@@ -153,30 +151,25 @@ local function setInfiniteJump(enabled)
     end)
 end
 
--- Applique l'état au chargement
 if Config.InfiniteJump then
     task.spawn(function() setInfiniteJump(true) end)
 end
 
--- ====== NOCLIP (from source.txt) ======
+-- ====== NOCLIP ======
 local noclipEnabled = Config.Noclip or false
 local noclipConnection = nil
-local Clip = true  -- true = collision activée, false = noclip
+local Clip = true
 
 local function setNoclip(enabled)
     noclipEnabled = enabled
     Config.Noclip = enabled
     SaveConfig()
-    
     if noclipConnection then
         noclipConnection:Disconnect()
         noclipConnection = nil
     end
-    
-    Clip = not enabled  -- Si enabled = true, alors Clip = false (noclip actif)
-    
+    Clip = not enabled
     if not enabled then
-        -- Restaurer les collisions
         local char = LocalPlayer.Character
         if char then
             for _, child in pairs(char:GetDescendants()) do
@@ -187,8 +180,6 @@ local function setNoclip(enabled)
         end
         return
     end
-    
-    -- Activer noclip avec un loop
     noclipConnection = RunService.Stepped:Connect(function()
         if not Clip then
             local char = LocalPlayer.Character
@@ -203,11 +194,129 @@ local function setNoclip(enabled)
     end)
 end
 
--- Applique l'état au chargement
 if Config.Noclip then
     task.spawn(function() setNoclip(true) end)
 end
 
+-- ====== ESP ======
+local espEnabled = Config.Esp or false
+local CoreGui = game:GetService("CoreGui")
+
+local function roundHp(hp)
+    return math.floor(hp + 0.5)
+end
+
+local function espColor(plr)
+    return plr.TeamColor.Color
+end
+
+local function ESP(plr)
+    task.spawn(function()
+        for _, v in pairs(CoreGui:GetChildren()) do
+            if v.Name == plr.Name .. "_ESP_DB" then v:Destroy() end
+        end
+        task.wait()
+        if not plr.Character or plr.Name == LocalPlayer.Name then return end
+        if CoreGui:FindFirstChild(plr.Name .. "_ESP_DB") then return end
+
+        local ESPholder = Instance.new("Folder")
+        ESPholder.Name = plr.Name .. "_ESP_DB"
+        ESPholder.Parent = CoreGui
+
+        repeat task.wait(0.5) until plr.Character
+            and plr.Character:FindFirstChildOfClass("Humanoid")
+            and plr.Character:FindFirstChild("Head")
+
+        local char = plr.Character
+        if not char then ESPholder:Destroy() return end
+
+        local hl = Instance.new("Highlight")
+        hl.Name = "HL_" .. plr.Name
+        hl.Adornee = char
+        hl.FillColor = espColor(plr)
+        hl.FillTransparency = 0.65
+        hl.OutlineColor = espColor(plr)
+        hl.OutlineTransparency = 0.65
+        hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+        hl.Parent = ESPholder
+
+        local billboard = Instance.new("BillboardGui")
+        billboard.Adornee = char:FindFirstChild("Head")
+        billboard.Name = "BB_" .. plr.Name
+        billboard.Parent = ESPholder
+        billboard.Size = UDim2.new(0, 100, 0, 44)
+        billboard.StudsOffset = Vector3.new(0, 2.5, 0)
+        billboard.AlwaysOnTop = true
+
+        local lbl = Instance.new("TextLabel")
+        lbl.Parent = billboard
+        lbl.BackgroundTransparency = 1
+        lbl.Size = UDim2.new(1, 0, 1, 0)
+        lbl.Font = Enum.Font.SourceSansSemibold
+        lbl.TextSize = 14
+        lbl.TextColor3 = Color3.new(1, 1, 1)
+        lbl.TextStrokeTransparency = 0
+        lbl.TextWrapped = true
+        lbl.Text = plr.Name
+
+        local loopConn, addedConn, teamConn
+
+        local function stopESP()
+            if loopConn then loopConn:Disconnect() end
+            if addedConn then addedConn:Disconnect() end
+            if teamConn then teamConn:Disconnect() end
+            if ESPholder and ESPholder.Parent then ESPholder:Destroy() end
+        end
+
+        local function restartESP()
+            stopESP()
+            if espEnabled then
+                task.wait(0.5)
+                ESP(plr)
+            end
+        end
+
+        addedConn = plr.CharacterAdded:Connect(restartESP)
+        teamConn  = plr:GetPropertyChangedSignal("TeamColor"):Connect(restartESP)
+
+        loopConn = RunService.RenderStepped:Connect(function()
+            if not CoreGui:FindFirstChild(plr.Name .. "_ESP_DB") then
+                stopESP()
+                return
+            end
+            local c = plr.Character
+            if c and c:FindFirstChildOfClass("Humanoid") then
+                local hum = c:FindFirstChildOfClass("Humanoid")
+                local hp = roundHp(hum.Health)
+                lbl.Text = plr.Name .. "\n" .. hp
+                local col = espColor(plr)
+                hl.FillColor    = col
+                hl.OutlineColor = col
+            end
+        end)
+    end)
+end
+
+local function setEsp(enabled)
+    espEnabled = enabled
+    Config.Esp = enabled
+    SaveConfig()
+    for _, v in pairs(CoreGui:GetChildren()) do
+        if v.Name:sub(-7) == "_ESP_DB" then v:Destroy() end
+    end
+    if not enabled then return end
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer then
+            ESP(plr)
+        end
+    end
+end
+
+if Config.Esp then
+    task.spawn(function() setEsp(true) end)
+end
+
+-- ====== DRAGGABLE ======
 local function MakeDraggable(handle, target, saveKey)
     local dragging, dragInput, dragStart, startPos
 
@@ -293,7 +402,7 @@ local function AddMobileMinimize(frame, labelText)
     end)
 end
 
--- ====== NOTIFICATION STYLE LETHAL HUB ======
+-- ====== NOTIFICATION ======
 local function ShowNotification(title, text)
     local existing = PlayerGui:FindFirstChild("XiNotif")
     if existing then existing:Destroy() end
@@ -352,7 +461,7 @@ local function ShowNotification(title, text)
     end)
 end
 
--- ====== SETTINGS GUI avec section Player ======
+-- ====== SETTINGS GUI ======
 local settingsGui = Instance.new("ScreenGui")
 settingsGui.Name = "SettingsUI"
 settingsGui.ResetOnSpawn = false
@@ -360,7 +469,7 @@ settingsGui.Parent = PlayerGui
 settingsGui.Enabled = false
 
 local sFrame = Instance.new("Frame")
-sFrame.Size = UDim2.new(0, 300, 0, 200)  -- Hauteur augmentée pour la section
+sFrame.Size = UDim2.new(0, 300, 0, 600)
 sFrame.Position = UDim2.new(Config.Positions.Settings.X, 0, Config.Positions.Settings.Y, 0)
 sFrame.BackgroundColor3 = Theme.Background
 sFrame.BackgroundTransparency = 0.05
@@ -386,7 +495,6 @@ sTitle.BackgroundTransparency = 1; sTitle.Text = "SETTINGS"
 sTitle.Font = Enum.Font.GothamBlack; sTitle.TextSize = 16
 sTitle.TextColor3 = Theme.TextPrimary; sTitle.TextXAlignment = Enum.TextXAlignment.Left
 
--- ScrollingFrame pour contenir les sections
 local sList = Instance.new("ScrollingFrame", sFrame)
 sList.Size = UDim2.new(1, -20, 1, -50)
 sList.Position = UDim2.new(0, 10, 0, 45)
@@ -399,7 +507,7 @@ local sLayout = Instance.new("UIListLayout", sList)
 sLayout.Padding = UDim.new(0, 8)
 sLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
--- ====== Fonction pour créer un toggle switch (style Lethal Hub) ======
+-- ====== TOGGLE SWITCH ======
 local function CreateToggleSwitch(parent, initialState, callback)
     local sw = Instance.new("Frame")
     sw.Size = UDim2.new(0, 40, 0, 20)
@@ -407,50 +515,50 @@ local function CreateToggleSwitch(parent, initialState, callback)
     sw.BackgroundColor3 = initialState and Theme.Success or Theme.SurfaceHighlight
     Instance.new("UICorner", sw).CornerRadius = UDim.new(1, 0)
     sw.Parent = parent
-    
+
     local dot = Instance.new("Frame")
     dot.Size = UDim2.new(0, 16, 0, 16)
     dot.Position = initialState and UDim2.new(1, -18, 0.5, -8) or UDim2.new(0, 2, 0.5, -8)
     dot.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     Instance.new("UICorner", dot).CornerRadius = UDim.new(1, 0)
     dot.Parent = sw
-    
+
     local btn = Instance.new("TextButton")
     btn.Size = UDim2.new(1, 0, 1, 0)
     btn.BackgroundTransparency = 1
     btn.Text = ""
     btn.Parent = sw
-    
+
     local isOn = initialState
-    
+
     local function SetState(s)
         isOn = s
         local tp = isOn and UDim2.new(1, -18, 0.5, -8) or UDim2.new(0, 2, 0.5, -8)
         local tc = isOn and Theme.Success or Theme.SurfaceHighlight
         TweenService:Create(dot, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = tp}):Play()
-        TweenService:Create(sw, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = tc}):Play()
+        TweenService:Create(sw,  TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = tc}):Play()
     end
-    
+
     btn.MouseButton1Click:Connect(function()
         callback(not isOn, SetState)
     end)
-    
+
     return {Set = SetState, Container = sw}
 end
 
--- ====== Fonction pour créer une ligne de section ======
+-- ====== SECTION HEADER ======
 local function CreateSectionHeader(text)
     local row = Instance.new("Frame", sList)
     row.Size = UDim2.new(1, 0, 0, 28)
     row.BackgroundTransparency = 1
-    
+
     local accent = Instance.new("Frame", row)
     accent.Size = UDim2.new(0, 3, 0, 16)
     accent.Position = UDim2.new(0, 4, 0.5, -8)
     accent.BackgroundColor3 = Theme.Accent1
     accent.BorderSizePixel = 0
     Instance.new("UICorner", accent).CornerRadius = UDim.new(0, 2)
-    
+
     local lbl = Instance.new("TextLabel", row)
     lbl.Size = UDim2.new(1, -20, 1, 0)
     lbl.Position = UDim2.new(0, 14, 0, 0)
@@ -460,14 +568,14 @@ local function CreateSectionHeader(text)
     lbl.TextSize = 11
     lbl.Font = Enum.Font.GothamBlack
     lbl.TextXAlignment = Enum.TextXAlignment.Left
-    
+
     local line = Instance.new("Frame", row)
     line.Size = UDim2.new(1, -80, 0, 1)
     line.Position = UDim2.new(0, 75, 0.5, 0)
     line.BackgroundColor3 = Theme.Accent1
     line.BackgroundTransparency = 0.7
     line.BorderSizePixel = 0
-    
+
     return row
 end
 
@@ -476,7 +584,7 @@ local function CreateRow(text, height)
     row.Size = UDim2.new(1, 0, 0, height or 34)
     row.BackgroundColor3 = Theme.Surface
     Instance.new("UICorner", row).CornerRadius = UDim.new(0, 6)
-    
+
     local lbl = Instance.new("TextLabel", row)
     lbl.Size = UDim2.new(0.6, 0, 1, 0)
     lbl.Position = UDim2.new(0, 10, 0, 0)
@@ -486,14 +594,13 @@ local function CreateRow(text, height)
     lbl.TextColor3 = Theme.TextPrimary
     lbl.TextSize = 12
     lbl.TextXAlignment = Enum.TextXAlignment.Left
-    
+
     return row
 end
 
 -- ====== SECTION PLAYER ======
 CreateSectionHeader("PLAYER")
 
--- Ligne Infinite Jump
 local rowInfJump = CreateRow("Infinite Jump", 34)
 local infJumpToggle = CreateToggleSwitch(rowInfJump, Config.InfiniteJump or false, function(ns, set)
     set(ns)
@@ -501,7 +608,6 @@ local infJumpToggle = CreateToggleSwitch(rowInfJump, Config.InfiniteJump or fals
     ShowNotification("INFINITE JUMP", ns and "ENABLED" or "DISABLED")
 end)
 
--- Ligne Noclip
 local rowNoclip = CreateRow("Noclip", 34)
 local noclipToggle = CreateToggleSwitch(rowNoclip, Config.Noclip or false, function(ns, set)
     set(ns)
@@ -509,7 +615,13 @@ local noclipToggle = CreateToggleSwitch(rowNoclip, Config.Noclip or false, funct
     ShowNotification("NOCLIP", ns and "ENABLED" or "DISABLED")
 end)
 
--- Met à jour la taille du canvas du scrolling frame
+local rowEsp = CreateRow("Esp", 34)
+local espToggle = CreateToggleSwitch(rowEsp, Config.Esp or false, function(ns, set)
+    set(ns)
+    setEsp(ns)
+    ShowNotification("ESP", ns and "ENABLED" or "DISABLED")
+end)
+
 local function updateSettingsCanvasSize()
     local contentHeight = sLayout.AbsoluteContentSize.Y
     sList.CanvasSize = UDim2.new(0, 0, 0, math.max(contentHeight + 20, sList.AbsoluteSize.Y))
@@ -527,7 +639,7 @@ UserInputService.InputBegan:Connect(function(input, processed)
     end
 end)
 
--- ====== HUD (XiStatusHUD - identique à l'original, sans dépendances) ======
+-- ====== HUD ======
 task.spawn(function()
     if PlayerGui:FindFirstChild("XiStatusHUD") then PlayerGui.XiStatusHUD:Destroy() end
 
@@ -571,9 +683,9 @@ task.spawn(function()
 
     local strokeGrad = Instance.new("UIGradient", stroke)
     strokeGrad.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, HTheme.Accent1),
+        ColorSequenceKeypoint.new(0,   HTheme.Accent1),
         ColorSequenceKeypoint.new(0.5, HTheme.Accent2),
-        ColorSequenceKeypoint.new(1, HTheme.Accent1)
+        ColorSequenceKeypoint.new(1,   HTheme.Accent1)
     }
     strokeGrad.Rotation = 0
 
@@ -592,7 +704,7 @@ task.spawn(function()
     topBar.Parent = main
 
     local accentBar = Instance.new("Frame", topBar)
-    accentBar.Size = UDim2.new(0, 4, 0, 40 * SCALE)  -- Changé de 30 à 40 pour plus de hauteur
+    accentBar.Size = UDim2.new(0, 4, 0, 40 * SCALE)
     accentBar.Position = UDim2.new(0, 12 * SCALE, 0.5, 0)
     accentBar.AnchorPoint = Vector2.new(0, 0.5)
     accentBar.BackgroundColor3 = HTheme.Accent1
@@ -606,14 +718,19 @@ task.spawn(function()
     }
     accentGrad.Rotation = 90
 
-    local title = Instance.new("TextLabel", topBar)
+    local titleContainer = Instance.new("Frame", topBar)
+    titleContainer.Size = UDim2.new(0, 200 * SCALE, 1, 0)
+    titleContainer.Position = UDim2.new(0, 24 * SCALE, 0, 0)
+    titleContainer.BackgroundTransparency = 1
+
+    local title = Instance.new("TextLabel", titleContainer)
     title.Text = "Dog Pound"
     title.Font = Enum.Font.GothamBlack
     title.TextSize = 20 * SCALE
     title.TextColor3 = HTheme.White
     title.BackgroundTransparency = 1
     title.AutomaticSize = Enum.AutomaticSize.X
-    title.Position = UDim2.new(0, 28 * SCALE, 0.5, 0)
+    title.Position = UDim2.new(0, 0, 0.5, -8 * SCALE)
     title.AnchorPoint = Vector2.new(0, 0.5)
     title.TextStrokeTransparency = 0.8
     title.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
@@ -649,24 +766,16 @@ task.spawn(function()
         end
     end)
 
-local titleContainer = Instance.new("Frame", topBar)
-titleContainer.Size = UDim2.new(0, 200 * SCALE, 1, 0)
-titleContainer.Position = UDim2.new(0, 24 * SCALE, 0, 0)
-titleContainer.BackgroundTransparency = 1
-title.Parent = titleContainer
-title.Position = UDim2.new(0, 0, 0.5, -8 * SCALE)  -- Centré verticalement (moitié de la hauteur du texte)
-title.AnchorPoint = Vector2.new(0, 0.5)  -- Ancre au milieu vertical
-
-local author = Instance.new("TextLabel", titleContainer)
-author.Text = "by @wispaxx"
-author.Font = Enum.Font.GothamBold
-author.TextSize = 11 * SCALE
-author.TextColor3 = HTheme.Gray
-author.BackgroundTransparency = 1
-author.AutomaticSize = Enum.AutomaticSize.X
-author.Position = UDim2.new(0, 0, 0.5, 10 * SCALE)  -- En dessous du titre, centré
-author.AnchorPoint = Vector2.new(0, 0.5)  -- Ancre au milieu vertical
-author.TextTransparency = 0.2
+    local author = Instance.new("TextLabel", titleContainer)
+    author.Text = "by @wispaxx"
+    author.Font = Enum.Font.GothamBold
+    author.TextSize = 11 * SCALE
+    author.TextColor3 = HTheme.Gray
+    author.BackgroundTransparency = 1
+    author.AutomaticSize = Enum.AutomaticSize.X
+    author.Position = UDim2.new(0, 0, 0.5, 10 * SCALE)
+    author.AnchorPoint = Vector2.new(0, 0.5)
+    author.TextTransparency = 0.2
 
     local statsContainer = Instance.new("Frame", topBar)
     statsContainer.Size = UDim2.new(0, 200 * SCALE, 1, 0)
@@ -699,4 +808,124 @@ author.TextTransparency = 0.2
             fc, lastFps, pc, ping
         )
     end)
+end)
+
+-- ====== TELEPORT PANEL ======
+local teleportGui = Instance.new("ScreenGui")
+teleportGui.Name = "TeleportPanel"
+teleportGui.ResetOnSpawn = false
+teleportGui.Parent = PlayerGui
+
+local tFrame = Instance.new("Frame")
+tFrame.Size = UDim2.new(0, 250, 0, 300)
+tFrame.Position = UDim2.new(
+    Config.Positions.Teleport.X, 0,
+    Config.Positions.Teleport.Y, 0
+)
+tFrame.BackgroundColor3 = Theme.Background
+tFrame.BackgroundTransparency = 0.05
+tFrame.BorderSizePixel = 0
+tFrame.ClipsDescendants = true
+tFrame.Parent = teleportGui
+
+ApplyViewportUIScale(tFrame)
+AddMobileMinimize(tFrame, "TELEPORT")
+
+Instance.new("UICorner", tFrame).CornerRadius = UDim.new(0, 12)
+
+local tStroke = Instance.new("UIStroke", tFrame)
+tStroke.Color = Theme.Accent2
+tStroke.Thickness = 1.5
+tStroke.Transparency = 0.4
+CreateGradient(tStroke)
+
+-- Header
+local tHeader = Instance.new("Frame", tFrame)
+tHeader.Size = UDim2.new(1, 0, 0, 40)
+tHeader.BackgroundTransparency = 1
+MakeDraggable(tHeader, tFrame, "Teleport")
+
+local tTitle = Instance.new("TextLabel", tHeader)
+tTitle.Size = UDim2.new(1, -20, 1, 0)
+tTitle.Position = UDim2.new(0, 15, 0, 0)
+tTitle.BackgroundTransparency = 1
+tTitle.Text = "TELEPORT PANEL"
+tTitle.Font = Enum.Font.GothamBlack
+tTitle.TextSize = 14
+tTitle.TextColor3 = Theme.TextPrimary
+tTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+-- SÃ©parateur
+local tSep = Instance.new("Frame", tFrame)
+tSep.Size = UDim2.new(1, -20, 0, 1)
+tSep.Position = UDim2.new(0, 10, 0, 40)
+tSep.BackgroundColor3 = Theme.Accent2
+tSep.BackgroundTransparency = 0.6
+tSep.BorderSizePixel = 0
+
+-- Ligne Riffle
+local tRow = Instance.new("Frame", tFrame)
+tRow.Size = UDim2.new(1, -20, 0, 50)
+tRow.Position = UDim2.new(0, 10, 0, 52)
+tRow.BackgroundColor3 = Theme.Surface
+tRow.BorderSizePixel = 0
+Instance.new("UICorner", tRow).CornerRadius = UDim.new(0, 8)
+
+-- Label "Riffle"
+local tLabel = Instance.new("TextLabel", tRow)
+tLabel.Size = UDim2.new(0.6, 0, 1, 0)
+tLabel.Position = UDim2.new(0, 12, 0, 0)
+tLabel.BackgroundTransparency = 1
+tLabel.Text = "Riffle"
+tLabel.Font = Enum.Font.GothamMedium
+tLabel.TextSize = 13
+tLabel.TextColor3 = Theme.TextPrimary
+tLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Bouton TP
+local tpBtn = Instance.new("TextButton", tRow)
+tpBtn.Size = UDim2.new(0, 48, 0, 30)
+tpBtn.Position = UDim2.new(1, -58, 0.5, -15)
+tpBtn.BackgroundColor3 = Color3.fromRGB(35, 37, 43)
+tpBtn.Text = "TP"
+tpBtn.Font = Enum.Font.GothamBlack
+tpBtn.TextSize = 13
+tpBtn.TextColor3 = Color3.fromRGB(10, 10, 20)
+tpBtn.AutoButtonColor = false
+Instance.new("UICorner", tpBtn).CornerRadius = UDim.new(0, 8)
+
+-- Effet hover
+tpBtn.MouseEnter:Connect(function()
+    TweenService:Create(tpBtn, TweenInfo.new(0.15), {BackgroundTransparency = 0.2}):Play()
+end)
+tpBtn.MouseLeave:Connect(function()
+    TweenService:Create(tpBtn, TweenInfo.new(0.15), {BackgroundTransparency = 0}):Play()
+end)
+
+-- Teleportation au click
+tpBtn.MouseButton1Click:Connect(function()
+    local char = LocalPlayer.Character
+    if not char then return end
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+
+    hrp.CFrame = CFrame.new(
+        Vector3.new(-929.500122, 32.0975571, -722.901062),
+        Vector3.new(-929.500122 + (-1), 32.0975571 + 0, -722.901062 + 0)
+    )
+
+    ShowNotification("TELEPORT", "Teleported at Riffle !")
+end)
+
+-- ====== PLAYERS EVENTS (ESP) ======
+Players.PlayerAdded:Connect(function(plr)
+    if espEnabled then
+        task.wait(1)
+        ESP(plr)
+    end
+end)
+
+Players.PlayerRemoving:Connect(function(plr)
+    local folder = CoreGui:FindFirstChild(plr.Name .. "_ESP_DB")
+    if folder then folder:Destroy() end
 end)
