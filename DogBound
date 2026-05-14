@@ -43,6 +43,7 @@ local DefaultConfig = {
     InfiniteJump   = false,
     Noclip         = false,
     Esp            = false,
+    Language       = "English",
 }
 
 local Config = DefaultConfig
@@ -69,6 +70,61 @@ local function SaveConfig()
             writefile(FileName, HttpService:JSONEncode(Config))
         end)
     end
+end
+
+-- ====== TRANSLATIONS ======
+local Translations = {
+    English = {
+        SETTINGS = "SETTINGS",
+        PLAYER = "PLAYER",
+        INFINITE_JUMP = "Infinite Jump",
+        NOCLIP = "Noclip",
+        ESP = "Esp",
+        ENABLED = "ENABLED",
+        DISABLED = "DISABLED",
+        LANGUAGE = "Language",
+        TELEPORT_PANEL = "TELEPORT PANEL",
+        CAMP = "Camp",
+        CAFETARIA = "Cafetaria",
+        DOG_CAGE_ROOM = "Dog Cage Room",
+        COPS_ROOM = "Cops Room",
+        PC_ROOM = "PC Room",
+        YARD = "Yard",
+        CELL_BLOCK_ROOM = "Cell Block Room",
+        DOG_AGILITY_ROOM = "Dog Agility Room",
+        OBSERVATION_TOWER = "Observation Tower",
+        TELEPORTED = "Teleported at",
+        HUD_TITLE = "Dog Pound",
+        HUD_AUTHOR = "by @wispaxx",
+    },
+    French = {
+        SETTINGS = "PARAMÈTRES",
+        PLAYER = "JOUEUR",
+        INFINITE_JUMP = "Saut Infini",
+        NOCLIP = "Noclip",
+        ESP = "Esp",
+        ENABLED = "ACTIVER",
+        DISABLED = "DÉSACTIVER",
+        LANGUAGE = "Langue",
+        TELEPORT_PANEL = "PANNEAU TP",
+        CAMP = "Camp",
+        CAFETARIA = "Cafétéria",
+        DOG_CAGE_ROOM = "Cellules des chiens",
+        COPS_ROOM = "Salle Police",
+        PC_ROOM = "Salle Informatique",
+        YARD = "Cour",
+        CELL_BLOCK_ROOM = "Cellules",
+        DOG_AGILITY_ROOM = "Salle de jeux",
+        OBSERVATION_TOWER = "Tour d'Observation",
+        TELEPORTED = "Téléporté à",
+        HUD_TITLE = "Fourrière de Chien",
+        HUD_AUTHOR = "fait par @wispaxx",
+    },
+}
+
+local function GetText(key)
+    local lang = Translations[Config.Language] or Translations.English
+    return lang[key] or key
 end
 
 -- ====== THEME ======
@@ -359,7 +415,7 @@ local function MakeDraggable(handle, target, saveKey)
     end)
 end
 
-local function AddMobileMinimize(frame, labelText)
+local function AddMobileMinimize(frame, labelKey)
     if not IS_MOBILE then return end
     if not frame or not frame.Parent then return end
     local guiParent = frame.Parent
@@ -382,7 +438,7 @@ local function AddMobileMinimize(frame, labelText)
     restoreBtn.Size = UDim2.new(0, 110, 0, 34)
     restoreBtn.Position = UDim2.new(0, 10, 1, -44)
     restoreBtn.BackgroundColor3 = Theme.SurfaceHighlight
-    restoreBtn.Text = labelText or "OPEN"
+    restoreBtn.Text = GetText(labelKey) or "OPEN"
     restoreBtn.Font = Enum.Font.GothamBold
     restoreBtn.TextSize = 12
     restoreBtn.TextColor3 = Theme.TextPrimary
@@ -491,7 +547,7 @@ sHeader.BackgroundTransparency = 1
 MakeDraggable(sHeader, sFrame, "Settings")
 local sTitle = Instance.new("TextLabel", sHeader)
 sTitle.Size = UDim2.new(1, -20, 1, 0); sTitle.Position = UDim2.new(0, 15, 0, 0)
-sTitle.BackgroundTransparency = 1; sTitle.Text = "SETTINGS"
+sTitle.BackgroundTransparency = 1; sTitle.Text = GetText("SETTINGS")
 sTitle.Font = Enum.Font.GothamBlack; sTitle.TextSize = 16
 sTitle.TextColor3 = Theme.TextPrimary; sTitle.TextXAlignment = Enum.TextXAlignment.Left
 
@@ -563,7 +619,7 @@ local function CreateSectionHeader(text)
     lbl.Size = UDim2.new(1, -20, 1, 0)
     lbl.Position = UDim2.new(0, 14, 0, 0)
     lbl.BackgroundTransparency = 1
-    lbl.Text = text
+    lbl.Text = GetText(text)
     lbl.TextColor3 = Theme.Accent1
     lbl.TextSize = 11
     lbl.Font = Enum.Font.GothamBlack
@@ -589,7 +645,7 @@ local function CreateRow(text, height)
     lbl.Size = UDim2.new(0.6, 0, 1, 0)
     lbl.Position = UDim2.new(0, 10, 0, 0)
     lbl.BackgroundTransparency = 1
-    lbl.Text = text
+    lbl.Text = GetText(text)
     lbl.Font = Enum.Font.GothamMedium
     lbl.TextColor3 = Theme.TextPrimary
     lbl.TextSize = 12
@@ -601,26 +657,76 @@ end
 -- ====== SECTION PLAYER ======
 CreateSectionHeader("PLAYER")
 
-local rowInfJump = CreateRow("Infinite Jump", 34)
+local rowInfJump = CreateRow("INFINITE_JUMP", 34)
 local infJumpToggle = CreateToggleSwitch(rowInfJump, Config.InfiniteJump or false, function(ns, set)
     set(ns)
     setInfiniteJump(ns)
-    ShowNotification("INFINITE JUMP", ns and "ENABLED" or "DISABLED")
+    ShowNotification(GetText("INFINITE_JUMP"), ns and GetText("ENABLED") or GetText("DISABLED"))
 end)
 
-local rowNoclip = CreateRow("Noclip", 34)
+local rowNoclip = CreateRow("NOCLIP", 34)
 local noclipToggle = CreateToggleSwitch(rowNoclip, Config.Noclip or false, function(ns, set)
     set(ns)
     setNoclip(ns)
-    ShowNotification("NOCLIP", ns and "ENABLED" or "DISABLED")
+    ShowNotification("NOCLIP", ns and GetText("ENABLED") or GetText("DISABLED"))
 end)
 
-local rowEsp = CreateRow("Esp", 34)
+local rowEsp = CreateRow("ESP", 34)
 local espToggle = CreateToggleSwitch(rowEsp, Config.Esp or false, function(ns, set)
     set(ns)
     setEsp(ns)
-    ShowNotification("ESP", ns and "ENABLED" or "DISABLED")
+    ShowNotification("ESP", ns and GetText("ENABLED") or GetText("DISABLED"))
 end)
+
+-- ====== LANGUAGE SELECTOR ======
+local rowLanguage = CreateRow("LANGUAGE", 34)
+local langContainer = Instance.new("Frame", rowLanguage)
+langContainer.Size = UDim2.new(0, 110, 0, 26)
+langContainer.Position = UDim2.new(1, -120, 0.5, -13)
+langContainer.BackgroundTransparency = 1
+langContainer.BorderSizePixel = 0
+
+local langLayout = Instance.new("UIListLayout", langContainer)
+langLayout.FillDirection = Enum.FillDirection.Horizontal
+langLayout.Padding = UDim.new(0, 4)
+langLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+local function CreateLangButton(text, langCode)
+    local btn = Instance.new("TextButton", langContainer)
+    btn.Size = UDim2.new(0, 50, 0, 24)
+    btn.BackgroundColor3 = Config.Language == langCode and Theme.Accent1 or Theme.SurfaceHighlight
+    btn.Text = text
+    btn.Font = Enum.Font.GothamMedium
+    btn.TextSize = 11
+    btn.TextColor3 = Config.Language == langCode and Color3.fromRGB(0, 0, 0) or Theme.TextPrimary
+    btn.AutoButtonColor = false
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+    
+    btn.MouseButton1Click:Connect(function()
+        Config.Language = langCode
+        SaveConfig()
+        
+        -- Mettre à jour les couleurs des boutons
+        for _, child in pairs(langContainer:GetChildren()) do
+            if child:IsA("TextButton") then
+                if child.Text == text then
+                    child.BackgroundColor3 = Theme.Accent1
+                    child.TextColor3 = Color3.fromRGB(0, 0, 0)
+                else
+                    child.BackgroundColor3 = Theme.SurfaceHighlight
+                    child.TextColor3 = Theme.TextPrimary
+                end
+            end
+        end
+        
+        ShowNotification("LANGUAGE", "Language changed to " .. text)
+    end)
+    
+    return btn
+end
+
+CreateLangButton("EN", "English")
+CreateLangButton("FR", "French")
 
 local function updateSettingsCanvasSize()
     local contentHeight = sLayout.AbsoluteContentSize.Y
@@ -724,7 +830,7 @@ task.spawn(function()
     titleContainer.BackgroundTransparency = 1
 
     local title = Instance.new("TextLabel", titleContainer)
-    title.Text = "Dog Pound"
+    title.Text = GetText("HUD_TITLE")
     title.Font = Enum.Font.GothamBlack
     title.TextSize = 20 * SCALE
     title.TextColor3 = HTheme.White
@@ -767,7 +873,7 @@ task.spawn(function()
     end)
 
     local author = Instance.new("TextLabel", titleContainer)
-    author.Text = "by @wispaxx"
+    author.Text = GetText("HUD_AUTHOR")
     author.Font = Enum.Font.GothamBold
     author.TextSize = 11 * SCALE
     author.TextColor3 = HTheme.Gray
@@ -829,7 +935,7 @@ tFrame.ClipsDescendants = true
 tFrame.Parent = teleportGui
 
 ApplyViewportUIScale(tFrame)
-AddMobileMinimize(tFrame, "TELEPORT")
+AddMobileMinimize(tFrame, "TELEPORT_PANEL")
 
 Instance.new("UICorner", tFrame).CornerRadius = UDim.new(0, 12)
 
@@ -849,7 +955,7 @@ local tTitle = Instance.new("TextLabel", tHeader)
 tTitle.Size = UDim2.new(1, -20, 1, 0)
 tTitle.Position = UDim2.new(0, 15, 0, 0)
 tTitle.BackgroundTransparency = 1
-tTitle.Text = "TELEPORT PANEL"
+tTitle.Text = GetText("TELEPORT_PANEL")
 tTitle.Font = Enum.Font.GothamBlack
 tTitle.TextSize = 14
 tTitle.TextColor3 = Theme.TextPrimary
@@ -919,20 +1025,20 @@ local function CreateTeleportButton(parent, label, cframeX, cframeY, cframeZ, r0
         if not hrp then return end
 
         hrp.CFrame = CFrame.new(cframeX, cframeY, cframeZ, r00, r01, r02, r10, r11, r12, r20, r21, r22)
-        ShowNotification("TELEPORT", "Teleported at " .. label .. " !")
+        ShowNotification("TELEPORT", GetText("TELEPORTED") .. " " .. label .. " !")
     end)
 end
 
 -- Tous les boutons de téléportation
-CreateTeleportButton(tList, "Camp", -950.999878, 35.75, -775.999878, -1, 0, 0, 0, 1, 0, 0, 0, -1)
-CreateTeleportButton(tList, "Cafetaria", 40, 15.5, 11.9999905, 1, 0, 0, 0, 1, 0, 0, 0, 1)
-CreateTeleportButton(tList, "Dog Cage Room", 44, 15.5, 91.5000458, 1, 0, 0, 0, 1, 0, 0, 0, 1)
-CreateTeleportButton(tList, "Cops Room", 8.75, 15.5, -121.75, 0, 0, -1, 0, 1, 0, 1, 0, 0)
-CreateTeleportButton(tList, "PC Room", 80.5, 15.5000019, -84.0000153, 0, 0, 1, 0, 1, -0, -1, 0, 0)
-CreateTeleportButton(tList, "Yard", -85.5, 13, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1)
-CreateTeleportButton(tList, "Cell Block Room", -86.5, 15.5, 82, 1, 0, 0, 0, 1, 0, 0, 0, 1)
-CreateTeleportButton(tList, "Dog Agility Room", 61.5, 15.5, 161.000061, 1, 0, 0, 0, 1, 0, 0, 0, 1)
-CreateTeleportButton(tList, "Observation Tower", -218, 52, -122.5, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+CreateTeleportButton(tList, GetText("CAMP"), -950.999878, 35.75, -775.999878, -1, 0, 0, 0, 1, 0, 0, 0, -1)
+CreateTeleportButton(tList, GetText("CAFETARIA"), 40, 15.5, 11.9999905, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+CreateTeleportButton(tList, GetText("DOG_CAGE_ROOM"), 44, 15.5, 91.5000458, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+CreateTeleportButton(tList, GetText("COPS_ROOM"), 8.75, 15.5, -121.75, 0, 0, -1, 0, 1, 0, 1, 0, 0)
+CreateTeleportButton(tList, GetText("PC_ROOM"), 80.5, 15.5000019, -84.0000153, 0, 0, 1, 0, 1, -0, -1, 0, 0)
+CreateTeleportButton(tList, GetText("YARD"), -85.5, 13, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+CreateTeleportButton(tList, GetText("CELL_BLOCK_ROOM"), -86.5, 15.5, 82, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+CreateTeleportButton(tList, GetText("DOG_AGILITY_ROOM"), 61.5, 15.5, 161.000061, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+CreateTeleportButton(tList, GetText("OBSERVATION_TOWER"), -218, 52, -122.5, 1, 0, 0, 0, 1, 0, 0, 0, 1)
 
 local function updateTeleportCanvasSize()
     local contentHeight = tLayout.AbsoluteContentSize.Y
