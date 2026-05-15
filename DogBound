@@ -716,13 +716,64 @@ local function findPromptInDescendants(obj)
     return nil
 end
 
-local function grabItem(promptSource, itemName, customCFrame)
+-- ====== FONCTIONS POUR GIVE PANEL OPTIMISÉ (avec gestion de la caméra) ======
+local function waitForNewTool(oldToolSet, timeout, expectedItemName)
+    local start = tick()
+    repeat
+        task.wait(0.05)
+        local currentTools = {}
+        local bp = LocalPlayer.Backpack
+        local char = LocalPlayer.Character
+        if bp then
+            for _, tool in pairs(bp:GetChildren()) do
+                if tool:IsA("Tool") then currentTools[tool.Name] = true end
+            end
+        end
+        if char then
+            for _, tool in pairs(char:GetChildren()) do
+                if tool:IsA("Tool") then currentTools[tool.Name] = true end
+            end
+        end
+        for name, _ in pairs(currentTools) do
+            if not oldToolSet[name] then
+                if expectedItemName and name ~= expectedItemName then
+                    oldToolSet[name] = true   -- ignorer les mauvais outils
+                else
+                    return name
+                end
+            end
+        end
+    until tick() - start > timeout
+    return nil
+end
+
+local function triggerPromptFast(prompt)
+    if not prompt then return false end
+    pcall(function() fireproximityprompt(prompt) end)
+    pcall(function() prompt:InputHoldBegin() task.wait(0.01) prompt:InputHoldEnd() end)
+    return true
+end
+
+local function findPromptInDescendants(obj)
+    if not obj then return nil end
+    local prompt = obj:FindFirstChildOfClass("ProximityPrompt")
+    if prompt then return prompt end
+    for _, child in pairs(obj:GetChildren()) do
+        prompt = child:FindFirstChildOfClass("ProximityPrompt")
+        if prompt then return prompt end
+    end
+    return nil
+end
+
+-- Fonction principale : grabItem avec CFrame corps ET CFrame caméra (optionnels)
+local function grabItem(promptSource, itemName, customBodyCFrame, customCameraCFrame)
     local char = LocalPlayer.Character
     if not char then return false end
     local hrp = char:FindFirstChild("HumanoidRootPart")
     if not hrp then return false end
 
-    local savedCFrame = hrp.CFrame
+    local savedBodyCFrame = hrp.CFrame
+    local savedCameraCFrame = workspace.CurrentCamera and workspace.CurrentCamera.CFrame
     local wasNoclip = noclipEnabled
 
     if not wasNoclip then
@@ -747,7 +798,7 @@ local function grabItem(promptSource, itemName, customCFrame)
         return false
     end
 
-    -- Sauvegarde des outils existants
+    -- Sauvegarde des outils déjà possédés
     local oldTools = {}
     for _, tool in pairs(LocalPlayer.Backpack:GetChildren()) do
         if tool:IsA("Tool") then oldTools[tool.Name] = true end
@@ -756,15 +807,23 @@ local function grabItem(promptSource, itemName, customCFrame)
         if tool:IsA("Tool") then oldTools[tool.Name] = true end
     end
 
-    -- Téléportation : si customCFrame fourni, on l'utilise, sinon on calcule une position devant l'item
-    if customCFrame then
-        hrp.CFrame = customCFrame
+    -- Téléportation du corps (si customBodyCFrame fourni)
+    if customBodyCFrame then
+        hrp.CFrame = customBodyCFrame
     else
         local targetPos = targetPart.Position
         local direction = (hrp.Position - targetPos).Unit
         local offset = direction * -5
         hrp.CFrame = CFrame.new(targetPos + offset) * CFrame.Angles(0, hrp.Orientation.Y, 0)
     end
+
+    -- Appliquer l'orientation de la caméra si fournie
+    if customCameraCFrame and workspace.CurrentCamera then
+        workspace.CurrentCamera.CFrame = customCameraCFrame
+    end
+
+    -- Petit délai pour que le serveur prenne en compte la nouvelle position/caméra
+    task.wait(0.05)
 
     -- Déclencher le prompt (plusieurs fois pour fiabilité)
     for i = 1, 3 do
@@ -773,7 +832,7 @@ local function grabItem(promptSource, itemName, customCFrame)
         task.wait(0.02)
     end
 
-    -- Attendre l'apparition d'un nouvel outil
+    -- Attente de l'obtention de l'outil (max 1.2s)
     local grabbed = waitForNewTool(oldTools, 1.2)
 
     if grabbed then
@@ -782,9 +841,15 @@ local function grabItem(promptSource, itemName, customCFrame)
         ShowNotification("GIVE PANEL", "Failed to grab " .. itemName)
     end
 
-    -- Retour à la position d'origine
-    hrp.CFrame = savedCFrame * CFrame.new(0, 3, 0)
+    -- Retour du corps à la position d'origine
+    hrp.CFrame = savedBodyCFrame * CFrame.new(0, 3, 0)
 
+    -- Restauration de la caméra d'origine
+    if savedCameraCFrame and workspace.CurrentCamera then
+        workspace.CurrentCamera.CFrame = savedCameraCFrame
+    end
+
+    -- Restauration du noclip
     if not wasNoclip then
         setNoclip(false)
     end
@@ -1519,44 +1584,51 @@ end)
 
 -- DOG_FOOD (pas de zone admin, calcul auto ou CFrame simple)
 CreateGiveButton(gList, GetText("DOG_FOOD"), function()
-    local cframe = CFrame.new(44.5184402, 13.6199989, -15.4199362, 0.00872862898, -2.25070469e-08, -0.999961913, -8.13370704e-08, 1, -2.32178916e-08, 0.999961913, 8.15366263e-08, 0.00872862898)
-    grabItem(game.Workspace.Map.Kitchen.TakeDogFood.DogFoodMain, "Dog Food")  -- TP calculé automatiquement
+    local bodyCF = CFrame.new(44.7985306, 13.6199999, -15.3438482, -0.0436278693, -2.39595321e-09, -0.999047875, -2.11916507e-09, 1, -2.30569408e-09, 0.999047875, 2.01655492e-09, -0.0436278693)
+    local camCF = CFrame.new(45.4242096, 18.5281887, -10.5036726, 0.999657393, -0.0135213723, 0.0224102326, 0, 0.856222212, 0.516607761, -0.026173383, -0.516430795, 0.855928898)
+    grabItem(game.Workspace.Map.Kitchen.TakeDogFood.DogFoodMain, "Dog Food", bodyCF, camCF)  -- TP calculé automatiquement
 end)
 
 -- MEDKIT (zone admin → TP devant la porte)
 CreateGiveButton(gList, GetText("MEDKIT"), function()
-    local cframe = CFrame.new(-67.2785263, 15.6199989, 161.334045, 0.999847591, 8.63755929e-08, -0.0174576566, -8.70161472e-08, 1, -3.59319614e-08, 0.0174576566, 3.74455844e-08, 0.999847591)  -- <-- À remplacer
-    grabItem(game.Workspace.Map.Vets.Important.DoctorMedKitShelf.Medkit, "Medkit", cframe)
+    local bodyCF = CFrame.new(-66.9499283, 15.6199989, 157.880768, -0.999884963, 7.49878992e-10, -0.0151683707, 7.0578221e-10, 1, 2.91250601e-09, 0.0151683707, 2.90146551e-09, -0.999884963)
+    local camCF = CFrame.new(-67.010582, 29.0720043, 154.470413, -0.99984777, 0.0165125355, -0.00563907018, 0, 0.323176891, 0.946338534, 0.0174488667, 0.94619447, -0.323127687)
+    grabItem(game.Workspace.Map.Vets.Important.DoctorMedKitShelf.Medkit, "Medkit", bodyCF, camCF)
 end)
 
 -- VITAMINS
 CreateGiveButton(gList, GetText("VITAMINS"), function()
-    local cframe = CFrame.new(-67.5486298, 15.6199989, 153.755234, 0.999656975, 8.40471017e-08, 0.0261901263, -8.27680822e-08, 1, -4.99201249e-08, -0.0261901263, 4.77352948e-08, 0.999656975)  -- À remplacer
-    grabItem(game.Workspace.Map.Vets.Important.StaminaKitShelf.StaminaFiller, "Vitamins", cframe)
+    local bodyCF = CFrame.new(-67.0330429, 15.6199989, 151.21463, -0.999644995, 6.39823661e-09, -0.0266440231, 6.1645169e-09, 1, 8.85407481e-09, 0.0266440231, 8.68668337e-09, -0.999644995)
+    local camCF = CFrame.new(-62.0863113, 20.2703209, 140.092178, -0.920503497, -0.0802696869, 0.382400453, 0, 0.978671134, 0.205432877, -0.390734375, 0.189101681, -0.900870204)
+    grabItem(game.Workspace.Map.Vets.Important.StaminaKitShelf.StaminaFiller, "Vitamins", bodyCF, camCF)
 end)
 
 -- EYE CHANGER (offset spécial ou CFrame fixe)
 CreateGiveButton(gList, GetText("EYE_CHANGER_NEEDLE"), function()
-    local cframe = CFrame.new(-55.7739067, 15.6199989, 113.602524, -0.0348844379, -7.06790999e-08, 0.999391377, 3.19879696e-08, 1, 7.18387057e-08, -0.999391377, 3.4474553e-08, -0.0348844379)  -- À remplacer
-    grabItem(game.Workspace.Map.Vets.Important.EyeNeedleModel.ColorNeedleMain, "Eye Changer Needle", cframe)
+    local bodyCF = CFrame.new(-54.7826538, 15.6199989, 113.578178, 0.00869909301, -6.43550635e-08, -0.999962151, -9.88932882e-08, 1, -6.52178187e-08, 0.999962151, 9.94568836e-08, 0.00869909301)
+    local camCF = CFrame.new(-62.9316101, 14.0266113, 114.635788, 0.121869259, -0.378390402, -0.917588592, 0, 0.924479485, -0.381232053, 0.992546141, 0.0464604683, 0.112665638)
+    grabItem(game.Workspace.Map.Vets.Important.EyeNeedleModel.ColorNeedleMain, "Eye Changer Needle", bodyCF, camCF)
 end)
 
 -- FIRE NEEDLE
 CreateGiveButton(gList, GetText("FIRE_NEEDLE"), function()
-    local cframe = CFrame.new(-67.0985107, 15.6199989, 123.618362, -0.997563303, -3.42223814e-08, -0.0697669238, -3.85548979e-08, 1, 6.07533295e-08, 0.0697669238, 6.32951469e-08, -0.997563303)  -- À remplacer
-    grabItem(game.Workspace.Map.Vets.Important.FireNeedleModel.ColorNeedleMain, "Fire Needle", cframe)
+    local bodyCF = CFrame.new(-67.2690506, 15.6199989, 123.87674, -0.996195376, -5.23071932e-08, -0.087147668, -5.43612302e-08, 1, 2.11963638e-08, 0.087147668, 2.58531738e-08, -0.996195376)
+    local camCF = CFrame.new(-58.5970116, 14.2732525, 120.800812, -0.382683426, 0.311663449, 0.869723678, 0, 0.94138211, -0.337342083, -0.923879564, -0.129095227, -0.360251337)
+    grabItem(game.Workspace.Map.Vets.Important.FireNeedleModel.ColorNeedleMain, "Fire Needle", bodyCF, camCF)
 end)
 
 -- SHRINK NEEDLE
 CreateGiveButton(gList, GetText("SHRINK_NEEDLE"), function()
-    local cframe = CFrame.new(-67.591362, 15.6199989, 126.639206, -0.998627722, -1.94781347e-08, -0.0523699597, -2.17373692e-08, 1, 4.25702922e-08, 0.0523699597, 4.36502603e-08, -0.998627722)  -- À remplacer
-    grabItem(game.Workspace.Map.Vets.Important.ShrinkNeedleModel.ColorNeedleMain, "Shrink Needle", cframe)
+    local bodyCF = CFrame.new(-67.0519104, 15.6199989, 125.038315, -0.999049664, 8.8143004e-08, -0.0435865186, 8.77650876e-08, 1, 1.05840572e-08, 0.0435865186, 6.74862433e-09, -0.999049664)
+    local camCF = CFrame.new(-54.6768913, 14.1766205, 124.130409, -0.113200106, 0.265188903, 0.957528472, 0, 0.963723123, -0.266904503, -0.993572235, -0.0302136187, -0.109093554)
+    grabItem(game.Workspace.Map.Vets.Important.ShrinkNeedleModel.ColorNeedleMain, "Shrink Needle", bodyCF, camCF)
 end)
 
 -- GROW NEEDLE
 CreateGiveButton(gList, GetText("GROW_NEEDLE"), function()
-    local cframe = CFrame.new(-67.3781433, 15.6199989, 130.436752, -0.999962151, -5.75757824e-08, -0.0086991135, -5.7198065e-08, 1, -4.36690293e-08, 0.0086991135, -4.31698055e-08, -0.999962151)  -- À remplacer
-    grabItem(game.Workspace.Map.Vets.Important.GrowNeedleModel.ColorNeedleMain, "Grow Needle", cframe)
+    local bodyCF = CFrame.new(-67.2410889, 15.6199989, 129.357178, -0.999657393, -1.60003335e-08, -0.0261754058, -1.50656394e-08, 1, -3.59060977e-08, 0.0261754058, -3.54994469e-08, -0.999657393)
+    local camCF = CFrame.new(-55.6185379, 14.512001, 125.166527, -0.374603391, 0.223366678, 0.899877608, 0, 0.970547974, -0.240908369, -0.927185237, -0.0902450904, -0.363570511)
+    grabItem(game.Workspace.Map.Vets.Important.GrowNeedleModel.ColorNeedleMain, "Grow Needle", bodyCF, camCF)
 end)
 
 -- RIFLE / TASER (pas de zone admin, calcul auto)
