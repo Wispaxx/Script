@@ -1208,10 +1208,10 @@ local function CreateGiveButton(parent, label, giveAction)
     Instance.new("UICorner", gvBtn).CornerRadius = UDim.new(0, 8)
 
     gvBtn.MouseEnter:Connect(function()
-        TweenService:Create(gvBtn, TweenInfo.new(0.15), {BackgroundTransparency = 0.2}):Play()
+        TweenService:Create(gvBtn, TweenInfo.new(0.2), {BackgroundTransparency = 0.2}):Play()
     end)
     gvBtn.MouseLeave:Connect(function()
-        TweenService:Create(gvBtn, TweenInfo.new(0.15), {BackgroundTransparency = 0}):Play()
+        TweenService:Create(gvBtn, TweenInfo.new(0.2), {BackgroundTransparency = 0}):Play()
     end)
 
     gvBtn.MouseButton1Click:Connect(function()
@@ -1262,13 +1262,13 @@ local function CreateWeaponButton()
         end
 
         hrp.CFrame = targetPart.CFrame * CFrame.new(0, 0, -1)
-        task.wait(0.15)
+        task.wait(0.2)
         fireproximityprompt(prompt)
-        task.wait(0.1)
+        task.wait(0.2)
 
         if not LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") and not char:FindFirstChildWhichIsA("Tool") then
             hrp.CFrame = targetPart.CFrame * CFrame.new(0, 0, -0.5)
-            task.wait(0.1)
+            task.wait(0.2)
             fireproximityprompt(prompt)
         end
 
@@ -1362,13 +1362,13 @@ CreateGiveButton(gList, GetText("DOG_FOOD"), function()
     end
 
     hrp.CFrame = targetPart.CFrame * CFrame.new(0, 0, -1)
-    task.wait(0.15)
+    task.wait(0.2)
     fireproximityprompt(prompt)
-    task.wait(0.1)
+    task.wait(0.2)
 
     if not LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") and not char:FindFirstChildWhichIsA("Tool") then
         hrp.CFrame = targetPart.CFrame * CFrame.new(0, 0, -0.5)
-        task.wait(0.1)
+        task.wait(0.2)
         fireproximityprompt(prompt)
     end
 
@@ -1424,13 +1424,13 @@ CreateGiveButton(gList, GetText("MEDKIT"), function()
     end
 
     hrp.CFrame = targetPart.CFrame * CFrame.new(0, 0, -1)
-    task.wait(0.15)
+    task.wait(0.2)
     fireproximityprompt(prompt)
-    task.wait(0.1)
+    task.wait(0.2)
 
     if not LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") and not char:FindFirstChildWhichIsA("Tool") then
         hrp.CFrame = targetPart.CFrame * CFrame.new(0, 0, -0.5)
-        task.wait(0.1)
+        task.wait(0.2)
         fireproximityprompt(prompt)
     end
 
@@ -1486,13 +1486,13 @@ CreateGiveButton(gList, GetText("VITAMINS"), function()
     end
 
     hrp.CFrame = targetPart.CFrame * CFrame.new(0, 0, -1)
-    task.wait(0.15)
+    task.wait(0.2)
     fireproximityprompt(prompt)
-    task.wait(0.1)
+    task.wait(0.2)
 
     if not LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") and not char:FindFirstChildWhichIsA("Tool") then
         hrp.CFrame = targetPart.CFrame * CFrame.new(0, 0, -0.5)
-        task.wait(0.1)
+        task.wait(0.2)
         fireproximityprompt(prompt)
     end
 
@@ -1516,7 +1516,7 @@ CreateGiveButton(gList, GetText("VITAMINS"), function()
             part.CanCollide = true
         end
     end
-    task.wait(0.1)
+    task.wait(0.2)
 
     hrp.CFrame = savedCFrame * CFrame.new(0, 3, 0)
 
@@ -1610,13 +1610,13 @@ CreateGiveButton(gList, GetText("FIRE_NEEDLE"), function()
     end
 
     hrp.CFrame = targetPart.CFrame * CFrame.new(0, 0, -1)
-    task.wait(0.15)
+    task.wait(0.2)
     fireproximityprompt(prompt)
-    task.wait(0.1)
+    task.wait(0.2)
 
     if not LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") and not char:FindFirstChildWhichIsA("Tool") then
         hrp.CFrame = targetPart.CFrame * CFrame.new(0, 0, -0.5)
-        task.wait(0.1)
+        task.wait(0.2)
         fireproximityprompt(prompt)
     end
 
@@ -1734,13 +1734,13 @@ CreateGiveButton(gList, GetText("GROW_NEEDLE"), function()
     end
 
     hrp.CFrame = targetPart.CFrame * CFrame.new(0, 0, -1)
-    task.wait(0.15)
+    task.wait(0.2)
     fireproximityprompt(prompt)
-    task.wait(0.1)
+    task.wait(0.2)
 
     if not LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") and not char:FindFirstChildWhichIsA("Tool") then
         hrp.CFrame = targetPart.CFrame * CFrame.new(0, 0, -0.5)
-        task.wait(0.1)
+        task.wait(0.2)
         fireproximityprompt(prompt)
     end
 
