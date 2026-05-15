@@ -47,10 +47,10 @@ local DefaultConfig = {
     Noclip         = false,
     Esp            = false,
     Language       = "English",
-    -- New saved values for movement panel
     MouvementSpeed = 25.5,
     FlyEnabled     = false,
     FlySpeed       = 3,
+    AutoGrab       = false,
 }
 
 local Config = DefaultConfig
@@ -116,6 +116,7 @@ local Translations = {
         GROW_NEEDLE = "Grow Needle",
         MOUVEMENT = "MOVEMENT",
         FLY = "FLY",
+        AUTO_GRAB = "Auto Grab",
     },
     French = {
         SETTINGS = "PARAMÈTRES",
@@ -152,6 +153,7 @@ local Translations = {
         GROW_NEEDLE = "Picure de grandissement",
         MOUVEMENT = "MOUVEMENT",
         FLY = "VOL",
+        AUTO_GRAB = "Prendre Automatiquement",
     },
 }
 
@@ -403,6 +405,115 @@ end
 
 if Config.Esp then
     task.spawn(function() setEsp(true) end)
+end
+
+local autoGrabEnabled = Config.AutoGrab or false
+local autoGrabConnection = nil
+local autoGrabTicker = 0
+local autoGrabLastGrab = {}
+
+-- ====== AUTO GRAB ======
+local BLOCKED_GRANDPARENTS = {
+    "TakeMP5Table",
+    "TakeShockGunTable",
+    "RadioMain",
+    "TakePKMTable",
+    "TakeKeyCardTable",
+    "AK47Model",
+    "GlockShelfInteractive",
+    "SwatShelfInteractive",
+    "M4A1ShelfInteractive",
+    "C4Prop",
+    "BreakOutProximityPrompt",
+    "LeashProximityPrompt",
+    "MuzzleProximityPrompt",
+    "CageDoorPrompt",
+
+}
+
+local function isBlocked(prompt)
+    local grandparent = prompt.Parent and prompt.Parent.Parent
+    if not grandparent then return false end
+    for _, name in ipairs(BLOCKED_GRANDPARENTS) do
+        if grandparent.Name == name then return true end
+    end
+    return false
+end
+
+local promptCache = {}
+
+local function updatePromptCache()
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if obj:IsA("ProximityPrompt") then
+            promptCache[obj] = true
+        end
+    end
+end
+
+workspace.DescendantAdded:Connect(function(obj)
+    if obj:IsA("ProximityPrompt") then
+        promptCache[obj] = true
+    end
+end)
+
+workspace.DescendantRemoving:Connect(function(obj)
+    if obj:IsA("ProximityPrompt") then
+        promptCache[obj] = nil
+    end
+end)
+
+local function setAutoGrab(enabled)
+    autoGrabEnabled = enabled
+    Config.AutoGrab = enabled
+    SaveConfig()
+    
+    if autoGrabConnection then
+        autoGrabConnection:Disconnect()
+        autoGrabConnection = nil
+    end
+    
+    if not enabled then return end
+    
+    updatePromptCache()
+    
+    autoGrabConnection = RunService.Heartbeat:Connect(function(dt)
+        if not autoGrabEnabled then return end
+        
+        autoGrabTicker = autoGrabTicker + dt
+        if autoGrabTicker < 0.1 then return end
+        autoGrabTicker = 0
+        
+        local char = LocalPlayer.Character
+        if not char then return end
+        local rootPart = char:FindFirstChild("HumanoidRootPart")
+        if not rootPart then return end
+        
+        local rootPos = rootPart.Position
+        local now = tick()
+        local GRAB_RANGE = 15
+        local COOLDOWN = 0.5
+        
+        for prompt in pairs(promptCache) do
+            if prompt and prompt.Enabled and not isBlocked(prompt) then
+                local part = prompt.Parent
+                if part and part:IsA("BasePart") then
+                    local dist = (part.Position - rootPos).Magnitude
+                    local range = math.min(prompt.MaxActivationDistance, GRAB_RANGE)
+                    
+                    if dist <= range and (not autoGrabLastGrab[prompt] or now - autoGrabLastGrab[prompt] > COOLDOWN) then
+                        autoGrabLastGrab[prompt] = now
+                        pcall(function()
+                            fireproximityprompt(prompt)
+                        end)
+                    end
+                end
+            end
+        end
+    end)
+end
+
+if Config.AutoGrab then
+    task.spawn(function() setAutoGrab(true) end)
 end
 
 -- ====== DRAGGABLE ======
@@ -702,6 +813,13 @@ local noclipToggle = CreateToggleSwitch(rowNoclip, Config.Noclip or false, funct
     set(ns)
     setNoclip(ns)
     ShowNotification("NOCLIP", ns and GetText("ENABLED") or GetText("DISABLED"))
+end)
+
+local rowAutoGrab = CreateRow("AUTO_GRAB", 34)
+local autoGrabToggle = CreateToggleSwitch(rowAutoGrab, Config.AutoGrab or false, function(ns, set)
+    set(ns)
+    setAutoGrab(ns)
+    ShowNotification("AUTO GRAB", ns and GetText("ENABLED") or GetText("DISABLED"))
 end)
 
 -- ====== SECTION VISUAL ======
@@ -1258,24 +1376,24 @@ local function CreateWeaponButton()
 
         if wasNoclip then
             setNoclip(false)
-            task.wait(0.05)
+            task.wait(0.1)
         end
 
         hrp.CFrame = targetPart.CFrame * CFrame.new(0, 0, -1)
-        task.wait(0.2)
+        task.wait(0.1)
         fireproximityprompt(prompt)
-        task.wait(0.2)
+        task.wait(0.1)
 
         if not LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") and not char:FindFirstChildWhichIsA("Tool") then
             hrp.CFrame = targetPart.CFrame * CFrame.new(0, 0, -0.5)
-            task.wait(0.2)
+            task.wait(0.1)
             fireproximityprompt(prompt)
         end
 
         local waited = 0
         repeat
-            task.wait(0.05)
-            waited = waited + 0.05
+            task.wait(0.1)
+            waited = waited + 0.1
         until LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool")
            or char:FindFirstChildWhichIsA("Tool")
            or waited >= 3
@@ -1283,7 +1401,7 @@ local function CreateWeaponButton()
         local hum = char:FindFirstChildWhichIsA("Humanoid")
         if hum then
             hum:ChangeState(Enum.HumanoidStateType.GettingUp)
-            task.wait(0.3)
+            task.wait(0.05)
             hum:ChangeState(Enum.HumanoidStateType.Running)
         end
 
@@ -1358,24 +1476,24 @@ CreateGiveButton(gList, GetText("DOG_FOOD"), function()
 
     if wasNoclip then
         setNoclip(false)
-        task.wait(0.05)
+        task.wait(0.1)
     end
 
     hrp.CFrame = targetPart.CFrame * CFrame.new(0, 0, -1)
-    task.wait(0.2)
+    task.wait(0.1)
     fireproximityprompt(prompt)
-    task.wait(0.2)
+    task.wait(0.1)
 
     if not LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") and not char:FindFirstChildWhichIsA("Tool") then
         hrp.CFrame = targetPart.CFrame * CFrame.new(0, 0, -0.5)
-        task.wait(0.2)
+        task.wait(0.1)
         fireproximityprompt(prompt)
     end
 
     local waited = 0
     repeat
-        task.wait(0.05)
-        waited = waited + 0.05
+        task.wait(0.1)
+        waited = waited + 0.1
     until LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool")
        or char:FindFirstChildWhichIsA("Tool")
        or waited >= 3
@@ -1383,7 +1501,7 @@ CreateGiveButton(gList, GetText("DOG_FOOD"), function()
     local hum = char:FindFirstChildWhichIsA("Humanoid")
     if hum then
         hum:ChangeState(Enum.HumanoidStateType.GettingUp)
-        task.wait(0.3)
+        task.wait(0.1)
         hum:ChangeState(Enum.HumanoidStateType.Running)
     end
 
@@ -1420,24 +1538,24 @@ CreateGiveButton(gList, GetText("MEDKIT"), function()
 
     if wasNoclip then
         setNoclip(false)
-        task.wait(0.05)
+        task.wait(0.1)
     end
 
     hrp.CFrame = targetPart.CFrame * CFrame.new(0, 0, -1)
-    task.wait(0.2)
+    task.wait(0.1)
     fireproximityprompt(prompt)
-    task.wait(0.2)
+    task.wait(0.1)
 
     if not LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") and not char:FindFirstChildWhichIsA("Tool") then
         hrp.CFrame = targetPart.CFrame * CFrame.new(0, 0, -0.5)
-        task.wait(0.2)
+        task.wait(0.1)
         fireproximityprompt(prompt)
     end
 
     local waited = 0
     repeat
-        task.wait(0.05)
-        waited = waited + 0.05
+        task.wait(0.1)
+        waited = waited + 0.1
     until LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool")
        or char:FindFirstChildWhichIsA("Tool")
        or waited >= 3
@@ -1445,7 +1563,7 @@ CreateGiveButton(gList, GetText("MEDKIT"), function()
     local hum = char:FindFirstChildWhichIsA("Humanoid")
     if hum then
         hum:ChangeState(Enum.HumanoidStateType.GettingUp)
-        task.wait(0.3)
+        task.wait(0.1)
         hum:ChangeState(Enum.HumanoidStateType.Running)
     end
 
@@ -1482,24 +1600,24 @@ CreateGiveButton(gList, GetText("VITAMINS"), function()
 
     if wasNoclip then
         setNoclip(false)
-        task.wait(0.05)
+        task.wait(0.1)
     end
 
     hrp.CFrame = targetPart.CFrame * CFrame.new(0, 0, -1)
-    task.wait(0.2)
+    task.wait(0.1)
     fireproximityprompt(prompt)
-    task.wait(0.2)
+    task.wait(0.1)
 
     if not LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") and not char:FindFirstChildWhichIsA("Tool") then
         hrp.CFrame = targetPart.CFrame * CFrame.new(0, 0, -0.5)
-        task.wait(0.2)
+        task.wait(0.1)
         fireproximityprompt(prompt)
     end
 
     local waited = 0
     repeat
-        task.wait(0.05)
-        waited = waited + 0.05
+        task.wait(0.1)
+        waited = waited + 0.1
     until LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool")
        or char:FindFirstChildWhichIsA("Tool")
        or waited >= 3
@@ -1507,7 +1625,7 @@ CreateGiveButton(gList, GetText("VITAMINS"), function()
     local hum = char:FindFirstChildWhichIsA("Humanoid")
     if hum then
         hum:ChangeState(Enum.HumanoidStateType.GettingUp)
-        task.wait(0.3)
+        task.wait(0.1)
         hum:ChangeState(Enum.HumanoidStateType.Running)
     end
 
@@ -1516,7 +1634,7 @@ CreateGiveButton(gList, GetText("VITAMINS"), function()
             part.CanCollide = true
         end
     end
-    task.wait(0.2)
+    task.wait(0.1)
 
     hrp.CFrame = savedCFrame * CFrame.new(0, 3, 0)
 
@@ -1544,11 +1662,11 @@ CreateGiveButton(gList, GetText("EYE_CHANGER_NEEDLE"), function()
 
     if wasNoclip then
         setNoclip(false)
-        task.wait(0.05)
+        task.wait(0.1)
     end
 
     hrp.CFrame = targetPart.CFrame * CFrame.new(0, 0, -1)
-    task.wait(0.15)
+    task.wait(0.1)
     fireproximityprompt(prompt)
     task.wait(0.1)
 
@@ -1560,8 +1678,8 @@ CreateGiveButton(gList, GetText("EYE_CHANGER_NEEDLE"), function()
 
     local waited = 0
     repeat
-        task.wait(0.05)
-        waited = waited + 0.05
+        task.wait(0.1)
+        waited = waited + 0.1
     until LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool")
        or char:FindFirstChildWhichIsA("Tool")
        or waited >= 3
@@ -1569,7 +1687,7 @@ CreateGiveButton(gList, GetText("EYE_CHANGER_NEEDLE"), function()
     local hum = char:FindFirstChildWhichIsA("Humanoid")
     if hum then
         hum:ChangeState(Enum.HumanoidStateType.GettingUp)
-        task.wait(0.3)
+        task.wait(0.1)
         hum:ChangeState(Enum.HumanoidStateType.Running)
     end
 
@@ -1606,24 +1724,24 @@ CreateGiveButton(gList, GetText("FIRE_NEEDLE"), function()
 
     if wasNoclip then
         setNoclip(false)
-        task.wait(0.05)
+        task.wait(0.1)
     end
 
     hrp.CFrame = targetPart.CFrame * CFrame.new(0, 0, -1)
-    task.wait(0.2)
+    task.wait(0.1)
     fireproximityprompt(prompt)
-    task.wait(0.2)
+    task.wait(0.1)
 
     if not LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") and not char:FindFirstChildWhichIsA("Tool") then
         hrp.CFrame = targetPart.CFrame * CFrame.new(0, 0, -0.5)
-        task.wait(0.2)
+        task.wait(0.1)
         fireproximityprompt(prompt)
     end
 
     local waited = 0
     repeat
-        task.wait(0.05)
-        waited = waited + 0.05
+        task.wait(0.1)
+        waited = waited + 0.1
     until LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool")
        or char:FindFirstChildWhichIsA("Tool")
        or waited >= 3
@@ -1631,7 +1749,7 @@ CreateGiveButton(gList, GetText("FIRE_NEEDLE"), function()
     local hum = char:FindFirstChildWhichIsA("Humanoid")
     if hum then
         hum:ChangeState(Enum.HumanoidStateType.GettingUp)
-        task.wait(0.3)
+        task.wait(0.1)
         hum:ChangeState(Enum.HumanoidStateType.Running)
     end
 
@@ -1672,13 +1790,13 @@ CreateGiveButton(gList, GetText("SHRINK_NEEDLE"), function()
     end
 
     hrp.CFrame = targetPart.CFrame * CFrame.new(0, 0, -1)
-    task.wait(0.15)
+    task.wait(0.05)
     fireproximityprompt(prompt)
-    task.wait(0.1)
+    task.wait(0.05)
 
     if not LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") and not char:FindFirstChildWhichIsA("Tool") then
         hrp.CFrame = targetPart.CFrame * CFrame.new(0, 0, -0.5)
-        task.wait(0.1)
+        task.wait(0.05)
         fireproximityprompt(prompt)
     end
 
@@ -1693,7 +1811,7 @@ CreateGiveButton(gList, GetText("SHRINK_NEEDLE"), function()
     local hum = char:FindFirstChildWhichIsA("Humanoid")
     if hum then
         hum:ChangeState(Enum.HumanoidStateType.GettingUp)
-        task.wait(0.3)
+        task.wait(0.05)
         hum:ChangeState(Enum.HumanoidStateType.Running)
     end
 
@@ -1730,24 +1848,24 @@ CreateGiveButton(gList, GetText("GROW_NEEDLE"), function()
 
     if wasNoclip then
         setNoclip(false)
-        task.wait(0.05)
+        task.wait(0.1)
     end
 
     hrp.CFrame = targetPart.CFrame * CFrame.new(0, 0, -1)
-    task.wait(0.2)
+    task.wait(0.1)
     fireproximityprompt(prompt)
-    task.wait(0.2)
+    task.wait(0.1)
 
     if not LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") and not char:FindFirstChildWhichIsA("Tool") then
         hrp.CFrame = targetPart.CFrame * CFrame.new(0, 0, -0.5)
-        task.wait(0.2)
+        task.wait(0.1)
         fireproximityprompt(prompt)
     end
 
     local waited = 0
     repeat
-        task.wait(0.05)
-        waited = waited + 0.05
+        task.wait(0.1)
+        waited = waited + 0.1
     until LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool")
        or char:FindFirstChildWhichIsA("Tool")
        or waited >= 3
@@ -1755,7 +1873,7 @@ CreateGiveButton(gList, GetText("GROW_NEEDLE"), function()
     local hum = char:FindFirstChildWhichIsA("Humanoid")
     if hum then
         hum:ChangeState(Enum.HumanoidStateType.GettingUp)
-        task.wait(0.3)
+        task.wait(0.1)
         hum:ChangeState(Enum.HumanoidStateType.Running)
     end
 
