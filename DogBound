@@ -1,3 +1,5 @@
+wait(3)
+
 if not game:IsLoaded() then game.Loaded:Wait() end
 
 local SharedState = {
@@ -414,26 +416,40 @@ local autoGrabLastGrab = {}
 local BLOCKED_GRANDPARENTS = {
     "TakeMP5Table",
     "TakeShockGunTable",
-    "RadioMain",
+    "Radio1",
+    "Radio2",
+    "Radio3",
+    "Radio4",
+    "Radio5",
+    "Radio6",
+    "BuyItemProps",
     "TakePKMTable",
-    "TakeKeyCardTable",
+    "KeyCardModel",
     "AK47Model",
     "GlockShelfInteractive",
     "SwatShelfInteractive",
     "M4A1ShelfInteractive",
     "C4Prop",
-    "BreakOutProximityPrompt",
-    "LeashProximityPrompt",
-    "MuzzleProximityPrompt",
     "CageDoorPrompt",
+}
 
+local BLOCKED_PROMPT_NAMES = {
+    "LeashProximityPrompt",
+    "BreakOutProximityPrompt",
+    "MuzzleProximityPrompt",
 }
 
 local function isBlocked(prompt)
+    -- Bloquer par nom du prompt
+    if BLOCKED_PROMPT_NAMES[prompt.Name] then
+        return true
+    end
+    -- Ancienne vérification par grand-parent
     local grandparent = prompt.Parent and prompt.Parent.Parent
-    if not grandparent then return false end
-    for _, name in ipairs(BLOCKED_GRANDPARENTS) do
-        if grandparent.Name == name then return true end
+    if grandparent then
+        for _, name in ipairs(BLOCKED_GRANDPARENTS) do
+            if grandparent.Name == name then return true end
+        end
     end
     return false
 end
