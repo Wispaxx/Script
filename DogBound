@@ -1,6 +1,8 @@
-wait(3)
+repeat task.wait() until game.Players.LocalPlayer
 
-if not game:IsLoaded() then game.Loaded:Wait() end
+local player = game.Players.LocalPlayer
+
+repeat task.wait() until player.Team and player.Team.Name ~= "Neutral"
 
 local SharedState = {
     MobileScaleObjects = {},
@@ -117,6 +119,18 @@ local Translations = {
         MOUVEMENT = "MOVEMENT",
         FLY = "FLY",
         AUTO_GRAB = "Auto Grab",
+        -- Warning AutoGrab popup
+        WARN_AG_TITLE  = "Warning",
+        WARN_AG_L1     = "If you enable this function you will grab every item near to you even if you don't want.",
+        WARN_AG_L2     = "This function contain vulnerabilities on small executors (e.g. Xeno/Solara).",
+        WARN_AG_L3     = "Can lag when enabled on small devices.",
+        WARN_AG_OK     = "Ok, got it",
+        WARN_AG_RETURN = "Return",
+        -- Need AutoGrab popup (Give panel)
+        NEED_AG_TITLE  = "Enable Auto-Grab to use this function",
+        NEED_AG_TEXT   = "You need to enable the Auto Grab function for the give panel to work.",
+        NEED_AG_OK     = "Ok, enable it.",
+        NEED_AG_RETURN = "Return",
     },
     French = {
         SETTINGS = "PARAMÈTRES",
@@ -154,6 +168,18 @@ local Translations = {
         MOUVEMENT = "MOUVEMENT",
         FLY = "VOL",
         AUTO_GRAB = "Prendre Automatiquement",
+        -- Warning AutoGrab popup
+        WARN_AG_TITLE  = "Attention",
+        WARN_AG_L1     = "Si vous activer cette fonction vous allez prendre tout les objets a proximité même si vous ne le voulez pas.",
+        WARN_AG_L2     = "Cette fonction contient des vulnérabilité sur des petits exécuteurs (exemple : Xeno/Solara).",
+        WARN_AG_L3     = "Peut lagger lors de l'activation sur des machines avec peu de performances.",
+        WARN_AG_OK     = "Ok, j'ai compris",
+        WARN_AG_RETURN = "Retour",
+        -- Need AutoGrab popup (Give panel)
+        NEED_AG_TITLE  = "Active l'Auto-Grab pour utiliser cette fonction",
+        NEED_AG_TEXT   = "Vous avez besoin d'activer l'auto grab pour que le give panel fonctionne.",
+        NEED_AG_OK     = "Ok, je l'active.",
+        NEED_AG_RETURN = "Retour",
     },
 }
 
@@ -434,9 +460,9 @@ local BLOCKED_GRANDPARENTS = {
 }
 
 local BLOCKED_PROMPT_NAMES = {
-    "LeashProximityPrompt",
-    "BreakOutProximityPrompt",
-    "MuzzleProximityPrompt",
+    LeashProximityPrompt = true,
+    BreakOutProximityPrompt = true,
+    MuzzleProximityPrompt = true,
 }
 
 local function isBlocked(prompt)
@@ -1025,11 +1051,269 @@ local noclipToggle = CreateToggleSwitch(rowNoclip, Config.Noclip or false, funct
     ShowNotification("NOCLIP", ns and GetText("ENABLED") or GetText("DISABLED"))
 end)
 
+-- Déclaration anticipée pour que ShowNeedAutoGrabWarning puisse y accéder
+local autoGrabToggle = nil
+
+-- ====== SHARED POPUP BUILDER ======
+-- Construit une popup warning réutilisable (même style pour les 2 popups)
+local function BuildWarningPopup(guiName, titleKey, phrases, btnOkKey, btnReturnKey, onConfirm, onReturn)
+    local existingGui = PlayerGui:FindFirstChild(guiName)
+    if existingGui then existingGui:Destroy() end
+
+    local warnGui = Instance.new("ScreenGui")
+    warnGui.Name = guiName
+    warnGui.ResetOnSpawn = false
+    warnGui.DisplayOrder = 999
+    warnGui.IgnoreGuiInset = true
+    warnGui.Parent = PlayerGui
+
+    -- Overlay plein écran
+    local overlay = Instance.new("Frame", warnGui)
+    overlay.Size = UDim2.new(1, 0, 1, 0)
+    overlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    overlay.BackgroundTransparency = 0.45
+    overlay.BorderSizePixel = 0
+
+    -- Popup centrale (AutomaticSize Y)
+    local popup = Instance.new("Frame", overlay)
+    popup.Size = UDim2.new(0, 360, 0, 0)
+    popup.AutomaticSize = Enum.AutomaticSize.Y
+    popup.AnchorPoint = Vector2.new(0.5, 0.5)
+    popup.Position = UDim2.new(0.5, 0, 0.5, 0)
+    popup.BackgroundColor3 = Color3.fromRGB(22, 22, 30)
+    popup.BorderSizePixel = 0
+    Instance.new("UICorner", popup).CornerRadius = UDim.new(0, 12)
+
+    local popupStroke = Instance.new("UIStroke", popup)
+    popupStroke.Color = Color3.fromRGB(55, 55, 68)
+    popupStroke.Thickness = 1.5
+    popupStroke.Transparency = 0.1
+
+    -- Padding intérieur global
+    local outerPad = Instance.new("UIPadding", popup)
+    outerPad.PaddingLeft   = UDim.new(0, 16)
+    outerPad.PaddingRight  = UDim.new(0, 16)
+    outerPad.PaddingTop    = UDim.new(0, 16)
+    outerPad.PaddingBottom = UDim.new(0, 16)
+
+    -- Layout vertical principal
+    local mainLayout = Instance.new("UIListLayout", popup)
+    mainLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    mainLayout.FillDirection = Enum.FillDirection.Vertical
+    mainLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+    mainLayout.Padding = UDim.new(0, 0)
+
+    -- === HEADER : barre accent jaune + titre ===
+    local headerFrame = Instance.new("Frame", popup)
+    headerFrame.LayoutOrder = 1
+    headerFrame.Size = UDim2.new(1, 0, 0, 32)
+    headerFrame.BackgroundTransparency = 1
+
+    local accentBar = Instance.new("Frame", headerFrame)
+    accentBar.Size = UDim2.new(0, 3, 0, 22)
+    accentBar.Position = UDim2.new(0, 0, 0.5, -11)
+    accentBar.BackgroundColor3 = Color3.fromRGB(255, 210, 0)
+    accentBar.BorderSizePixel = 0
+    Instance.new("UICorner", accentBar).CornerRadius = UDim.new(1, 0)
+
+    local titleLbl = Instance.new("TextLabel", headerFrame)
+    titleLbl.Size = UDim2.new(1, -10, 1, 0)
+    titleLbl.Position = UDim2.new(0, 10, 0, 0)
+    titleLbl.BackgroundTransparency = 1
+    titleLbl.Text = GetText(titleKey)
+    titleLbl.Font = Enum.Font.GothamBlack
+    titleLbl.TextSize = 15
+    titleLbl.TextColor3 = Color3.fromRGB(255, 210, 0)
+    titleLbl.TextXAlignment = Enum.TextXAlignment.Left
+    titleLbl.TextWrapped = true
+
+    -- === SEPARATEUR ===
+    local sepFrame = Instance.new("Frame", popup)
+    sepFrame.LayoutOrder = 2
+    sepFrame.Size = UDim2.new(1, 0, 0, 10)
+    sepFrame.BackgroundTransparency = 1
+
+    local sep = Instance.new("Frame", sepFrame)
+    sep.Size = UDim2.new(1, 0, 0, 1)
+    sep.Position = UDim2.new(0, 0, 0.5, 0)
+    sep.BackgroundColor3 = Color3.fromRGB(55, 55, 68)
+    sep.BorderSizePixel = 0
+
+    -- === CONTENU TEXTE (chaque phrase wrap sur sa propre hauteur auto) ===
+    local contentFrame = Instance.new("Frame", popup)
+    contentFrame.LayoutOrder = 3
+    contentFrame.Size = UDim2.new(1, 0, 0, 0)
+    contentFrame.AutomaticSize = Enum.AutomaticSize.Y
+    contentFrame.BackgroundTransparency = 1
+
+    local contentLayout = Instance.new("UIListLayout", contentFrame)
+    contentLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    contentLayout.FillDirection = Enum.FillDirection.Vertical
+    contentLayout.Padding = UDim.new(0, 8)
+
+    for i, phraseKey in ipairs(phrases) do
+        local lbl = Instance.new("TextLabel", contentFrame)
+        lbl.LayoutOrder = i
+        lbl.Size = UDim2.new(1, 0, 0, 0)
+        lbl.AutomaticSize = Enum.AutomaticSize.Y
+        lbl.BackgroundTransparency = 1
+        -- phraseKey peut être une clé de traduction OU du texte direct
+        lbl.Text = (type(phraseKey) == "string" and GetText(phraseKey) ~= phraseKey)
+            and GetText(phraseKey) or phraseKey
+        lbl.Font = Enum.Font.GothamMedium
+        lbl.TextSize = 12
+        lbl.TextColor3 = Color3.fromRGB(175, 175, 185)
+        lbl.TextXAlignment = Enum.TextXAlignment.Left
+        lbl.TextWrapped = true
+    end
+
+    -- === ESPACE avant boutons ===
+    local spacer = Instance.new("Frame", popup)
+    spacer.LayoutOrder = 4
+    spacer.Size = UDim2.new(1, 0, 0, 12)
+    spacer.BackgroundTransparency = 1
+
+    -- === RANGÉE BOUTONS (alignée à droite) ===
+    local btnRow = Instance.new("Frame", popup)
+    btnRow.LayoutOrder = 5
+    btnRow.Size = UDim2.new(1, 0, 0, 34)
+    btnRow.BackgroundTransparency = 1
+
+    local btnLayout = Instance.new("UIListLayout", btnRow)
+    btnLayout.FillDirection = Enum.FillDirection.Horizontal
+    btnLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+    btnLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+    btnLayout.Padding = UDim.new(0, 8)
+    btnLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+    -- Bouton Return (à gauche des deux)
+    local returnBtn = Instance.new("TextButton", btnRow)
+    returnBtn.LayoutOrder = 1
+    returnBtn.Size = UDim2.new(0, 110, 0, 34)
+    returnBtn.BackgroundColor3 = Color3.fromRGB(38, 38, 50)
+    returnBtn.Text = GetText(btnReturnKey)
+    returnBtn.Font = Enum.Font.GothamBold
+    returnBtn.TextSize = 13
+    returnBtn.TextColor3 = Color3.fromRGB(210, 210, 220)
+    returnBtn.AutoButtonColor = false
+    Instance.new("UICorner", returnBtn).CornerRadius = UDim.new(0, 8)
+    local returnStroke = Instance.new("UIStroke", returnBtn)
+    returnStroke.Color = Color3.fromRGB(70, 70, 85)
+    returnStroke.Thickness = 1
+
+    -- Bouton Ok (à droite)
+    local okBtn = Instance.new("TextButton", btnRow)
+    okBtn.LayoutOrder = 2
+    okBtn.Size = UDim2.new(0, 130, 0, 34)
+    okBtn.BackgroundColor3 = Color3.fromRGB(38, 38, 50)
+    okBtn.Text = GetText(btnOkKey)
+    okBtn.Font = Enum.Font.GothamBold
+    okBtn.TextSize = 13
+    okBtn.TextColor3 = Color3.fromRGB(210, 210, 220)
+    okBtn.AutoButtonColor = false
+    Instance.new("UICorner", okBtn).CornerRadius = UDim.new(0, 8)
+    local okStroke = Instance.new("UIStroke", okBtn)
+    okStroke.Color = Color3.fromRGB(70, 70, 85)
+    okStroke.Thickness = 1
+
+    -- Hover Return → rouge transparent
+    returnBtn.MouseEnter:Connect(function()
+        TweenService:Create(returnBtn, TweenInfo.new(0.12), {BackgroundColor3 = Color3.fromRGB(110, 18, 18)}):Play()
+        TweenService:Create(returnStroke, TweenInfo.new(0.12), {Color = Color3.fromRGB(160, 30, 30)}):Play()
+    end)
+    returnBtn.MouseLeave:Connect(function()
+        TweenService:Create(returnBtn, TweenInfo.new(0.12), {BackgroundColor3 = Color3.fromRGB(38, 38, 50)}):Play()
+        TweenService:Create(returnStroke, TweenInfo.new(0.12), {Color = Color3.fromRGB(70, 70, 85)}):Play()
+    end)
+    -- Hover Ok → léger highlight
+    okBtn.MouseEnter:Connect(function()
+        TweenService:Create(okBtn, TweenInfo.new(0.12), {BackgroundColor3 = Color3.fromRGB(52, 52, 68)}):Play()
+    end)
+    okBtn.MouseLeave:Connect(function()
+        TweenService:Create(okBtn, TweenInfo.new(0.12), {BackgroundColor3 = Color3.fromRGB(38, 38, 50)}):Play()
+    end)
+
+    -- Animation d'entrée
+    popup.BackgroundTransparency = 1
+    local startPos = UDim2.new(0.5, 0, 0.52, 0)
+    local endPos   = UDim2.new(0.5, 0, 0.5,  0)
+    popup.Position = startPos
+    TweenService:Create(popup, TweenInfo.new(0.18, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        BackgroundTransparency = 0,
+        Position = endPos,
+    }):Play()
+
+    local function closePopup(confirmed)
+        local tw = TweenService:Create(popup, TweenInfo.new(0.14, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+            BackgroundTransparency = 1,
+            Position = startPos,
+        })
+        tw:Play()
+        tw.Completed:Connect(function()
+            if warnGui.Parent then warnGui:Destroy() end
+        end)
+        if confirmed then onConfirm() else onReturn() end
+    end
+
+    okBtn.MouseButton1Click:Connect(function() closePopup(true) end)
+    returnBtn.MouseButton1Click:Connect(function() closePopup(false) end)
+end
+
+-- ====== AUTO GRAB WARNING POPUP ======
+local function ShowAutoGrabWarning(onConfirm, onReturn)
+    BuildWarningPopup(
+        "AutoGrabWarning",
+        "WARN_AG_TITLE",
+        {"WARN_AG_L1", "WARN_AG_L2", "WARN_AG_L3"},
+        "WARN_AG_OK",
+        "WARN_AG_RETURN",
+        onConfirm,
+        onReturn
+    )
+end
+
+-- ====== NEED AUTOGRAB POPUP (Give Panel) ======
+local function ShowNeedAutoGrabWarning(onAutoGrabEnabled)
+    BuildWarningPopup(
+        "NeedAutoGrabWarning",
+        "NEED_AG_TITLE",
+        {"NEED_AG_TEXT"},
+        "NEED_AG_OK",
+        "NEED_AG_RETURN",
+        function() -- Ok, enable it → ouvre la popup AutoGrab warning
+            ShowAutoGrabWarning(
+                function() -- Ok, got it → active l'AutoGrab
+                    setAutoGrab(true)
+                    ShowNotification("AUTO GRAB", GetText("ENABLED"))
+                    -- Met aussi à jour le toggle visuel dans les settings
+                    if autoGrabToggle then autoGrabToggle.Set(true) end
+                    if onAutoGrabEnabled then onAutoGrabEnabled() end
+                end,
+                function() end -- Return sur la 2ème popup → on ne fait rien
+            )
+        end,
+        function() end -- Return sur la 1ère popup → on ferme simplement
+    )
+end
+
 local rowAutoGrab = CreateRow("AUTO_GRAB", 34)
-local autoGrabToggle = CreateToggleSwitch(rowAutoGrab, Config.AutoGrab or false, function(ns, set)
-    set(ns)
-    setAutoGrab(ns)
-    ShowNotification("AUTO GRAB", ns and GetText("ENABLED") or GetText("DISABLED"))
+autoGrabToggle = CreateToggleSwitch(rowAutoGrab, Config.AutoGrab or false, function(ns, set)
+    if ns then
+        ShowAutoGrabWarning(
+            function() -- Ok, got it → active
+                set(true)
+                setAutoGrab(true)
+                ShowNotification("AUTO GRAB", GetText("ENABLED"))
+            end,
+            function() -- Return → switch reste OFF
+                set(false)
+            end
+        )
+    else
+        set(false)
+        setAutoGrab(false)
+        ShowNotification("AUTO GRAB", GetText("DISABLED"))
+    end
 end)
 
 -- ====== SECTION VISUAL ======
@@ -1539,6 +1823,11 @@ local function CreateGiveButton(parent, label, giveAction)
     end)
 
     gvBtn.MouseButton1Click:Connect(function()
+        -- Si l'AutoGrab est désactivé, montrer la popup "Enable AutoGrab"
+        if not autoGrabEnabled then
+            ShowNeedAutoGrabWarning(nil)
+            return
+        end
         local ok, err = pcall(giveAction)
         if ok then
             ShowNotification("GIVE PANEL", label .. " obtained !")
