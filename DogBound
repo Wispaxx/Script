@@ -41,6 +41,7 @@ local DefaultConfig = {
         Teleport  = {X = 0.3,      Y = 0.4},
         Give      = {X = 0.55,     Y = 0.4},
         Mouvement = {X = 0.1,      Y = 0.2},
+        Quick     = {X = 0.5,      Y = 0.1},
     },
     MenuKey        = "LeftControl",
     MobileGuiScale = 0.5,
@@ -53,6 +54,7 @@ local DefaultConfig = {
     FlyEnabled     = false,
     FlySpeed       = 3,
     AutoGrab       = false,
+    AimbotTargetMode = "Nearest",
 }
 
 local Config = DefaultConfig
@@ -88,8 +90,7 @@ local Translations = {
         PLAYER = "PLAYER",
         INFINITE_JUMP = "Infinite Jump",
         NOCLIP = "Noclip",
-        ESP = "Esp",
-        ENABLED = "ENABLED",
+        AIMBOT = "Aimbot",
         DISABLED = "DISABLED",
         LANGUAGE = "Language",
         TELEPORT_PANEL = "TELEPORT PANEL",
@@ -119,26 +120,19 @@ local Translations = {
         MOUVEMENT = "MOVEMENT",
         FLY = "FLY",
         AUTO_GRAB = "Auto Grab",
-        -- Warning AutoGrab popup
-        WARN_AG_TITLE  = "Warning",
-        WARN_AG_L1     = "If you enable this function you will grab every item near to you even if you don't want.",
-        WARN_AG_L2     = "This function contain vulnerabilities on small executors (e.g. Xeno/Solara).",
-        WARN_AG_L3     = "Can lag when enabled on small devices.",
-        WARN_AG_OK     = "Ok, got it",
-        WARN_AG_RETURN = "Return",
-        -- Need AutoGrab popup (Give panel)
-        NEED_AG_TITLE  = "Enable Auto-Grab to use this function",
-        NEED_AG_TEXT   = "You need to enable the Auto Grab function for the give panel to work.",
-        NEED_AG_OK     = "Ok, enable it.",
-        NEED_AG_RETURN = "Return",
+        AUTO_MUZZLE_ALL = "Auto Muzzle All Dogs",
+        QUICK_PANEL = "QUICK PANEL",
+        AIMBOT_TARGET_MODE = "Target mode",
+        NEAREST = "Nearest",
+        LOWEST = "Lowest",
+        EXPERIMENTAL = "Experimental",
     },
     French = {
         SETTINGS = "PARAMÈTRES",
         PLAYER = "JOUEUR",
         INFINITE_JUMP = "Saut Infini",
         NOCLIP = "Noclip",
-        ESP = "Esp",
-        ENABLED = "ACTIVER",
+        AIMBOT = "Aimbot",
         DISABLED = "DÉSACTIVER",
         LANGUAGE = "Langue",
         VISUAL = "Visuel",
@@ -168,18 +162,12 @@ local Translations = {
         MOUVEMENT = "MOUVEMENT",
         FLY = "VOL",
         AUTO_GRAB = "Prendre Automatiquement",
-        -- Warning AutoGrab popup
-        WARN_AG_TITLE  = "Attention",
-        WARN_AG_L1     = "Si vous activer cette fonction vous allez prendre tout les objets a proximité même si vous ne le voulez pas.",
-        WARN_AG_L2     = "Cette fonction contient des vulnérabilité sur des petits exécuteurs (exemple : Xeno/Solara).",
-        WARN_AG_L3     = "Peut lagger lors de l'activation sur des machines avec peu de performances.",
-        WARN_AG_OK     = "Ok, j'ai compris",
-        WARN_AG_RETURN = "Retour",
-        -- Need AutoGrab popup (Give panel)
-        NEED_AG_TITLE  = "Active l'Auto-Grab pour utiliser cette fonction",
-        NEED_AG_TEXT   = "Vous avez besoin d'activer l'auto grab pour que le give panel fonctionne.",
-        NEED_AG_OK     = "Ok, je l'active.",
-        NEED_AG_RETURN = "Retour",
+        AUTO_MUZZLE_ALL = "Auto museler tous les chiens",
+        QUICK_PANEL = "Paneau Rapide",
+        AIMBOT_TARGET_MODE = "Mode ciblage",
+        NEAREST = "Le plus proche",
+        LOWEST = "Le moins de PV",
+        EXPERIMENTAL = "Expérimental",
     },
 }
 
@@ -554,6 +542,82 @@ end
 
 if Config.AutoGrab then
     task.spawn(function() setAutoGrab(true) end)
+end
+
+-- ====== AIMBOT (silent aim avec modes Nearest/Lowest) ======
+local aimbotEnabled = Config.Aimbot or false
+local aimbotTargetMode = Config.AimbotTargetMode or "Nearest"
+
+-- Fonction qui retourne la cible selon le mode
+local function getTargetGuard()
+    local char = LocalPlayer.Character
+    if not char then return nil end
+    local localHRP = char:FindFirstChild("HumanoidRootPart")
+    if not localHRP then return nil end
+
+    local bestTarget = nil
+    local bestValue = math.huge   -- Pour les deux modes, on cherche le minimum
+
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer and plr.Team and plr.Team.Name == "Guards" then
+            local pChar = plr.Character
+            local pHRP = pChar and pChar:FindFirstChild("HumanoidRootPart")
+            local pHum = pChar and pChar:FindFirstChildOfClass("Humanoid")
+            if pHRP and pHum and pHum.Health > 0 then
+                local dist = (pHRP.Position - localHRP.Position).Magnitude
+                -- Vérifier la visibilité (sans obstacle)
+                local direction = (pHRP.Position - localHRP.Position).Unit
+                local params = RaycastParams.new()
+                params.FilterType = Enum.RaycastFilterType.Blacklist
+                params.FilterDescendantsInstances = {char}
+                local hit = workspace:Raycast(localHRP.Position, direction * dist, params)
+                if not hit or hit.Instance:IsDescendantOf(pChar) then
+                    if aimbotTargetMode == "Nearest" then
+                        if dist < bestValue then
+                            bestValue = dist
+                            bestTarget = pHRP
+                        end
+                    else -- Mode Lowest (le moins de PV)
+                        local hp = pHum.Health
+                        if hp < bestValue then
+                            bestValue = hp
+                            bestTarget = pHRP
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return bestTarget
+end
+
+-- Hook sur la souris (silent aim)
+local mouse = LocalPlayer:GetMouse()
+local oldIndex = nil
+
+oldIndex = hookmetamethod(game, "__index", function(self, key)
+    if self == mouse and not checkcaller() and aimbotEnabled then
+        local target = getTargetGuard()
+        if target then
+            if key == "Hit" then
+                return CFrame.new(target.Position)
+            elseif key == "Target" then
+                return target
+            end
+        end
+    end
+    return oldIndex(self, key)
+end)
+
+-- Activation / désactivation
+local function setSilentAim(enabled)
+    aimbotEnabled = enabled
+    Config.Aimbot = enabled
+    SaveConfig()
+end
+
+if Config.Aimbot then
+    setSilentAim(true)
 end
 
 -- ====== DRAGGABLE ======
@@ -1051,270 +1115,159 @@ local noclipToggle = CreateToggleSwitch(rowNoclip, Config.Noclip or false, funct
     ShowNotification("NOCLIP", ns and GetText("ENABLED") or GetText("DISABLED"))
 end)
 
--- Déclaration anticipée pour que ShowNeedAutoGrabWarning puisse y accéder
-local autoGrabToggle = nil
+-- ====== AUTO MUZZLE ALL ======
+local autoMuzzleRunning = false
 
--- ====== SHARED POPUP BUILDER ======
--- Construit une popup warning réutilisable (même style pour les 2 popups)
-local function BuildWarningPopup(guiName, titleKey, phrases, btnOkKey, btnReturnKey, onConfirm, onReturn)
-    local existingGui = PlayerGui:FindFirstChild(guiName)
-    if existingGui then existingGui:Destroy() end
+local function setAutoMuzzleAll(set)
+    if autoMuzzleRunning then return end
+    autoMuzzleRunning = true
 
-    local warnGui = Instance.new("ScreenGui")
-    warnGui.Name = guiName
-    warnGui.ResetOnSpawn = false
-    warnGui.DisplayOrder = 999
-    warnGui.IgnoreGuiInset = true
-    warnGui.Parent = PlayerGui
+    task.spawn(function()
+        local char = LocalPlayer.Character
+        local hrp  = char and char:FindFirstChild("HumanoidRootPart")
+        local hum  = char and char:FindFirstChildOfClass("Humanoid")
 
-    -- Overlay plein écran
-    local overlay = Instance.new("Frame", warnGui)
-    overlay.Size = UDim2.new(1, 0, 1, 0)
-    overlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    overlay.BackgroundTransparency = 0.45
-    overlay.BorderSizePixel = 0
+        if not char or not hrp or not hum then
+            ShowNotification("AUTO MUZZLE ALL", "Character not found.")
+            set(false); autoMuzzleRunning = false; return
+        end
 
-    -- Popup centrale (AutomaticSize Y)
-    local popup = Instance.new("Frame", overlay)
-    popup.Size = UDim2.new(0, 360, 0, 0)
-    popup.AutomaticSize = Enum.AutomaticSize.Y
-    popup.AnchorPoint = Vector2.new(0.5, 0.5)
-    popup.Position = UDim2.new(0.5, 0, 0.5, 0)
-    popup.BackgroundColor3 = Color3.fromRGB(22, 22, 30)
-    popup.BorderSizePixel = 0
-    Instance.new("UICorner", popup).CornerRadius = UDim.new(0, 12)
+        -- ─── 1. Trouver l'outil Muzzle (backpack ou déjà équipé) ───
+        local muzzleTool = char:FindFirstChild("Muzzle")
+        if not muzzleTool or not muzzleTool:IsA("Tool") then
+            local bp = LocalPlayer:FindFirstChild("Backpack")
+            if bp then muzzleTool = bp:FindFirstChild("Muzzle") end
+        end
 
-    local popupStroke = Instance.new("UIStroke", popup)
-    popupStroke.Color = Color3.fromRGB(55, 55, 68)
-    popupStroke.Thickness = 1.5
-    popupStroke.Transparency = 0.1
+        if not muzzleTool or not muzzleTool:IsA("Tool") then
+            ShowNotification("AUTO MUZZLE ALL", "Muzzle not found in inventory!")
+            set(false); autoMuzzleRunning = false; return
+        end
 
-    -- Padding intérieur global
-    local outerPad = Instance.new("UIPadding", popup)
-    outerPad.PaddingLeft   = UDim.new(0, 16)
-    outerPad.PaddingRight  = UDim.new(0, 16)
-    outerPad.PaddingTop    = UDim.new(0, 16)
-    outerPad.PaddingBottom = UDim.new(0, 16)
+        -- ─── 2. Équiper si pas déjà en main ───
+        if muzzleTool.Parent ~= char then
+            hum:EquipTool(muzzleTool)
+            task.wait(0.35)
+        end
 
-    -- Layout vertical principal
-    local mainLayout = Instance.new("UIListLayout", popup)
-    mainLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    mainLayout.FillDirection = Enum.FillDirection.Vertical
-    mainLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
-    mainLayout.Padding = UDim.new(0, 0)
-
-    -- === HEADER : barre accent jaune + titre ===
-    local headerFrame = Instance.new("Frame", popup)
-    headerFrame.LayoutOrder = 1
-    headerFrame.Size = UDim2.new(1, 0, 0, 32)
-    headerFrame.BackgroundTransparency = 1
-
-    local accentBar = Instance.new("Frame", headerFrame)
-    accentBar.Size = UDim2.new(0, 3, 0, 22)
-    accentBar.Position = UDim2.new(0, 0, 0.5, -11)
-    accentBar.BackgroundColor3 = Color3.fromRGB(255, 210, 0)
-    accentBar.BorderSizePixel = 0
-    Instance.new("UICorner", accentBar).CornerRadius = UDim.new(1, 0)
-
-    local titleLbl = Instance.new("TextLabel", headerFrame)
-    titleLbl.Size = UDim2.new(1, -10, 1, 0)
-    titleLbl.Position = UDim2.new(0, 10, 0, 0)
-    titleLbl.BackgroundTransparency = 1
-    titleLbl.Text = GetText(titleKey)
-    titleLbl.Font = Enum.Font.GothamBlack
-    titleLbl.TextSize = 15
-    titleLbl.TextColor3 = Color3.fromRGB(255, 210, 0)
-    titleLbl.TextXAlignment = Enum.TextXAlignment.Left
-    titleLbl.TextWrapped = true
-
-    -- === SEPARATEUR ===
-    local sepFrame = Instance.new("Frame", popup)
-    sepFrame.LayoutOrder = 2
-    sepFrame.Size = UDim2.new(1, 0, 0, 10)
-    sepFrame.BackgroundTransparency = 1
-
-    local sep = Instance.new("Frame", sepFrame)
-    sep.Size = UDim2.new(1, 0, 0, 1)
-    sep.Position = UDim2.new(0, 0, 0.5, 0)
-    sep.BackgroundColor3 = Color3.fromRGB(55, 55, 68)
-    sep.BorderSizePixel = 0
-
-    -- === CONTENU TEXTE (chaque phrase wrap sur sa propre hauteur auto) ===
-    local contentFrame = Instance.new("Frame", popup)
-    contentFrame.LayoutOrder = 3
-    contentFrame.Size = UDim2.new(1, 0, 0, 0)
-    contentFrame.AutomaticSize = Enum.AutomaticSize.Y
-    contentFrame.BackgroundTransparency = 1
-
-    local contentLayout = Instance.new("UIListLayout", contentFrame)
-    contentLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    contentLayout.FillDirection = Enum.FillDirection.Vertical
-    contentLayout.Padding = UDim.new(0, 8)
-
-    for i, phraseKey in ipairs(phrases) do
-        local lbl = Instance.new("TextLabel", contentFrame)
-        lbl.LayoutOrder = i
-        lbl.Size = UDim2.new(1, 0, 0, 0)
-        lbl.AutomaticSize = Enum.AutomaticSize.Y
-        lbl.BackgroundTransparency = 1
-        -- phraseKey peut être une clé de traduction OU du texte direct
-        lbl.Text = (type(phraseKey) == "string" and GetText(phraseKey) ~= phraseKey)
-            and GetText(phraseKey) or phraseKey
-        lbl.Font = Enum.Font.GothamMedium
-        lbl.TextSize = 12
-        lbl.TextColor3 = Color3.fromRGB(175, 175, 185)
-        lbl.TextXAlignment = Enum.TextXAlignment.Left
-        lbl.TextWrapped = true
-    end
-
-    -- === ESPACE avant boutons ===
-    local spacer = Instance.new("Frame", popup)
-    spacer.LayoutOrder = 4
-    spacer.Size = UDim2.new(1, 0, 0, 12)
-    spacer.BackgroundTransparency = 1
-
-    -- === RANGÉE BOUTONS (alignée à droite) ===
-    local btnRow = Instance.new("Frame", popup)
-    btnRow.LayoutOrder = 5
-    btnRow.Size = UDim2.new(1, 0, 0, 34)
-    btnRow.BackgroundTransparency = 1
-
-    local btnLayout = Instance.new("UIListLayout", btnRow)
-    btnLayout.FillDirection = Enum.FillDirection.Horizontal
-    btnLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
-    btnLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-    btnLayout.Padding = UDim.new(0, 8)
-    btnLayout.SortOrder = Enum.SortOrder.LayoutOrder
-
-    -- Bouton Return (à gauche des deux)
-    local returnBtn = Instance.new("TextButton", btnRow)
-    returnBtn.LayoutOrder = 1
-    returnBtn.Size = UDim2.new(0, 110, 0, 34)
-    returnBtn.BackgroundColor3 = Color3.fromRGB(38, 38, 50)
-    returnBtn.Text = GetText(btnReturnKey)
-    returnBtn.Font = Enum.Font.GothamBold
-    returnBtn.TextSize = 13
-    returnBtn.TextColor3 = Color3.fromRGB(210, 210, 220)
-    returnBtn.AutoButtonColor = false
-    Instance.new("UICorner", returnBtn).CornerRadius = UDim.new(0, 8)
-    local returnStroke = Instance.new("UIStroke", returnBtn)
-    returnStroke.Color = Color3.fromRGB(70, 70, 85)
-    returnStroke.Thickness = 1
-
-    -- Bouton Ok (à droite)
-    local okBtn = Instance.new("TextButton", btnRow)
-    okBtn.LayoutOrder = 2
-    okBtn.Size = UDim2.new(0, 130, 0, 34)
-    okBtn.BackgroundColor3 = Color3.fromRGB(38, 38, 50)
-    okBtn.Text = GetText(btnOkKey)
-    okBtn.Font = Enum.Font.GothamBold
-    okBtn.TextSize = 13
-    okBtn.TextColor3 = Color3.fromRGB(210, 210, 220)
-    okBtn.AutoButtonColor = false
-    Instance.new("UICorner", okBtn).CornerRadius = UDim.new(0, 8)
-    local okStroke = Instance.new("UIStroke", okBtn)
-    okStroke.Color = Color3.fromRGB(70, 70, 85)
-    okStroke.Thickness = 1
-
-    -- Hover Return → rouge transparent
-    returnBtn.MouseEnter:Connect(function()
-        TweenService:Create(returnBtn, TweenInfo.new(0.12), {BackgroundColor3 = Color3.fromRGB(110, 18, 18)}):Play()
-        TweenService:Create(returnStroke, TweenInfo.new(0.12), {Color = Color3.fromRGB(160, 30, 30)}):Play()
-    end)
-    returnBtn.MouseLeave:Connect(function()
-        TweenService:Create(returnBtn, TweenInfo.new(0.12), {BackgroundColor3 = Color3.fromRGB(38, 38, 50)}):Play()
-        TweenService:Create(returnStroke, TweenInfo.new(0.12), {Color = Color3.fromRGB(70, 70, 85)}):Play()
-    end)
-    -- Hover Ok → léger highlight
-    okBtn.MouseEnter:Connect(function()
-        TweenService:Create(okBtn, TweenInfo.new(0.12), {BackgroundColor3 = Color3.fromRGB(52, 52, 68)}):Play()
-    end)
-    okBtn.MouseLeave:Connect(function()
-        TweenService:Create(okBtn, TweenInfo.new(0.12), {BackgroundColor3 = Color3.fromRGB(38, 38, 50)}):Play()
-    end)
-
-    -- Animation d'entrée
-    popup.BackgroundTransparency = 1
-    local startPos = UDim2.new(0.5, 0, 0.52, 0)
-    local endPos   = UDim2.new(0.5, 0, 0.5,  0)
-    popup.Position = startPos
-    TweenService:Create(popup, TweenInfo.new(0.18, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        BackgroundTransparency = 0,
-        Position = endPos,
-    }):Play()
-
-    local function closePopup(confirmed)
-        local tw = TweenService:Create(popup, TweenInfo.new(0.14, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-            BackgroundTransparency = 1,
-            Position = startPos,
-        })
-        tw:Play()
-        tw.Completed:Connect(function()
-            if warnGui.Parent then warnGui:Destroy() end
-        end)
-        if confirmed then onConfirm() else onReturn() end
-    end
-
-    okBtn.MouseButton1Click:Connect(function() closePopup(true) end)
-    returnBtn.MouseButton1Click:Connect(function() closePopup(false) end)
-end
-
--- ====== AUTO GRAB WARNING POPUP ======
-local function ShowAutoGrabWarning(onConfirm, onReturn)
-    BuildWarningPopup(
-        "AutoGrabWarning",
-        "WARN_AG_TITLE",
-        {"WARN_AG_L1", "WARN_AG_L2", "WARN_AG_L3"},
-        "WARN_AG_OK",
-        "WARN_AG_RETURN",
-        onConfirm,
-        onReturn
-    )
-end
-
--- ====== NEED AUTOGRAB POPUP (Give Panel) ======
-local function ShowNeedAutoGrabWarning(onAutoGrabEnabled)
-    BuildWarningPopup(
-        "NeedAutoGrabWarning",
-        "NEED_AG_TITLE",
-        {"NEED_AG_TEXT"},
-        "NEED_AG_OK",
-        "NEED_AG_RETURN",
-        function() -- Ok, enable it → ouvre la popup AutoGrab warning
-            ShowAutoGrabWarning(
-                function() -- Ok, got it → active l'AutoGrab
-                    setAutoGrab(true)
-                    ShowNotification("AUTO GRAB", GetText("ENABLED"))
-                    -- Met aussi à jour le toggle visuel dans les settings
-                    if autoGrabToggle then autoGrabToggle.Set(true) end
-                    if onAutoGrabEnabled then onAutoGrabEnabled() end
-                end,
-                function() end -- Return sur la 2ème popup → on ne fait rien
-            )
-        end,
-        function() end -- Return sur la 1ère popup → on ferme simplement
-    )
-end
-
-local rowAutoGrab = CreateRow("AUTO_GRAB", 34)
-autoGrabToggle = CreateToggleSwitch(rowAutoGrab, Config.AutoGrab or false, function(ns, set)
-    if ns then
-        ShowAutoGrabWarning(
-            function() -- Ok, got it → active
-                set(true)
-                setAutoGrab(true)
-                ShowNotification("AUTO GRAB", GetText("ENABLED"))
-            end,
-            function() -- Return → switch reste OFF
-                set(false)
+        -- ─── 3. Lister tous les joueurs Dogs et StrayDogs ───
+        local DOG_TEAMS = { Dogs = true, StrayDogs = true }
+        local targets = {}
+        for _, plr in ipairs(Players:GetPlayers()) do
+            if plr ~= LocalPlayer
+            and plr.Team
+            and DOG_TEAMS[plr.Team.Name]
+            then
+                table.insert(targets, plr)
             end
+        end
+
+        if #targets == 0 then
+            ShowNotification("AUTO MUZZLE ALL", "No dogs found on the server.")
+            set(false); autoMuzzleRunning = false; return
+        end
+
+        ShowNotification("AUTO MUZZLE ALL", "Muzzling " .. #targets .. " dog(s)...")
+
+        -- ─── 4. Pour chaque dog : TP → trouver le prompt → déclencher ───
+        local muzzled = 0
+        local savedNoclip = noclipEnabled
+        local startPosition = hrp.CFrame
+        setNoclip(false); task.wait(0.05)
+
+        for _, dogPlr in ipairs(targets) do
+            -- re-check personnage (il peut avoir respawn)
+            local dogChar = dogPlr.Character
+            local dogHRP  = dogChar and dogChar:FindFirstChild("HumanoidRootPart")
+
+            if dogChar and dogHRP then
+                -- TP juste à côté du dog (légèrement devant lui)
+                hrp.CFrame = dogHRP.CFrame * CFrame.new(0, 0, -2.5)
+                task.wait(0.25)
+
+                -- Chercher MuzzleProximityPrompt dans le personnage du dog
+                local prompt = nil
+
+                -- Priorité 1 : "MuzzleProximityPrompt" dans le char du dog
+                for _, desc in ipairs(dogChar:GetDescendants()) do
+                    if desc:IsA("ProximityPrompt")
+                    and desc.Name == "MuzzleProximityPrompt"
+                    then
+                        prompt = desc
+                        break
+                    end
+                end
+
+                -- Priorité 2 : "MuzzleProximityPrompt" dans le workspace près du dog
+                if not prompt then
+                    local bestDist = 15 -- rayon max de recherche en studs
+                    for _, obj in ipairs(workspace:GetDescendants()) do
+                        if obj:IsA("ProximityPrompt")
+                        and obj.Name == "MuzzleProximityPrompt"
+                        then
+                            local part = obj.Parent
+                            if part and part:IsA("BasePart") then
+                                local d = (part.Position - dogHRP.Position).Magnitude
+                                if d < bestDist then
+                                    bestDist = d
+                                    prompt = obj
+                                end
+                            end
+                        end
+                    end
+                end
+
+                -- Priorité 3 : le ProximityPrompt le plus proche du dog (fallback)
+                if not prompt then
+                    local bestDist = 12
+                    for _, obj in ipairs(workspace:GetDescendants()) do
+                        if obj:IsA("ProximityPrompt") and obj.Enabled then
+                            local part = obj.Parent
+                            if part and part:IsA("BasePart") then
+                                local d = (part.Position - dogHRP.Position).Magnitude
+                                if d < bestDist then
+                                    bestDist = d
+                                    prompt = obj
+                                end
+                            end
+                        end
+                    end
+                end
+
+                if prompt then
+                    triggerPromptFast(prompt)
+                    muzzled = muzzled + 1
+                    task.wait(0.3) -- petit délai entre chaque dog
+                end
+            end
+        end
+
+        -- TP de retour à la position de départ
+        local char = LocalPlayer.Character
+        if char then
+            local hrp = char:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                hrp.CFrame = startPosition
+            end
+        end
+        task.wait(0.1)
+
+        ShowNotification(
+            "AUTO MUZZLE ALL",
+            muzzled .. "/" .. #targets .. " dog(s) muzzled!"
         )
-    else
+
+        -- Attendre 2 secondes avant de réactiver le noclip
+        task.wait(2)
+
+        -- Restaurer noclip à son état précédent
+        if savedNoclip then setNoclip(true) end
+
+        -- La fonction est "one-shot" : elle se remet à OFF automatiquement
         set(false)
-        setAutoGrab(false)
-        ShowNotification("AUTO GRAB", GetText("DISABLED"))
-    end
-end)
+        autoMuzzleRunning = false
+    end)
+end
 
 -- ====== SECTION VISUAL ======
 CreateSectionHeader("VISUAL")
@@ -1324,6 +1277,107 @@ local espToggle = CreateToggleSwitch(rowEsp, Config.Esp or false, function(ns, s
     set(ns)
     setEsp(ns)
     ShowNotification("ESP", ns and GetText("ENABLED") or GetText("DISABLED"))
+end)
+
+-- ====== SECTION EXPERIMENTAL ======
+CreateSectionHeader("EXPERIMENTAL")
+
+-- On déclare rowTargetMode comme upvalue AVANT le toggle aimbot
+-- (le callback y fait référence), mais on ne le crée/parent qu'APRÈS rowAimbot
+-- → dans sList, l'ordre d'insertion = ordre visuel : Aimbot d'abord, Target mode ensuite.
+local rowTargetMode
+
+-- 1. Créer et insérer rowAimbot en premier dans sList
+local rowAimbot = CreateRow("AIMBOT", 34)
+
+-- 2. Créer le toggle (le callback capture rowTargetMode par upvalue ; il sera assigné juste après)
+local aimbotToggle = CreateToggleSwitch(rowAimbot, Config.Aimbot or false, function(ns, set)
+    set(ns)
+    setSilentAim(ns)
+    if ns then
+        rowTargetMode.BackgroundTransparency = 1
+        rowTargetMode.Visible = true
+        TweenService:Create(rowTargetMode, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundTransparency = 0}):Play()
+    else
+        local tw = TweenService:Create(rowTargetMode, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {BackgroundTransparency = 1})
+        tw:Play()
+        tw.Completed:Connect(function() if rowTargetMode then rowTargetMode.Visible = false end end)
+    end
+    ShowNotification(GetText("AIMBOT"), ns and GetText("ENABLED") or GetText("DISABLED"))
+end)
+
+-- 3. Créer et insérer rowTargetMode en second dans sList (apparaît sous Aimbot)
+rowTargetMode = Instance.new("Frame", sList)
+rowTargetMode.Name = "RowTargetMode"
+rowTargetMode.Size = UDim2.new(1, 0, 0, 34)
+rowTargetMode.BackgroundColor3 = Theme.Surface
+rowTargetMode.BackgroundTransparency = (Config.Aimbot) and 0 or 1
+rowTargetMode.Visible = Config.Aimbot or false
+Instance.new("UICorner", rowTargetMode).CornerRadius = UDim.new(0, 6)
+
+local tmLabel = Instance.new("TextLabel", rowTargetMode)
+tmLabel.Size = UDim2.new(0.42, 0, 1, 0)
+tmLabel.Position = UDim2.new(0, 10, 0, 0)
+tmLabel.BackgroundTransparency = 1
+tmLabel.Text = GetText("AIMBOT_TARGET_MODE")
+tmLabel.Font = Enum.Font.GothamMedium
+tmLabel.TextColor3 = Theme.TextPrimary
+tmLabel.TextSize = 11
+tmLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+local tmBtnContainer = Instance.new("Frame", rowTargetMode)
+tmBtnContainer.Size = UDim2.new(0, 134, 0, 24)
+tmBtnContainer.Position = UDim2.new(1, -144, 0.5, -12)
+tmBtnContainer.BackgroundTransparency = 1
+
+local tmLayout = Instance.new("UIListLayout", tmBtnContainer)
+tmLayout.FillDirection = Enum.FillDirection.Horizontal
+tmLayout.Padding = UDim.new(0, 6)
+tmLayout.SortOrder = Enum.SortOrder.LayoutOrder
+tmLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+
+local tmNearestBtn = Instance.new("TextButton", tmBtnContainer)
+tmNearestBtn.LayoutOrder = 1
+tmNearestBtn.Size = UDim2.new(0, 64, 0, 24)
+tmNearestBtn.Text = GetText("NEAREST")
+tmNearestBtn.Font = Enum.Font.GothamBold
+tmNearestBtn.TextSize = 10
+tmNearestBtn.AutoButtonColor = false
+Instance.new("UICorner", tmNearestBtn).CornerRadius = UDim.new(0, 6)
+
+local tmLowestBtn = Instance.new("TextButton", tmBtnContainer)
+tmLowestBtn.LayoutOrder = 2
+tmLowestBtn.Size = UDim2.new(0, 64, 0, 24)
+tmLowestBtn.Text = GetText("LOWEST")
+tmLowestBtn.Font = Enum.Font.GothamBold
+tmLowestBtn.TextSize = 10
+tmLowestBtn.AutoButtonColor = false
+Instance.new("UICorner", tmLowestBtn).CornerRadius = UDim.new(0, 6)
+
+local function refreshTargetModeButtons()
+    local isNearest = (aimbotTargetMode == "Nearest")
+    tmNearestBtn.BackgroundColor3 = isNearest and Theme.Accent1 or Theme.SurfaceHighlight
+    tmNearestBtn.TextColor3       = isNearest and Color3.fromRGB(0, 0, 0) or Theme.TextPrimary
+    tmLowestBtn.BackgroundColor3  = (not isNearest) and Theme.Accent1 or Theme.SurfaceHighlight
+    tmLowestBtn.TextColor3        = (not isNearest) and Color3.fromRGB(0, 0, 0) or Theme.TextPrimary
+end
+
+refreshTargetModeButtons()
+
+tmNearestBtn.MouseButton1Click:Connect(function()
+    aimbotTargetMode = "Nearest"
+    Config.AimbotTargetMode = "Nearest"
+    SaveConfig()
+    refreshTargetModeButtons()
+    ShowNotification(GetText("AIMBOT"), GetText("NEAREST"))
+end)
+
+tmLowestBtn.MouseButton1Click:Connect(function()
+    aimbotTargetMode = "Lowest"
+    Config.AimbotTargetMode = "Lowest"
+    SaveConfig()
+    refreshTargetModeButtons()
+    ShowNotification(GetText("AIMBOT"), GetText("LOWEST"))
 end)
 
 -- ====== SECTION LANGUAGE ======
@@ -1725,6 +1779,82 @@ Players.PlayerRemoving:Connect(function(plr)
     if folder then folder:Destroy() end
 end)
 
+-- ====== QUICK PANEL ======
+local quickGui = Instance.new("ScreenGui")
+quickGui.Name = "QuickPanel"
+quickGui.ResetOnSpawn = false
+quickGui.Parent = PlayerGui
+
+local qFrame = Instance.new("Frame")
+qFrame.Size = UDim2.new(0, 250, 0, 300)
+qFrame.Position = UDim2.new(
+    Config.Positions.Quick.X, 0,
+    Config.Positions.Quick.Y, 0
+)
+qFrame.BackgroundColor3 = Theme.Background
+qFrame.BackgroundTransparency = 0.05
+qFrame.BorderSizePixel = 0
+qFrame.ClipsDescendants = true
+qFrame.Parent = quickGui
+
+ApplyViewportUIScale(qFrame)
+AddMobileMinimize(qFrame, "QUICK_PANEL")
+
+Instance.new("UICorner", qFrame).CornerRadius = UDim.new(0, 12)
+
+local qStroke = Instance.new("UIStroke", qFrame)
+qStroke.Color = Theme.Accent2
+qStroke.Thickness = 1.5
+qStroke.Transparency = 0.4
+CreateGradient(qStroke)
+
+-- Header
+local qHeader = Instance.new("Frame", qFrame)
+qHeader.Size = UDim2.new(1, 0, 0, 40)
+qHeader.BackgroundTransparency = 1
+MakeDraggable(qHeader, qFrame, "Quick")
+
+local qTitle = Instance.new("TextLabel", qHeader)
+qTitle.Size = UDim2.new(1, -20, 1, 0)
+qTitle.Position = UDim2.new(0, 15, 0, 0)
+qTitle.BackgroundTransparency = 1
+qTitle.Text = GetText("QUICK_PANEL")
+qTitle.Font = Enum.Font.GothamBlack
+qTitle.TextSize = 14
+qTitle.TextColor3 = Theme.TextPrimary
+qTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Séparateur
+local qSep = Instance.new("Frame", qFrame)
+qSep.Size = UDim2.new(1, -20, 0, 1)
+qSep.Position = UDim2.new(0, 10, 0, 40)
+qSep.BackgroundColor3 = Theme.Accent2
+qSep.BackgroundTransparency = 0.6
+qSep.BorderSizePixel = 0
+
+-- Bouton Auto Muzzle All (pleine largeur, en haut)
+local qBtn = Instance.new("TextButton", qFrame)
+qBtn.Size = UDim2.new(1, -20, 0, 50)
+qBtn.Position = UDim2.new(0, 10, 0, 50)
+qBtn.BackgroundColor3 = Color3.fromRGB(35, 37, 43)
+qBtn.Text = GetText("AUTO_MUZZLE_ALL")
+qBtn.Font = Enum.Font.GothamBlack
+qBtn.TextSize = 13
+qBtn.TextColor3 = Color3.fromRGB(10, 10, 20)
+qBtn.AutoButtonColor = false
+Instance.new("UICorner", qBtn).CornerRadius = UDim.new(0, 8)
+
+qBtn.MouseEnter:Connect(function()
+    TweenService:Create(qBtn, TweenInfo.new(0.15), {BackgroundTransparency = 0.2}):Play()
+end)
+qBtn.MouseLeave:Connect(function()
+    TweenService:Create(qBtn, TweenInfo.new(0.15), {BackgroundTransparency = 0}):Play()
+end)
+
+qBtn.MouseButton1Click:Connect(function()
+    setAutoMuzzleAll(function(state) end)
+end)
+
 -- ====== GIVE PANEL (version optimisée) ======
 local giveGui = Instance.new("ScreenGui")
 giveGui.Name = "GivePanel"
@@ -1823,16 +1953,25 @@ local function CreateGiveButton(parent, label, giveAction)
     end)
 
     gvBtn.MouseButton1Click:Connect(function()
-        -- Si l'AutoGrab est désactivé, montrer la popup "Enable AutoGrab"
+        local wasAutoGrabEnabled = autoGrabEnabled
+        
+        -- Activer AutoGrab s'il n'est pas déjà actif
         if not autoGrabEnabled then
-            ShowNeedAutoGrabWarning(nil)
-            return
+            setAutoGrab(true)
+            task.wait(0.1)
         end
+        
         local ok, err = pcall(giveAction)
         if ok then
             ShowNotification("GIVE PANEL", label .. " obtained !")
         else
             ShowNotification("GIVE PANEL", "Error : " .. tostring(err))
+        end
+        
+        -- Désactiver AutoGrab s'il n'était pas activé avant
+        if not wasAutoGrabEnabled then
+            task.wait(0.2)
+            setAutoGrab(false)
         end
     end)
     
