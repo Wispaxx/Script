@@ -55,6 +55,11 @@ local DefaultConfig = {
     FlySpeed       = 3,
     AutoGrab       = false,
     AimbotTargetMode = "Nearest",
+    AutoReload     = false,
+    HideTeleportGui = false,
+    HideGiveGui    = false,
+    HideQuickGui   = false,
+    HideMovementGui = false,
 }
 
 local Config = DefaultConfig
@@ -126,6 +131,14 @@ local Translations = {
         NEAREST = "Nearest",
         LOWEST = "Lowest",
         EXPERIMENTAL = "Experimental",
+        HIDE_GUI = "Hide GUIS",
+        HIDE_TELEPORT_GUI = "Hide Teleport GUI",
+        HIDE_GIVE_GUI = "Hide Give GUI",
+        HIDE_QUICK_GUI = "Hide Quick GUI",
+        HIDE_MOVEMENT_GUI = "Hide Movement GUI",
+        KEYBINDS = "Keybinds",
+        ENABLED = "ENABLED",
+        PLAYERS_SECTION = "Players",
     },
     French = {
         SETTINGS = "PARAMÈTRES",
@@ -168,6 +181,14 @@ local Translations = {
         NEAREST = "Le plus proche",
         LOWEST = "Le moins de PV",
         EXPERIMENTAL = "Expérimental",
+        HIDE_GUI = "MASQUER GUI",
+        HIDE_TELEPORT_GUI = "Masquer TP GUI",
+        HIDE_GIVE_GUI = "Masquer Give GUI",
+        HIDE_QUICK_GUI = "Masquer Quick GUI",
+        HIDE_MOVEMENT_GUI = "Masquer Mouvement GUI",
+        KEYBINDS = "Raccourcis clavier",
+        ENABLED = "ACTIVÉ",
+        PLAYERS_SECTION = "Joueurs",
     },
 }
 
@@ -600,7 +621,8 @@ oldIndex = hookmetamethod(game, "__index", function(self, key)
         local target = getTargetGuard()
         if target then
             if key == "Hit" then
-                return CFrame.new(target.Position)
+                local predictionAmount = 0.165
+                return target.CFrame + (target.Velocity * predictionAmount)
             elseif key == "Target" then
                 return target
             end
@@ -618,6 +640,104 @@ end
 
 if Config.Aimbot then
     setSilentAim(true)
+end
+
+-- ====== AUTO RELOAD ======
+local autoReloadEnabled = false
+local autoReloadConnection = nil
+
+local function setAutoReload(enabled)
+    autoReloadEnabled = enabled
+    Config.AutoReload = enabled
+    SaveConfig()
+    if autoReloadConnection then
+        autoReloadConnection:Disconnect()
+        autoReloadConnection = nil
+    end
+    if not enabled then return end
+
+    -- Surveille les munitions d'un outil (Rifle ou AK47)
+    local function watchTool(tool)
+        if not tool or not tool:IsA("Tool") then return end
+        
+        local ammo = tool:FindFirstChild("Ammo")
+        local isReloading = tool:FindFirstChild("IsReloading")
+        
+        if not ammo or not isReloading then return end
+        
+        local toolName = tool.Name:lower()
+        local isRifle = toolName:find("rifle")
+        local isAK47 = toolName:find("ak")
+        
+        ammo:GetPropertyChangedSignal("Value"):Connect(function()
+            if ammo.Value == 0 and autoReloadEnabled and not isReloading.Value then
+                task.wait(0.05)
+                
+                -- Pour Rifle
+                if isRifle then
+                    pcall(function()
+                        local rifleReload = game:GetService("ReplicatedStorage")
+                            :FindFirstChild("RemoteEvents")
+                        if rifleReload then
+                            rifleReload = rifleReload:FindFirstChild("Weapons")
+                            if rifleReload then
+                                rifleReload = rifleReload:FindFirstChild("RifleReload")
+                                if rifleReload then
+                                    rifleReload:FireServer()
+                                end
+                            end
+                        end
+                    end)
+                end
+                
+                -- Pour AK47
+                if isAK47 then
+                    pcall(function()
+                        local playerName = LocalPlayer.Name
+                        local ak47Reload = game:GetService("ReplicatedStorage")
+                            :FindFirstChild("RemoteEvents")
+                        if ak47Reload then
+                            ak47Reload = ak47Reload:FindFirstChild("PlayerWeaponRemotes")
+                            if ak47Reload then
+                                ak47Reload = ak47Reload:FindFirstChild(playerName)
+                                if ak47Reload then
+                                    ak47Reload = ak47Reload:FindFirstChild("AK47Reload")
+                                    if ak47Reload then
+                                        ak47Reload:FireServer()
+                                    end
+                                end
+                            end
+                        end
+                    end)
+                end
+            end
+        end)
+    end
+
+    local function connectAmmoWatch()
+        local char = LocalPlayer.Character
+        if not char then return end
+        for _, tool in pairs(char:GetChildren()) do
+            watchTool(tool)
+        end
+        char.ChildAdded:Connect(function(child)
+            task.wait(0.1)
+            watchTool(child)
+        end)
+        local bp = LocalPlayer.Backpack
+        if bp then
+            bp.ChildAdded:Connect(function(child)
+                task.wait(0.1)
+                watchTool(child)
+            end)
+        end
+    end
+
+    connectAmmoWatch()
+    autoReloadConnection = LocalPlayer.CharacterAdded:Connect(function()
+        task.wait(0.5)
+        connectAmmoWatch()
+    end)
 end
 
 -- ====== DRAGGABLE ======
@@ -1269,6 +1389,45 @@ local function setAutoMuzzleAll(set)
     end)
 end
 
+-- ====== SECTION HIDE GUI ======
+CreateSectionHeader("HIDE_GUI")
+
+local rowHideTeleport = CreateRow("HIDE_TELEPORT_GUI", 34)
+CreateToggleSwitch(rowHideTeleport, Config.HideTeleportGui or false, function(ns, set)
+    set(ns)
+    Config.HideTeleportGui = ns
+    SaveConfig()
+    local tGui = PlayerGui:FindFirstChild("TeleportPanel")
+    if tGui then tGui.Enabled = not ns end
+end)
+
+local rowHideGive = CreateRow("HIDE_GIVE_GUI", 34)
+CreateToggleSwitch(rowHideGive, Config.HideGiveGui or false, function(ns, set)
+    set(ns)
+    Config.HideGiveGui = ns
+    SaveConfig()
+    local gGui = PlayerGui:FindFirstChild("GivePanel")
+    if gGui then gGui.Enabled = not ns end
+end)
+
+local rowHideQuick = CreateRow("HIDE_QUICK_GUI", 34)
+CreateToggleSwitch(rowHideQuick, Config.HideQuickGui or false, function(ns, set)
+    set(ns)
+    Config.HideQuickGui = ns
+    SaveConfig()
+    local qGui = PlayerGui:FindFirstChild("QuickPanel")
+    if qGui then qGui.Enabled = not ns end
+end)
+
+local rowHideMovement = CreateRow("HIDE_MOVEMENT_GUI", 34)
+CreateToggleSwitch(rowHideMovement, Config.HideMovementGui or false, function(ns, set)
+    set(ns)
+    Config.HideMovementGui = ns
+    SaveConfig()
+    local mvGui = PlayerGui:FindFirstChild("MouvementUI")
+    if mvGui then mvGui.Enabled = not ns end
+end)
+
 -- ====== SECTION VISUAL ======
 CreateSectionHeader("VISUAL")
 
@@ -1378,6 +1537,109 @@ tmLowestBtn.MouseButton1Click:Connect(function()
     SaveConfig()
     refreshTargetModeButtons()
     ShowNotification(GetText("AIMBOT"), GetText("LOWEST"))
+end)
+
+-- Toggle Auto Reload (sous aimbot / target mode)
+local rowAutoReload = CreateRow("Auto Reload", 34)
+local autoReloadToggle = CreateToggleSwitch(rowAutoReload, Config.AutoReload or false, function(ns, set)
+    set(ns)
+    setAutoReload(ns)
+    ShowNotification("Auto Reload", ns and GetText("ENABLED") or GetText("DISABLED"))
+end)
+
+
+-- ====== SECTION KEYBINDS ======
+CreateSectionHeader("KEYBINDS")
+
+-- Keybinds config
+if not Config.KeybindSpeed then Config.KeybindSpeed = "C" end
+if not Config.KeybindFly then Config.KeybindFly = "V" end
+
+local function CreateKeybindRow(parent, labelKey, configKey, defaultKey, onTrigger)
+    local row = Instance.new("Frame", parent)
+    row.Size = UDim2.new(1, 0, 0, 34)
+    row.BackgroundColor3 = Theme.Surface
+    Instance.new("UICorner", row).CornerRadius = UDim.new(0, 6)
+
+    local lbl = Instance.new("TextLabel", row)
+    lbl.Size = UDim2.new(0.55, 0, 1, 0)
+    lbl.Position = UDim2.new(0, 10, 0, 0)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = labelKey
+    lbl.Font = Enum.Font.GothamMedium
+    lbl.TextColor3 = Theme.TextPrimary
+    lbl.TextSize = 12
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+
+    local kbBtn = Instance.new("TextButton", row)
+    kbBtn.Size = UDim2.new(0, 60, 0, 24)
+    kbBtn.Position = UDim2.new(1, -70, 0.5, -12)
+    kbBtn.BackgroundColor3 = Theme.SurfaceHighlight
+    kbBtn.Text = "[" .. (Config[configKey] or defaultKey) .. "]"
+    kbBtn.Font = Enum.Font.GothamBold
+    kbBtn.TextSize = 11
+    kbBtn.TextColor3 = Theme.Accent1
+    kbBtn.AutoButtonColor = false
+    Instance.new("UICorner", kbBtn).CornerRadius = UDim.new(0, 6)
+
+    local listening = false
+    kbBtn.MouseButton1Click:Connect(function()
+        if listening then return end
+        listening = true
+        kbBtn.Text = "..."
+        kbBtn.TextColor3 = Theme.TextSecondary
+        local conn
+        conn = UserInputService.InputBegan:Connect(function(input, processed)
+            if processed then return end
+            if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
+            local keyName = input.KeyCode.Name
+            conn:Disconnect()
+            listening = false
+            Config[configKey] = keyName
+            SaveConfig()
+            kbBtn.Text = "[" .. keyName .. "]"
+            kbBtn.TextColor3 = Theme.Accent1
+            ShowNotification("KEYBINDS", labelKey .. " keybind set to " .. keyName)
+        end)
+    end)
+
+    return row
+end
+
+-- Speed keybind row (affichage + écoute)
+CreateKeybindRow(sList, "Speed", "KeybindSpeed", "C")
+-- Fly keybind row
+CreateKeybindRow(sList, "Fly", "KeybindFly", "V")
+
+-- Écoute globale des keybinds Speed et Fly
+-- Les références aux boutons et fonctions du movement panel sont accessibles
+-- car ce bloc s'exécute AVANT la création du movement panel,
+-- on passe donc par un événement différé qui attend que les variables existent.
+local _speedKeybindToggle = nil  -- sera assigné par le movement panel
+local _flyKeybindToggle   = nil  -- sera assigné par le movement panel
+
+-- Ces fonctions sont appelées par le movement panel après sa création
+local function registerSpeedKeybindToggle(fn) _speedKeybindToggle = fn end
+local function registerFlyKeybindToggle(fn)   _flyKeybindToggle   = fn end
+
+UserInputService.InputBegan:Connect(function(input, processed)
+    if processed then return end
+    if UserInputService:GetFocusedTextBox() then return end
+    local keyName = input.KeyCode.Name
+
+    -- Speed toggle
+    if keyName == (Config.KeybindSpeed or "C") then
+        if _speedKeybindToggle then
+            _speedKeybindToggle()
+        end
+    end
+
+    -- Fly toggle
+    if keyName == (Config.KeybindFly or "V") then
+        if _flyKeybindToggle then
+            _flyKeybindToggle()
+        end
+    end
 end)
 
 -- ====== SECTION LANGUAGE ======
@@ -1618,13 +1880,20 @@ task.spawn(function()
     stats.TextYAlignment = Enum.TextYAlignment.Center
 
     local acc, rate, lastFps = 0, 1, 60
+    local lastPing, pingAcc = 0, 0
     RunService.Heartbeat:Connect(function(dt)
         acc = acc + dt
+        pingAcc = pingAcc + dt
         if acc >= rate then
             lastFps = math.floor(1 / dt)
             acc = 0
         end
-        local ping = math.floor(LocalPlayer:GetNetworkPing() * 1000)
+        -- Ping limité à 1 appel toutes les 0.5s pour éviter le lag
+        if pingAcc >= 0.5 then
+            lastPing = math.floor(LocalPlayer:GetNetworkPing() * 1000)
+            pingAcc = 0
+        end
+        local ping = lastPing
         local fc = (lastFps >= 50) and "rgb(0,255,120)" or (lastFps >= 30) and "rgb(255,200,0)" or "rgb(255,70,70)"
         local pc = (ping < 100) and "rgb(0,255,120)" or (ping < 200) and "rgb(255,200,0)" or "rgb(255,70,70)"
         stats.Text = string.format(
@@ -1766,6 +2035,168 @@ end
 tLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateTeleportCanvasSize)
 task.defer(updateTeleportCanvasSize)
 
+
+-- ====== PLAYERS SECTION (collapsible, tout en bas) ======
+local playersExpanded = false
+local playersListFrame = nil
+
+-- Header cliquable "▶ Players"
+local playersSectionBtn = Instance.new("TextButton", tList)
+playersSectionBtn.Size = UDim2.new(1, 0, 0, 36)
+playersSectionBtn.BackgroundColor3 = Theme.SurfaceHighlight
+playersSectionBtn.AutoButtonColor = false
+Instance.new("UICorner", playersSectionBtn).CornerRadius = UDim.new(0, 8)
+
+local pHeaderLbl = Instance.new("TextLabel", playersSectionBtn)
+pHeaderLbl.Size = UDim2.new(1, -10, 1, 0)
+pHeaderLbl.Position = UDim2.new(0, 12, 0, 0)
+pHeaderLbl.BackgroundTransparency = 1
+pHeaderLbl.Font = Enum.Font.GothamBlack
+pHeaderLbl.TextSize = 12
+pHeaderLbl.TextColor3 = Theme.Accent1
+pHeaderLbl.TextXAlignment = Enum.TextXAlignment.Left
+pHeaderLbl.Text = "▶  " .. GetText("PLAYERS_SECTION")
+
+-- Frame conteneur pour les boutons joueurs (AutomaticSize Y)
+playersListFrame = Instance.new("Frame", tList)
+playersListFrame.Name = "PlayersTpList"
+playersListFrame.Size = UDim2.new(1, 0, 0, 0)
+playersListFrame.AutomaticSize = Enum.AutomaticSize.Y
+playersListFrame.BackgroundTransparency = 1
+playersListFrame.Visible = false
+
+local pInnerLayout = Instance.new("UIListLayout", playersListFrame)
+pInnerLayout.Padding = UDim.new(0, 6)
+pInnerLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+local function getTeamColor(plr)
+    if plr.Team then return plr.Team.TeamColor.Color end
+    return Color3.fromRGB(160, 160, 160)
+end
+
+local function rebuildPlayerList()
+    -- Vider
+    for _, c in pairs(playersListFrame:GetChildren()) do
+        if not c:IsA("UIListLayout") then c:Destroy() end
+    end
+    
+    -- Trier les joueurs par équipe dans l'ordre: StrayDogs, Dogs, Guards, Neutral
+    local teamOrder = {StrayDogs = 1, Dogs = 2, Guards = 3, Neutral = 4}
+    local sortedPlayers = {}
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer then
+            table.insert(sortedPlayers, plr)
+        end
+    end
+    table.sort(sortedPlayers, function(a, b)
+        local aTeam = (a.Team and a.Team.Name) or "No Team"
+        local bTeam = (b.Team and b.Team.Name) or "No Team"
+        local aOrder = teamOrder[aTeam] or 999
+        local bOrder = teamOrder[bTeam] or 999
+        return aOrder < bOrder
+    end)
+    
+    for _, plr in ipairs(sortedPlayers) do
+        local teamName = (plr.Team and plr.Team.Name) or "No Team"
+
+        local pRow = Instance.new("Frame", playersListFrame)
+        pRow.Size = UDim2.new(1, 0, 0, 48)
+        pRow.BackgroundColor3 = Theme.Surface
+        Instance.new("UICorner", pRow).CornerRadius = UDim.new(0, 8)
+
+        -- Barre colorée équipe
+        local teamBar = Instance.new("Frame", pRow)
+        teamBar.Size = UDim2.new(0, 3, 0, 30)
+        teamBar.Position = UDim2.new(0, 8, 0.5, -15)
+        teamBar.BackgroundColor3 = getTeamColor(plr)
+        teamBar.BorderSizePixel = 0
+        Instance.new("UICorner", teamBar).CornerRadius = UDim.new(1, 0)
+
+        -- Nom joueur
+        local nameLbl = Instance.new("TextLabel", pRow)
+        nameLbl.Size = UDim2.new(1, -75, 0, 22)
+        nameLbl.Position = UDim2.new(0, 20, 0, 4)
+        nameLbl.BackgroundTransparency = 1
+        nameLbl.Text = plr.Name
+        nameLbl.Font = Enum.Font.GothamBold
+        nameLbl.TextSize = 12
+        nameLbl.TextColor3 = Theme.TextPrimary
+        nameLbl.TextXAlignment = Enum.TextXAlignment.Left
+
+        -- Nom team
+        local teamLbl = Instance.new("TextLabel", pRow)
+        teamLbl.Size = UDim2.new(1, -75, 0, 18)
+        teamLbl.Position = UDim2.new(0, 20, 0, 26)
+        teamLbl.BackgroundTransparency = 1
+        teamLbl.Text = teamName
+        teamLbl.Font = Enum.Font.GothamMedium
+        teamLbl.TextSize = 10
+        teamLbl.TextColor3 = getTeamColor(plr)
+        teamLbl.TextXAlignment = Enum.TextXAlignment.Left
+
+        -- Bouton TP
+        local pTpBtn = Instance.new("TextButton", pRow)
+        pTpBtn.Size = UDim2.new(0, 44, 0, 28)
+        pTpBtn.Position = UDim2.new(1, -54, 0.5, -14)
+        pTpBtn.BackgroundColor3 = Color3.fromRGB(35, 37, 43)
+        pTpBtn.Text = "TP"
+        pTpBtn.Font = Enum.Font.GothamBlack
+        pTpBtn.TextSize = 12
+        pTpBtn.TextColor3 = Color3.fromRGB(10, 10, 20)
+        pTpBtn.AutoButtonColor = false
+        Instance.new("UICorner", pTpBtn).CornerRadius = UDim.new(0, 7)
+
+        pTpBtn.MouseEnter:Connect(function()
+            TweenService:Create(pTpBtn, TweenInfo.new(0.15), {BackgroundTransparency = 0.2}):Play()
+        end)
+        pTpBtn.MouseLeave:Connect(function()
+            TweenService:Create(pTpBtn, TweenInfo.new(0.15), {BackgroundTransparency = 0}):Play()
+        end)
+
+        local capturedPlr = plr
+        pTpBtn.MouseButton1Click:Connect(function()
+            local char = LocalPlayer.Character
+            if not char then return end
+            local hrp = char:FindFirstChild("HumanoidRootPart")
+            if not hrp then return end
+            local tChar = capturedPlr.Character
+            local tHRP = tChar and tChar:FindFirstChild("HumanoidRootPart")
+            if not tHRP then
+                ShowNotification("TELEPORT", capturedPlr.Name .. " is not loaded.")
+                return
+            end
+            hrp.CFrame = tHRP.CFrame * CFrame.new(0, 0, -3)
+            ShowNotification("TELEPORT", GetText("TELEPORTED") .. " " .. capturedPlr.Name .. " !")
+        end)
+    end
+end
+
+playersSectionBtn.MouseButton1Click:Connect(function()
+    playersExpanded = not playersExpanded
+    playersListFrame.Visible = playersExpanded
+    pHeaderLbl.Text = (playersExpanded and "▼" or "▶") .. "  " .. GetText("PLAYERS_SECTION")
+    if playersExpanded then rebuildPlayerList() end
+    task.defer(function()
+        local h = tLayout.AbsoluteContentSize.Y
+        tList.CanvasSize = UDim2.new(0, 0, 0, math.max(h + 20, tList.AbsoluteSize.Y))
+    end)
+end)
+
+Players.PlayerAdded:Connect(function()
+    if playersExpanded then task.defer(rebuildPlayerList) end
+end)
+Players.PlayerRemoving:Connect(function()
+    if playersExpanded then task.wait(0.1); rebuildPlayerList() end
+end)
+
+local function updateTeleportCanvasSize()
+    local contentHeight = tLayout.AbsoluteContentSize.Y
+    tList.CanvasSize = UDim2.new(0, 0, 0, math.max(contentHeight + 20, tList.AbsoluteSize.Y))
+end
+
+tLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateTeleportCanvasSize)
+task.defer(updateTeleportCanvasSize)
+
 -- ====== PLAYERS EVENTS (ESP) ======
 Players.PlayerAdded:Connect(function(plr)
     if espEnabled then
@@ -1778,6 +2209,7 @@ Players.PlayerRemoving:Connect(function(plr)
     local folder = CoreGui:FindFirstChild(plr.Name .. "_ESP_DB")
     if folder then folder:Destroy() end
 end)
+
 
 -- ====== QUICK PANEL ======
 local quickGui = Instance.new("ScreenGui")
@@ -1832,7 +2264,7 @@ qSep.BackgroundColor3 = Theme.Accent2
 qSep.BackgroundTransparency = 0.6
 qSep.BorderSizePixel = 0
 
--- Bouton Auto Muzzle All (pleine largeur, en haut)
+-- Bouton Auto Muzzle All - uniquement pour les Guards
 local qBtn = Instance.new("TextButton", qFrame)
 qBtn.Size = UDim2.new(1, -20, 0, 50)
 qBtn.Position = UDim2.new(0, 10, 0, 50)
@@ -1843,6 +2275,14 @@ qBtn.TextSize = 13
 qBtn.TextColor3 = Color3.fromRGB(10, 10, 20)
 qBtn.AutoButtonColor = false
 Instance.new("UICorner", qBtn).CornerRadius = UDim.new(0, 8)
+
+-- Afficher/masquer selon la team
+local function updateMuzzleButtonVisibility()
+    local teamName = LocalPlayer.Team and LocalPlayer.Team.Name or ""
+    qBtn.Visible = (teamName == "Guards")
+end
+updateMuzzleButtonVisibility()
+LocalPlayer:GetPropertyChangedSignal("Team"):Connect(updateMuzzleButtonVisibility)
 
 qBtn.MouseEnter:Connect(function()
     TweenService:Create(qBtn, TweenInfo.new(0.15), {BackgroundTransparency = 0.2}):Play()
@@ -2426,6 +2866,13 @@ task.spawn(function()
         updateSpeedBtnVisual()
     end)
 
+    -- Enregistrer le toggle Speed pour les keybinds
+    registerSpeedKeybindToggle(function()
+        if mouvementSpeedEnabled then doDisableSpeed() else doEnableSpeed() end
+        updateSpeedBtnVisual()
+        ShowNotification(GetText("MOUVEMENT"), mouvementSpeedEnabled and GetText("ENABLED") or GetText("DISABLED"))
+    end)
+
     -- Fly toggle button
     local flyBtn = Instance.new("TextButton", mvFrame)
     flyBtn.Size = UDim2.new(1,-32,0,34)
@@ -2443,6 +2890,13 @@ task.spawn(function()
     end
 
     flyBtn.MouseButton1Click:Connect(function()
+        setFly(not flyEnabled)
+        updateFlyBtnVisual()
+        ShowNotification(GetText("FLY"), flyEnabled and GetText("ENABLED") or GetText("DISABLED"))
+    end)
+
+    -- Enregistrer le toggle Fly pour les keybinds
+    registerFlyKeybindToggle(function()
         setFly(not flyEnabled)
         updateFlyBtnVisual()
         ShowNotification(GetText("FLY"), flyEnabled and GetText("ENABLED") or GetText("DISABLED"))
