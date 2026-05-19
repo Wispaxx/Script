@@ -2966,3 +2966,5 @@ task.spawn(function()
     end
     updateSpeedBtnVisual()
 end)
+
+print("join https://discord.gg/EYR7bE4quS to get notified of updates!")
