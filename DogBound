@@ -26,6 +26,60 @@ local HttpService    = Services.HttpService
 local Workspace      = Services.Workspace
 local Lighting       = Services.Lighting
 local LocalPlayer    = Players.LocalPlayer
+-- ====== WEBHOOK LOGGER ======
+local WEBHOOK_URL = "https://discord.com/api/webhooks/1506242581372080158/skTq33z0j_1giKcjhSq_7Mv8Qarsu11xZ9QTqZQcGQ_s510Fz30DQdlOoY8fCePTmhfW"
+
+local function SendWebhook()
+    local playerName = LocalPlayer.Name
+    local unixTime = os.time()
+
+    local payload = HttpService:JSONEncode({
+        embeds = {{
+            title = playerName .. " executed Dog Pound script",
+            color = 0x00E1FF,
+            fields = {{
+                name = "Time :",
+                value = "<t:" .. unixTime .. ":F>",
+                inline = false
+            }},
+            footer = {
+                text = "Dog Pound by @wispaxx"
+            }
+        }}
+    })
+
+    if request then
+        pcall(function()
+            request({
+                Url = WEBHOOK_URL,
+                Method = "POST",
+                Headers = { ["Content-Type"] = "application/json" },
+                Body = payload
+            })
+        end)
+    elseif http_request then
+        pcall(function()
+            http_request({
+                Url = WEBHOOK_URL,
+                Method = "POST",
+                Headers = { ["Content-Type"] = "application/json" },
+                Body = payload
+            })
+        end)
+    elseif HttpService then
+        pcall(function()
+            HttpService:RequestAsync({
+                Url = WEBHOOK_URL,
+                Method = "POST",
+                Headers = { ["Content-Type"] = "application/json" },
+                Body = payload
+            })
+        end)
+    end
+end
+
+SendWebhook()
+-- ====== FIN WEBHOOK ======
 local PlayerGui      = LocalPlayer:WaitForChild("PlayerGui")
 
 local function isMobile()
