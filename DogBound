@@ -1,5 +1,9 @@
 task.wait()
 
-local nigga = game.Players.LocalPlayer
+local player = game.Players.LocalPlayer
 
-nigga:Kick("This script has been disabled by the owner, to get the new one check https://discord.gg/jZVnbky8MN or Wispaxx Hub discord")
+if player.Name == "WispaxxGAGDC" then
+    player:Kick("You have been blacklisted for youtube copyrightning, to appeal DM wispaxx0757")
+else
+    player:Kick("This script has been disabled by the owner, to get the new one check https://discord.gg/jZVnbky8MN or Wispaxx Hub discord")
+end
