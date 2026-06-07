@@ -1,4 +1,3 @@
 local player = game.Players.LocalPlayer
 
 player:Kick("This script as been disabled by the owner, to get the new one check https://discord.gg/jZVnbky8MN or Wispaxx Hub discord")
-end
