@@ -1,5 +1,5 @@
-task.wait()
-
 local Nigga = game.Players.LocalPlayer
+
+task.wait(0.67)
 
 Nigga:Kick("This script has been disabled by the owner, to get the new one check https://discord.gg/jZVnbky8MN or Wispaxx Hub discord")
