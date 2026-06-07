@@ -1,3 +1,5 @@
 task.wait()
 
-game.Players.LocalPlayer:Kick("This script has been disabled by the owner, to get the new one check https://discord.gg/jZVnbky8MN or Wispaxx Hub discord")
+local nigga = game.Players.LocalPlayer
+
+nigga:Kick("This script has been disabled by the owner, to get the new one check https://discord.gg/jZVnbky8MN or Wispaxx Hub discord")
